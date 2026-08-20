@@ -1,6 +1,6 @@
 # DATA-3 — Manufacturing Supply Chain & Shortage Risk Analytics
 
-**Status: ~20% slice.** BOM propagation to buildability, Monte Carlo fan charts,
+**Status: ~50% slice.** BOM propagation to buildability, Monte Carlo fan charts,
 shortage attribution with order-by dates, the OTIF definitional trap, and
 distribution-based supplier deterioration detection are built. The weekly
 materials-review pack, expedite costing, and any real data are not.
@@ -147,7 +147,26 @@ today still lands inside the window. Beyond it, forecast uncertainty starts to
 dominate supply uncertainty and the analysis is answering a sales question wearing
 a materials hat.
 
-## What is NOT built (the other 80%)
+## Built in the second pass — see [docs/EXTENSIONS.md](docs/EXTENSIONS.md)
+
+`python extend.py` — four gaps this README previously named:
+
+- **Expedite options with costs.** The first build identified shortage drivers and
+  stopped. The number that decides an expedite is the premium against the margin of
+  the units it unblocks — and roughly half the options **do not recover the
+  runway**, i.e. the days saved are fewer than the days already lost past the
+  order-by date. Air freight on a part that needed ordering six weeks ago buys a
+  faster arrival of something still too late.
+- **Multi-tier risk.** Dual-sourcing is worthless if both sources buy from the same
+  sub-tier. The top tier-2 source sits behind **63 parts and all four products** —
+  a concentration a single-tier risk score cannot see.
+- **Genuine calibration.** RESULTS.md checked the percentiles against the same
+  simulations they came from and said so. This draws independent futures and asks
+  how often the fan contained them: **~98% inside P10–P90 against a target of
+  80%** — the band is too wide, which is reported rather than tuned away.
+- **The weekly materials pack**, generated to `out/materials_review_pack.md`.
+
+## What is NOT built (the other 50%)
 
 1. **No real data.** Everything is `src/supply.py`. No ERP extract, no real BOM,
    no real supplier history.

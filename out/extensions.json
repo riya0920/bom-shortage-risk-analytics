@@ -1,0 +1,618 @@
+{
+  "expedites": [
+    {
+      "part": "PRT-0111",
+      "supplier": "SUP-004",
+      "mode": "air freight",
+      "lead_mean_days": 59.186559640105614,
+      "days_saved": 32.55260780205809,
+      "premium_usd": 899.860968589817,
+      "unit_cost": 2.7268514199691425,
+      "single_sourced": true,
+      "order_by_day": -81.03289126628437,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0111",
+      "supplier": "SUP-004",
+      "mode": "partial shipment",
+      "lead_mean_days": 59.186559640105614,
+      "days_saved": 17.755967892031688,
+      "premium_usd": 239.96292495728454,
+      "unit_cost": 2.7268514199691425,
+      "single_sourced": true,
+      "order_by_day": -81.03289126628437,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0111",
+      "supplier": "SUP-004",
+      "mode": "supplier overtime",
+      "lead_mean_days": 59.186559640105614,
+      "days_saved": 8.877983946015844,
+      "premium_usd": 74.98841404915142,
+      "unit_cost": 2.7268514199691425,
+      "single_sourced": true,
+      "order_by_day": -81.03289126628437,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0042",
+      "supplier": "SUP-040",
+      "mode": "air freight",
+      "lead_mean_days": 46.02175713426837,
+      "days_saved": 25.311966423847604,
+      "premium_usd": 7692.951692138618,
+      "unit_cost": 33.21654443928591,
+      "single_sourced": true,
+      "order_by_day": -6.117096338667537,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0042",
+      "supplier": "SUP-040",
+      "mode": "partial shipment",
+      "lead_mean_days": 46.02175713426837,
+      "days_saved": 13.806527140280513,
+      "premium_usd": 2051.453784570298,
+      "unit_cost": 33.21654443928591,
+      "single_sourced": true,
+      "order_by_day": -6.117096338667537,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0042",
+      "supplier": "SUP-040",
+      "mode": "supplier overtime",
+      "lead_mean_days": 46.02175713426837,
+      "days_saved": 6.903263570140257,
+      "premium_usd": 641.0793076782181,
+      "unit_cost": 33.21654443928591,
+      "single_sourced": true,
+      "order_by_day": -6.117096338667537,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0223",
+      "supplier": "SUP-031",
+      "mode": "air freight",
+      "lead_mean_days": 68.88843193117695,
+      "days_saved": 37.88863756214733,
+      "premium_usd": 574.0918013183699,
+      "unit_cost": 3.192058945334278,
+      "single_sourced": false,
+      "order_by_day": -54.000860559726206,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0223",
+      "supplier": "SUP-031",
+      "mode": "partial shipment",
+      "lead_mean_days": 68.88843193117695,
+      "days_saved": 20.66652957935309,
+      "premium_usd": 153.09114701823196,
+      "unit_cost": 3.192058945334278,
+      "single_sourced": false,
+      "order_by_day": -54.000860559726206,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0223",
+      "supplier": "SUP-031",
+      "mode": "supplier overtime",
+      "lead_mean_days": 68.88843193117695,
+      "days_saved": 10.333264789676544,
+      "premium_usd": 47.840983443197494,
+      "unit_cost": 3.192058945334278,
+      "single_sourced": false,
+      "order_by_day": -54.000860559726206,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0137",
+      "supplier": "SUP-048",
+      "mode": "air freight",
+      "lead_mean_days": 59.65087113488957,
+      "days_saved": 32.807979124189266,
+      "premium_usd": 2349.834954132165,
+      "unit_cost": 15.6655663608811,
+      "single_sourced": false,
+      "order_by_day": -73.35649678082093,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0137",
+      "supplier": "SUP-048",
+      "mode": "partial shipment",
+      "lead_mean_days": 59.65087113488957,
+      "days_saved": 17.895261340466874,
+      "premium_usd": 626.622654435244,
+      "unit_cost": 15.6655663608811,
+      "single_sourced": false,
+      "order_by_day": -73.35649678082093,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0137",
+      "supplier": "SUP-048",
+      "mode": "supplier overtime",
+      "lead_mean_days": 59.65087113488957,
+      "days_saved": 8.947630670233437,
+      "premium_usd": 195.81957951101373,
+      "unit_cost": 15.6655663608811,
+      "single_sourced": false,
+      "order_by_day": -73.35649678082093,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0012",
+      "supplier": "SUP-005",
+      "mode": "air freight",
+      "lead_mean_days": 68.3036249405668,
+      "days_saved": 37.566993717311746,
+      "premium_usd": 2217.2787114666107,
+      "unit_cost": 14.78185807644407,
+      "single_sourced": false,
+      "order_by_day": -69.04850945592099,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0012",
+      "supplier": "SUP-005",
+      "mode": "partial shipment",
+      "lead_mean_days": 68.3036249405668,
+      "days_saved": 20.491087482170045,
+      "premium_usd": 591.2743230577629,
+      "unit_cost": 14.78185807644407,
+      "single_sourced": false,
+      "order_by_day": -69.04850945592099,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0012",
+      "supplier": "SUP-005",
+      "mode": "supplier overtime",
+      "lead_mean_days": 68.3036249405668,
+      "days_saved": 10.245543741085022,
+      "premium_usd": 184.77322595555088,
+      "unit_cost": 14.78185807644407,
+      "single_sourced": false,
+      "order_by_day": -69.04850945592099,
+      "recovers_runway": false
+    },
+    {
+      "part": "PRT-0166",
+      "supplier": "SUP-024",
+      "mode": "air freight",
+      "lead_mean_days": 50.03219541938144,
+      "days_saved": 27.517707480659794,
+      "premium_usd": 264.77967247333856,
+      "unit_cost": 1.765197816488924,
+      "single_sourced": false,
+      "order_by_day": 12.383417185713029,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0166",
+      "supplier": "SUP-024",
+      "mode": "partial shipment",
+      "lead_mean_days": 50.03219541938144,
+      "days_saved": 15.009658625814433,
+      "premium_usd": 70.60791265955696,
+      "unit_cost": 1.765197816488924,
+      "single_sourced": false,
+      "order_by_day": 12.383417185713029,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0166",
+      "supplier": "SUP-024",
+      "mode": "supplier overtime",
+      "lead_mean_days": 50.03219541938144,
+      "days_saved": 7.5048293129072166,
+      "premium_usd": 22.06497270611155,
+      "unit_cost": 1.765197816488924,
+      "single_sourced": false,
+      "order_by_day": 12.383417185713029,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0173",
+      "supplier": "SUP-050",
+      "mode": "air freight",
+      "lead_mean_days": 23.002333655130368,
+      "days_saved": 12.651283510321703,
+      "premium_usd": 967.7374968679976,
+      "unit_cost": 6.451583312453317,
+      "single_sourced": false,
+      "order_by_day": 47.093403200174926,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0173",
+      "supplier": "SUP-050",
+      "mode": "partial shipment",
+      "lead_mean_days": 23.002333655130368,
+      "days_saved": 6.900700096539111,
+      "premium_usd": 258.0633324981327,
+      "unit_cost": 6.451583312453317,
+      "single_sourced": false,
+      "order_by_day": 47.093403200174926,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0173",
+      "supplier": "SUP-050",
+      "mode": "supplier overtime",
+      "lead_mean_days": 23.002333655130368,
+      "days_saved": 3.4503500482695557,
+      "premium_usd": 80.64479140566647,
+      "unit_cost": 6.451583312453317,
+      "single_sourced": false,
+      "order_by_day": 47.093403200174926,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0195",
+      "supplier": "SUP-025",
+      "mode": "air freight",
+      "lead_mean_days": 27.14539646471104,
+      "days_saved": 14.929968055591074,
+      "premium_usd": 287.65867230064225,
+      "unit_cost": 1.9177244820042816,
+      "single_sourced": true,
+      "order_by_day": 51.54458632262932,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0195",
+      "supplier": "SUP-025",
+      "mode": "partial shipment",
+      "lead_mean_days": 27.14539646471104,
+      "days_saved": 8.143618939413313,
+      "premium_usd": 76.70897928017126,
+      "unit_cost": 1.9177244820042816,
+      "single_sourced": true,
+      "order_by_day": 51.54458632262932,
+      "recovers_runway": true
+    },
+    {
+      "part": "PRT-0195",
+      "supplier": "SUP-025",
+      "mode": "supplier overtime",
+      "lead_mean_days": 27.14539646471104,
+      "days_saved": 4.071809469706657,
+      "premium_usd": 23.97155602505352,
+      "unit_cost": 1.9177244820042816,
+      "single_sourced": true,
+      "order_by_day": 51.54458632262932,
+      "recovers_runway": true
+    }
+  ],
+  "drivers": [
+    {
+      "part": "PRT-0111",
+      "supplier": "SUP-004",
+      "single_sourced": true,
+      "times_gating_in_sim": 2200,
+      "first_impact_week": 3,
+      "lead_mean_days": 59.186559640105614,
+      "lead_p95_days": 102.03289126628437,
+      "order_by_day": -81.03289126628437,
+      "runway_days": -81.03289126628437,
+      "already_too_late": true,
+      "on_hand": 358.0,
+      "unit_cost": 2.7268514199691425
+    },
+    {
+      "part": "PRT-0042",
+      "supplier": "SUP-040",
+      "single_sourced": true,
+      "times_gating_in_sim": 1544,
+      "first_impact_week": 7,
+      "lead_mean_days": 46.02175713426837,
+      "lead_p95_days": 55.11709633866754,
+      "order_by_day": -6.117096338667537,
+      "runway_days": -6.117096338667537,
+      "already_too_late": true,
+      "on_hand": 335.0,
+      "unit_cost": 33.21654443928591
+    },
+    {
+      "part": "PRT-0223",
+      "supplier": "SUP-031",
+      "single_sourced": false,
+      "times_gating_in_sim": 1199,
+      "first_impact_week": 5,
+      "lead_mean_days": 68.88843193117695,
+      "lead_p95_days": 89.0008605597262,
+      "order_by_day": -54.000860559726206,
+      "runway_days": -54.000860559726206,
+      "already_too_late": true,
+      "on_hand": 1020.0,
+      "unit_cost": 3.192058945334278
+    },
+    {
+      "part": "PRT-0137",
+      "supplier": "SUP-048",
+      "single_sourced": false,
+      "times_gating_in_sim": 966,
+      "first_impact_week": 4,
+      "lead_mean_days": 59.65087113488957,
+      "lead_p95_days": 101.35649678082093,
+      "order_by_day": -73.35649678082093,
+      "runway_days": -73.35649678082093,
+      "already_too_late": true,
+      "on_hand": 292.0,
+      "unit_cost": 15.6655663608811
+    },
+    {
+      "part": "PRT-0012",
+      "supplier": "SUP-005",
+      "single_sourced": false,
+      "times_gating_in_sim": 656,
+      "first_impact_week": 3,
+      "lead_mean_days": 68.3036249405668,
+      "lead_p95_days": 90.04850945592099,
+      "order_by_day": -69.04850945592099,
+      "runway_days": -69.04850945592099,
+      "already_too_late": true,
+      "on_hand": 333.0,
+      "unit_cost": 14.78185807644407
+    },
+    {
+      "part": "PRT-0166",
+      "supplier": "SUP-024",
+      "single_sourced": false,
+      "times_gating_in_sim": 451,
+      "first_impact_week": 11,
+      "lead_mean_days": 50.03219541938144,
+      "lead_p95_days": 64.61658281428697,
+      "order_by_day": 12.383417185713029,
+      "runway_days": 12.383417185713029,
+      "already_too_late": false,
+      "on_hand": 5867.0,
+      "unit_cost": 1.765197816488924
+    },
+    {
+      "part": "PRT-0173",
+      "supplier": "SUP-050",
+      "single_sourced": false,
+      "times_gating_in_sim": 424,
+      "first_impact_week": 12,
+      "lead_mean_days": 23.002333655130368,
+      "lead_p95_days": 36.906596799825074,
+      "order_by_day": 47.093403200174926,
+      "runway_days": 47.093403200174926,
+      "already_too_late": false,
+      "on_hand": 2542.0,
+      "unit_cost": 6.451583312453317
+    },
+    {
+      "part": "PRT-0195",
+      "supplier": "SUP-025",
+      "single_sourced": true,
+      "times_gating_in_sim": 52,
+      "first_impact_week": null,
+      "lead_mean_days": 27.14539646471104,
+      "lead_p95_days": 39.45541367737068,
+      "order_by_day": 51.54458632262932,
+      "runway_days": 51.54458632262932,
+      "already_too_late": false,
+      "on_hand": 1118.0,
+      "unit_cost": 1.9177244820042816
+    }
+  ],
+  "subtier": {
+    "n_tier2": 11,
+    "concentration": [
+      {
+        "tier2": "T2-01",
+        "tier1_suppliers": 13,
+        "parts_behind_it": 63,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-02",
+        "tier1_suppliers": 9,
+        "parts_behind_it": 51,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-03",
+        "tier1_suppliers": 7,
+        "parts_behind_it": 42,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-05",
+        "tier1_suppliers": 7,
+        "parts_behind_it": 36,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-12",
+        "tier1_suppliers": 4,
+        "parts_behind_it": 15,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-09",
+        "tier1_suppliers": 2,
+        "parts_behind_it": 15,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-04",
+        "tier1_suppliers": 3,
+        "parts_behind_it": 12,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-C",
+          "PRD-D"
+        ],
+        "n_products_affected": 4
+      },
+      {
+        "tier2": "T2-10",
+        "tier1_suppliers": 2,
+        "parts_behind_it": 8,
+        "products_affected": [
+          "PRD-A",
+          "PRD-B",
+          "PRD-D"
+        ],
+        "n_products_affected": 3
+      }
+    ]
+  },
+  "hidden_single_source": [
+    {
+      "tier2": "T2-01",
+      "tier1_count": 13,
+      "tier1_suppliers": [
+        "SUP-002",
+        "SUP-006",
+        "SUP-007",
+        "SUP-008",
+        "SUP-014",
+        "SUP-016"
+      ],
+      "parts_exposed": 63
+    },
+    {
+      "tier2": "T2-02",
+      "tier1_count": 9,
+      "tier1_suppliers": [
+        "SUP-010",
+        "SUP-015",
+        "SUP-017",
+        "SUP-018",
+        "SUP-033",
+        "SUP-035"
+      ],
+      "parts_exposed": 51
+    },
+    {
+      "tier2": "T2-05",
+      "tier1_count": 7,
+      "tier1_suppliers": [
+        "SUP-003",
+        "SUP-005",
+        "SUP-013",
+        "SUP-029",
+        "SUP-030",
+        "SUP-032"
+      ],
+      "parts_exposed": 36
+    },
+    {
+      "tier2": "T2-03",
+      "tier1_count": 7,
+      "tier1_suppliers": [
+        "SUP-004",
+        "SUP-011",
+        "SUP-022",
+        "SUP-024",
+        "SUP-027",
+        "SUP-039"
+      ],
+      "parts_exposed": 42
+    },
+    {
+      "tier2": "T2-12",
+      "tier1_count": 4,
+      "tier1_suppliers": [
+        "SUP-009",
+        "SUP-012",
+        "SUP-026",
+        "SUP-047"
+      ],
+      "parts_exposed": 15
+    },
+    {
+      "tier2": "T2-04",
+      "tier1_count": 3,
+      "tier1_suppliers": [
+        "SUP-023",
+        "SUP-025",
+        "SUP-036"
+      ],
+      "parts_exposed": 12
+    }
+  ],
+  "calibration": {
+    "n_futures": 60,
+    "n_sims_in_fan": 150,
+    "per_product": [
+      {
+        "product": "PRD-A",
+        "pct_inside_p10_p90": 98.84615384615384,
+        "pct_below_p10": 0.0,
+        "pct_above_p90": 1.1538461538461537,
+        "target_inside_pct": 80.0
+      },
+      {
+        "product": "PRD-B",
+        "pct_inside_p10_p90": 100.0,
+        "pct_below_p10": 0.0,
+        "pct_above_p90": 0.0,
+        "target_inside_pct": 80.0
+      },
+      {
+        "product": "PRD-C",
+        "pct_inside_p10_p90": 99.1025641025641,
+        "pct_below_p10": 0.0,
+        "pct_above_p90": 0.8974358974358975,
+        "target_inside_pct": 80.0
+      },
+      {
+        "product": "PRD-D",
+        "pct_inside_p10_p90": 97.3076923076923,
+        "pct_below_p10": 0.0,
+        "pct_above_p90": 2.6923076923076925,
+        "target_inside_pct": 80.0
+      }
+    ],
+    "mean_inside_pct": 98.81410256410257
+  },
+  "pack": "# Weekly Materials Review\n\n*Generated by `extend.py`. Every number traces to `out/extensions.json`.*\n\n## 1. Can we build the plan?\n\n| product | 13-week demand | P50 buildable | P10 | fill at P50 |\n|---|---|---|---|---|\n| PRD-A | 735 | 166 | 166 | 23% |\n| PRD-B | 608 | 119 | 119 | 20% |\n| PRD-C | 591 | 222 | 146 | 38% |\n| PRD-D | 483 | 171 | 170 | 35% |\n\n## 2. Top shortage drivers \u2014 action required\n\n| part | supplier | single source | first impact | order by | status |\n|---|---|---|---|---|---|\n| PRT-0111 | SUP-004 | YES | week 3 | day -81 | **PAST DUE** |\n| PRT-0042 | SUP-040 | YES | week 7 | day -6 | **PAST DUE** |\n| PRT-0223 | SUP-031 | no | week 5 | day -54 | **PAST DUE** |\n| PRT-0137 | SUP-048 | no | week 4 | day -73 | **PAST DUE** |\n| PRT-0012 | SUP-005 | no | week 3 | day -69 | **PAST DUE** |\n| PRT-0166 | SUP-024 | no | week 11 | day +12 | on track |\n\n## 3. Recommended expedites\n\n| part | mode | days saved | premium | recovers runway? |\n|---|---|---|---|---|\n| PRT-0111 | air freight | 33 | $900 | no |\n| PRT-0111 | partial shipment | 18 | $240 | no |\n| PRT-0111 | supplier overtime | 9 | $75 | no |\n| PRT-0042 | air freight | 25 | $7,693 | yes |\n| PRT-0042 | partial shipment | 14 | $2,051 | yes |\n| PRT-0042 | supplier overtime | 7 | $641 | yes |\n| PRT-0223 | air freight | 38 | $574 | no |\n| PRT-0223 | partial shipment | 21 | $153 | no |\n\n## 4. Sub-tier concentration\n\n| tier-2 source | tier-1 suppliers behind it | parts | products |\n|---|---|---|---|\n| T2-01 | 13 | 63 | 4 |\n| T2-02 | 9 | 51 | 4 |\n| T2-03 | 7 | 42 | 4 |\n| T2-05 | 7 | 36 | 4 |\n| T2-12 | 4 | 15 | 4 |\n\n*Prepared for the Monday materials review. Items marked PAST DUE need a decision in this meeting, not next week.*\n",
+  "wall_seconds": 30.83217190002324
+}
