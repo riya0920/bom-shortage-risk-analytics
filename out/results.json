@@ -1,0 +1,1122 @@
+{
+  "base": {
+    "products": [
+      "PRD-A",
+      "PRD-B",
+      "PRD-C",
+      "PRD-D"
+    ],
+    "purchased_parts": 260,
+    "sub_assemblies": 32,
+    "bom_lines": 442,
+    "suppliers": 50,
+    "single_sourced_parts": 68,
+    "open_pos": 390,
+    "received_pos": 3624,
+    "horizon_weeks": 13,
+    "planted_disruptions": [
+      {
+        "supplier_id": "SUP-011",
+        "kind": "lead_time_doubling",
+        "onset_day": -91.77282668801274
+      },
+      {
+        "supplier_id": "SUP-044",
+        "kind": "tail_blowout",
+        "onset_day": -87.71255233994776
+      },
+      {
+        "supplier_id": "SUP-041",
+        "kind": "lead_time_doubling",
+        "onset_day": -92.24267357471923
+      },
+      {
+        "supplier_id": "SUP-009",
+        "kind": "tail_blowout",
+        "onset_day": -97.81131966126647
+      },
+      {
+        "supplier_id": "SUP-002",
+        "kind": "lead_time_doubling",
+        "onset_day": -94.72963404412116
+      },
+      {
+        "supplier_id": "SUP-014",
+        "kind": "tail_blowout",
+        "onset_day": -59.661567882233754
+      }
+    ]
+  },
+  "deterioration": {
+    "flags": [
+      {
+        "supplier_id": "SUP-044",
+        "n_recent": 21,
+        "n_baseline": 53,
+        "mean_baseline": 18.292362729576546,
+        "mean_recent": 22.387581999395866,
+        "mean_ratio": 1.2238759055000503,
+        "p95_baseline": 25.60476934450069,
+        "p95_recent": 53.50725692790448,
+        "p95_ratio": 2.0897379003102245,
+        "sd_ratio": 3.1949004389342925,
+        "triggers": [
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-027",
+        "n_recent": 10,
+        "n_baseline": 15,
+        "mean_baseline": 69.52944182662264,
+        "mean_recent": 97.7777035464138,
+        "mean_ratio": 1.40627770017528,
+        "p95_baseline": 85.84673062882047,
+        "p95_recent": 159.47156771664612,
+        "p95_ratio": 1.857631228918441,
+        "sd_ratio": 2.4143220212802783,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-011",
+        "n_recent": 17,
+        "n_baseline": 38,
+        "mean_baseline": 29.281873625123982,
+        "mean_recent": 51.7178798385429,
+        "mean_ratio": 1.7662080132115836,
+        "p95_baseline": 37.49056420427867,
+        "p95_recent": 65.16983661777984,
+        "p95_ratio": 1.7382997028981022,
+        "sd_ratio": 2.110830447130548,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-014",
+        "n_recent": 11,
+        "n_baseline": 14,
+        "mean_baseline": 32.15497430708822,
+        "mean_recent": 39.343539150113365,
+        "mean_ratio": 1.2235599622743443,
+        "p95_baseline": 49.664558305097756,
+        "p95_recent": 80.69862359719447,
+        "p95_ratio": 1.6248734782145693,
+        "sd_ratio": 1.415235082043594,
+        "triggers": [
+          "p95"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-003",
+        "n_recent": 6,
+        "n_baseline": 27,
+        "mean_baseline": 75.7774818608834,
+        "mean_recent": 92.76505329085357,
+        "mean_ratio": 1.224177037990744,
+        "p95_baseline": 109.73639973809556,
+        "p95_recent": 156.34526304060896,
+        "p95_ratio": 1.4247347590567334,
+        "sd_ratio": 2.039152420860044,
+        "triggers": [
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-043",
+        "n_recent": 20,
+        "n_baseline": 37,
+        "mean_baseline": 65.93564523835309,
+        "mean_recent": 70.1358439853494,
+        "mean_ratio": 1.0637014885015967,
+        "p95_baseline": 96.21147414230191,
+        "p95_recent": 131.15729686078777,
+        "p95_ratio": 1.3632188679158903,
+        "sd_ratio": 1.38606766680554,
+        "triggers": [
+          "p95"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "SUP-036",
+        "n_recent": 5,
+        "n_baseline": 13,
+        "mean_baseline": 45.93779252159108,
+        "mean_recent": 34.11144834285987,
+        "mean_ratio": 0.742557412327274,
+        "p95_baseline": 70.52396350647003,
+        "p95_recent": 57.51867867424126,
+        "p95_ratio": 0.8155905569454327,
+        "sd_ratio": 1.6267155685222867,
+        "triggers": [
+          "variance"
+        ],
+        "flagged": true
+      }
+    ],
+    "score": {
+      "planted": [
+        "SUP-002",
+        "SUP-009",
+        "SUP-011",
+        "SUP-014",
+        "SUP-041",
+        "SUP-044"
+      ],
+      "flagged": [
+        "SUP-003",
+        "SUP-011",
+        "SUP-014",
+        "SUP-027",
+        "SUP-036",
+        "SUP-043",
+        "SUP-044"
+      ],
+      "true_positives": [
+        "SUP-011",
+        "SUP-014",
+        "SUP-044"
+      ],
+      "false_positives": [
+        "SUP-003",
+        "SUP-027",
+        "SUP-036",
+        "SUP-043"
+      ],
+      "missed": [
+        "SUP-002",
+        "SUP-009",
+        "SUP-041"
+      ],
+      "precision": 0.42857142857142855,
+      "recall": 0.5,
+      "by_kind": {
+        "lead_time_doubling": {
+          "planted": 3,
+          "caught": 1,
+          "by_p95_only": 0
+        },
+        "tail_blowout": {
+          "planted": 3,
+          "caught": 2,
+          "by_p95_only": 1
+        }
+      }
+    }
+  },
+  "otif_gap": [
+    {
+      "supplier_id": "SUP-036",
+      "n_receipts": 28,
+      "otif_vs_original_pct": 35.714285714285715,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 64.28571428571428
+    },
+    {
+      "supplier_id": "SUP-009",
+      "n_receipts": 26,
+      "otif_vs_original_pct": 38.46153846153846,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 61.53846153846154
+    },
+    {
+      "supplier_id": "SUP-003",
+      "n_receipts": 70,
+      "otif_vs_original_pct": 42.857142857142854,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 57.142857142857146
+    },
+    {
+      "supplier_id": "SUP-006",
+      "n_receipts": 42,
+      "otif_vs_original_pct": 42.857142857142854,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 57.142857142857146
+    },
+    {
+      "supplier_id": "SUP-021",
+      "n_receipts": 72,
+      "otif_vs_original_pct": 43.05555555555556,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 56.94444444444444
+    },
+    {
+      "supplier_id": "SUP-048",
+      "n_receipts": 112,
+      "otif_vs_original_pct": 43.75,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 56.25
+    },
+    {
+      "supplier_id": "SUP-018",
+      "n_receipts": 102,
+      "otif_vs_original_pct": 44.11764705882353,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 55.88235294117647
+    },
+    {
+      "supplier_id": "SUP-045",
+      "n_receipts": 68,
+      "otif_vs_original_pct": 44.11764705882353,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 55.88235294117647
+    },
+    {
+      "supplier_id": "SUP-024",
+      "n_receipts": 49,
+      "otif_vs_original_pct": 44.89795918367347,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 55.10204081632653
+    },
+    {
+      "supplier_id": "SUP-042",
+      "n_receipts": 109,
+      "otif_vs_original_pct": 45.87155963302752,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 54.12844036697248
+    }
+  ],
+  "risk": {
+    "weights": {
+      "single_source": 0.3,
+      "lead_variability": 0.25,
+      "quality": 0.25,
+      "financial": 0.2
+    },
+    "top": [
+      {
+        "supplier_id": "SUP-016",
+        "risk_score": 0.643758796566027,
+        "contributions": {
+          "single_source": 0.18,
+          "lead_variability": 0.17107067643462645,
+          "quality": 0.178568201176004,
+          "financial": 0.11411991895539647
+        },
+        "single_sourced_parts": 3,
+        "lead_cv": 0.4105696234431035,
+        "quality_reject_rate": 0.0357136402352008,
+        "financial_score": 0.4294004052230177
+      },
+      {
+        "supplier_id": "SUP-032",
+        "risk_score": 0.5242532543658296,
+        "contributions": {
+          "single_source": 0.12,
+          "lead_variability": 0.24683855766337914,
+          "quality": 0.1248151284884767,
+          "financial": 0.032599568213973695
+        },
+        "single_sourced_parts": 2,
+        "lead_cv": 0.5924125383921099,
+        "quality_reject_rate": 0.024963025697695342,
+        "financial_score": 0.8370021589301315
+      },
+      {
+        "supplier_id": "SUP-046",
+        "risk_score": 0.5193775893965219,
+        "contributions": {
+          "single_source": 0.24,
+          "lead_variability": 0.15320361770490729,
+          "quality": 0.08872643309243355,
+          "financial": 0.03744753859918102
+        },
+        "single_sourced_parts": 4,
+        "lead_cv": 0.3676886824917775,
+        "quality_reject_rate": 0.017745286618486712,
+        "financial_score": 0.8127623070040949
+      },
+      {
+        "supplier_id": "SUP-033",
+        "risk_score": 0.4979227951632377,
+        "contributions": {
+          "single_source": 0.06,
+          "lead_variability": 0.11350911014565794,
+          "quality": 0.25,
+          "financial": 0.07441368501757976
+        },
+        "single_sourced_parts": 1,
+        "lead_cv": 0.27242186434957905,
+        "quality_reject_rate": 0.05471401061530286,
+        "financial_score": 0.6279315749121012
+      },
+      {
+        "supplier_id": "SUP-019",
+        "risk_score": 0.48588827137789686,
+        "contributions": {
+          "single_source": 0.06,
+          "lead_variability": 0.12298588351103958,
+          "quality": 0.25,
+          "financial": 0.05290238786685728
+        },
+        "single_sourced_parts": 1,
+        "lead_cv": 0.295166120426495,
+        "quality_reject_rate": 0.07357875253311981,
+        "financial_score": 0.7354880606657136
+      },
+      {
+        "supplier_id": "SUP-014",
+        "risk_score": 0.4834956958431067,
+        "contributions": {
+          "single_source": 0.12,
+          "lead_variability": 0.16063083168283634,
+          "quality": 0.1581810447999904,
+          "financial": 0.044683819360279965
+        },
+        "single_sourced_parts": 2,
+        "lead_cv": 0.3855139960388072,
+        "quality_reject_rate": 0.03163620895999808,
+        "financial_score": 0.7765809031986002
+      },
+      {
+        "supplier_id": "SUP-011",
+        "risk_score": 0.46667536978863383,
+        "contributions": {
+          "single_source": 0.24,
+          "lead_variability": 0.15677666197578083,
+          "quality": 0.03453747698215186,
+          "financial": 0.03536123083070113
+        },
+        "single_sourced_parts": 4,
+        "lead_cv": 0.37626398874187394,
+        "quality_reject_rate": 0.006907495396430372,
+        "financial_score": 0.8231938458464944
+      },
+      {
+        "supplier_id": "SUP-035",
+        "risk_score": 0.4665538307163574,
+        "contributions": {
+          "single_source": 0.24,
+          "lead_variability": 0.11813108353123783,
+          "quality": 0.027973180885365448,
+          "financial": 0.08044956629975414
+        },
+        "single_sourced_parts": 4,
+        "lead_cv": 0.2835146004749708,
+        "quality_reject_rate": 0.00559463617707309,
+        "financial_score": 0.5977521685012294
+      },
+      {
+        "supplier_id": "SUP-004",
+        "risk_score": 0.46527631261336755,
+        "contributions": {
+          "single_source": 0.18,
+          "lead_variability": 0.16128645118460144,
+          "quality": 0.020207158376857926,
+          "financial": 0.1037827030519082
+        },
+        "single_sourced_parts": 3,
+        "lead_cv": 0.38708748284304345,
+        "quality_reject_rate": 0.004041431675371586,
+        "financial_score": 0.48108648474045906
+      },
+      {
+        "supplier_id": "SUP-045",
+        "risk_score": 0.4483770675986964,
+        "contributions": {
+          "single_source": 0.12,
+          "lead_variability": 0.06319142937715852,
+          "quality": 0.201089104915062,
+          "financial": 0.0640965333064759
+        },
+        "single_sourced_parts": 2,
+        "lead_cv": 0.15165943050518044,
+        "quality_reject_rate": 0.0402178209830124,
+        "financial_score": 0.6795173334676206
+      }
+    ]
+  },
+  "deterministic": {
+    "built": {
+      "PRD-A": [
+        69.0,
+        56.0,
+        41.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        61.0,
+        12.0,
+        49.0
+      ],
+      "PRD-B": [
+        52.0,
+        57.0,
+        40.0,
+        12.0,
+        0.0,
+        38.0,
+        7.0,
+        12.0,
+        15.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "PRD-C": [
+        65.0,
+        26.0,
+        40.0,
+        21.0,
+        28.0,
+        34.0,
+        15.0,
+        39.0,
+        33.0,
+        0.0,
+        39.0,
+        0.0,
+        0.0
+      ],
+      "PRD-D": [
+        37.0,
+        40.0,
+        28.0,
+        34.0,
+        17.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "demand": {
+      "PRD-A": [
+        69.0,
+        56.0,
+        56.0,
+        59.0,
+        61.0,
+        61.0,
+        48.0,
+        54.0,
+        52.0,
+        45.0,
+        61.0,
+        62.0,
+        51.0
+      ],
+      "PRD-B": [
+        52.0,
+        57.0,
+        40.0,
+        33.0,
+        64.0,
+        64.0,
+        21.0,
+        36.0,
+        69.0,
+        49.0,
+        37.0,
+        25.0,
+        61.0
+      ],
+      "PRD-C": [
+        65.0,
+        26.0,
+        40.0,
+        21.0,
+        38.0,
+        58.0,
+        45.0,
+        39.0,
+        69.0,
+        22.0,
+        61.0,
+        66.0,
+        41.0
+      ],
+      "PRD-D": [
+        37.0,
+        40.0,
+        28.0,
+        34.0,
+        40.0,
+        26.0,
+        22.0,
+        50.0,
+        32.0,
+        52.0,
+        26.0,
+        41.0,
+        55.0
+      ]
+    },
+    "gating_events": 37
+  },
+  "monte_carlo": {
+    "fan": {
+      "PRD-A": {
+        "p10": [
+          69.0,
+          56.0,
+          41.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          4.0,
+          0.0
+        ],
+        "p50": [
+          69.0,
+          56.0,
+          41.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          57.0,
+          25.0,
+          24.0
+        ],
+        "p90": [
+          69.0,
+          56.0,
+          41.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          45.0,
+          61.0,
+          62.0,
+          51.0
+        ],
+        "demand": [
+          69.0,
+          56.0,
+          56.0,
+          59.0,
+          61.0,
+          61.0,
+          48.0,
+          54.0,
+          52.0,
+          45.0,
+          61.0,
+          62.0,
+          51.0
+        ]
+      },
+      "PRD-B": {
+        "p10": [
+          52.0,
+          57.0,
+          10.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          52.0,
+          57.0,
+          40.0,
+          12.0,
+          0.0,
+          1.0,
+          0.0,
+          3.0,
+          7.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          52.0,
+          57.0,
+          40.0,
+          33.0,
+          49.0,
+          41.200000000000045,
+          19.0,
+          36.0,
+          36.0,
+          19.0,
+          14.0,
+          4.400000000000091,
+          0.0
+        ],
+        "demand": [
+          52.0,
+          57.0,
+          40.0,
+          33.0,
+          64.0,
+          64.0,
+          21.0,
+          36.0,
+          69.0,
+          49.0,
+          37.0,
+          25.0,
+          61.0
+        ]
+      },
+      "PRD-C": {
+        "p10": [
+          65.0,
+          26.0,
+          35.0,
+          7.0,
+          0.0,
+          0.0,
+          6.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          65.0,
+          26.0,
+          40.0,
+          21.0,
+          28.0,
+          34.0,
+          31.5,
+          15.0,
+          13.0,
+          7.0,
+          23.5,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          65.0,
+          26.0,
+          40.0,
+          21.0,
+          38.0,
+          58.0,
+          45.0,
+          39.0,
+          69.0,
+          22.0,
+          61.0,
+          58.10000000000002,
+          23.0
+        ],
+        "demand": [
+          65.0,
+          26.0,
+          40.0,
+          21.0,
+          38.0,
+          58.0,
+          45.0,
+          39.0,
+          69.0,
+          22.0,
+          61.0,
+          66.0,
+          41.0
+        ]
+      },
+      "PRD-D": {
+        "p10": [
+          37.0,
+          40.0,
+          24.0,
+          12.0,
+          16.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          37.0,
+          40.0,
+          28.0,
+          34.0,
+          17.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          37.0,
+          40.0,
+          28.0,
+          34.0,
+          21.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          37.0,
+          40.0,
+          28.0,
+          34.0,
+          40.0,
+          26.0,
+          22.0,
+          50.0,
+          32.0,
+          52.0,
+          26.0,
+          41.0,
+          55.0
+        ]
+      }
+    },
+    "n_sims": 300,
+    "allocation": "even",
+    "top_gating_parts": [
+      {
+        "part": "PRT-0180",
+        "times_gating": 2599
+      },
+      {
+        "part": "PRT-0047",
+        "times_gating": 2572
+      },
+      {
+        "part": "PRT-0079",
+        "times_gating": 1152
+      },
+      {
+        "part": "PRT-0096",
+        "times_gating": 702
+      },
+      {
+        "part": "PRT-S012",
+        "times_gating": 681
+      },
+      {
+        "part": "PRT-0105",
+        "times_gating": 666
+      },
+      {
+        "part": "PRT-0125",
+        "times_gating": 652
+      },
+      {
+        "part": "PRT-0162",
+        "times_gating": 385
+      },
+      {
+        "part": "PRT-0144",
+        "times_gating": 273
+      },
+      {
+        "part": "PRT-0008",
+        "times_gating": 156
+      },
+      {
+        "part": "PRT-0040",
+        "times_gating": 88
+      },
+      {
+        "part": "PRT-0126",
+        "times_gating": 16
+      },
+      {
+        "part": "PRT-0210",
+        "times_gating": 15
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "part": "PRT-0180",
+      "supplier": "SUP-033",
+      "single_sourced": false,
+      "times_gating_in_sim": 2599,
+      "first_impact_week": 5,
+      "lead_mean_days": 44.64815091141556,
+      "lead_p95_days": 66.10901007338848,
+      "order_by_day": -31.109010073388475,
+      "runway_days": -31.109010073388475,
+      "already_too_late": true,
+      "on_hand": 1569.0,
+      "unit_cost": 4.177261500052803
+    },
+    {
+      "part": "PRT-0047",
+      "supplier": "SUP-042",
+      "single_sourced": false,
+      "times_gating_in_sim": 2572,
+      "first_impact_week": 3,
+      "lead_mean_days": 21.288258018948543,
+      "lead_p95_days": 27.901724348648095,
+      "order_by_day": -6.901724348648095,
+      "runway_days": -6.901724348648095,
+      "already_too_late": true,
+      "on_hand": 667.0,
+      "unit_cost": 62.13173251229705
+    },
+    {
+      "part": "PRT-0079",
+      "supplier": "SUP-049",
+      "single_sourced": false,
+      "times_gating_in_sim": 1152,
+      "first_impact_week": 9,
+      "lead_mean_days": 45.19096321854669,
+      "lead_p95_days": 64.28370366378402,
+      "order_by_day": -1.2837036637840242,
+      "runway_days": -1.2837036637840242,
+      "already_too_late": true,
+      "on_hand": 2336.0,
+      "unit_cost": 7.6324667256330585
+    },
+    {
+      "part": "PRT-0096",
+      "supplier": "SUP-003",
+      "single_sourced": true,
+      "times_gating_in_sim": 702,
+      "first_impact_week": 4,
+      "lead_mean_days": 68.2810589886667,
+      "lead_p95_days": 82.82922083285442,
+      "order_by_day": -54.82922083285442,
+      "runway_days": -54.82922083285442,
+      "already_too_late": true,
+      "on_hand": 966.0,
+      "unit_cost": 54.29403836857869
+    },
+    {
+      "part": "PRT-S012",
+      "supplier": "SUP-016",
+      "single_sourced": false,
+      "times_gating_in_sim": 681,
+      "first_impact_week": null,
+      "lead_mean_days": 45.95880046648969,
+      "lead_p95_days": 67.26786866526709,
+      "order_by_day": 23.732131334732912,
+      "runway_days": 23.732131334732912,
+      "already_too_late": false,
+      "on_hand": 10293.0,
+      "unit_cost": 35.42304488591876
+    },
+    {
+      "part": "PRT-0105",
+      "supplier": "SUP-015",
+      "single_sourced": false,
+      "times_gating_in_sim": 666,
+      "first_impact_week": 6,
+      "lead_mean_days": 14.516678632368915,
+      "lead_p95_days": 21.856550725513593,
+      "order_by_day": 20.143449274486407,
+      "runway_days": 20.143449274486407,
+      "already_too_late": false,
+      "on_hand": 1075.0,
+      "unit_cost": 2.351682739351755
+    },
+    {
+      "part": "PRT-0125",
+      "supplier": "SUP-023",
+      "single_sourced": false,
+      "times_gating_in_sim": 652,
+      "first_impact_week": 11,
+      "lead_mean_days": 54.39899377783799,
+      "lead_p95_days": 72.88188075620162,
+      "order_by_day": 4.118119243798375,
+      "runway_days": 4.118119243798375,
+      "already_too_late": false,
+      "on_hand": 2725.0,
+      "unit_cost": 7.135476796226773
+    },
+    {
+      "part": "PRT-0162",
+      "supplier": "SUP-035",
+      "single_sourced": true,
+      "times_gating_in_sim": 385,
+      "first_impact_week": null,
+      "lead_mean_days": 52.5339992065923,
+      "lead_p95_days": 66.56214747736982,
+      "order_by_day": 24.43785252263018,
+      "runway_days": 24.43785252263018,
+      "already_too_late": false,
+      "on_hand": 1463.0,
+      "unit_cost": 25.982913993209447
+    },
+    {
+      "part": "PRT-0144",
+      "supplier": "SUP-005",
+      "single_sourced": false,
+      "times_gating_in_sim": 273,
+      "first_impact_week": 9,
+      "lead_mean_days": 68.3036249405668,
+      "lead_p95_days": 90.04850945592099,
+      "order_by_day": -27.048509455920993,
+      "runway_days": -27.048509455920993,
+      "already_too_late": true,
+      "on_hand": 1207.0,
+      "unit_cost": 6.162624919301776
+    },
+    {
+      "part": "PRT-0008",
+      "supplier": "SUP-034",
+      "single_sourced": false,
+      "times_gating_in_sim": 156,
+      "first_impact_week": 13,
+      "lead_mean_days": 36.88797395489122,
+      "lead_p95_days": 50.718402817621765,
+      "order_by_day": 40.281597182378235,
+      "runway_days": 40.281597182378235,
+      "already_too_late": false,
+      "on_hand": 1445.0,
+      "unit_cost": 2.86672494261427
+    }
+  ],
+  "allocation": [
+    {
+      "policy": "even",
+      "per_product": {
+        "PRD-A": {
+          "p50_total": 279.0,
+          "demand_total": 735.0,
+          "fill_rate_pct": 37.95918367346939
+        },
+        "PRD-B": {
+          "p50_total": 172.0,
+          "demand_total": 608.0,
+          "fill_rate_pct": 28.289473684210527
+        },
+        "PRD-C": {
+          "p50_total": 305.0,
+          "demand_total": 591.0,
+          "fill_rate_pct": 51.60744500846024
+        },
+        "PRD-D": {
+          "p50_total": 156.0,
+          "demand_total": 483.0,
+          "fill_rate_pct": 32.298136645962735
+        }
+      },
+      "total_p50": 912.0,
+      "worst_product_fill_pct": 28.289473684210527
+    },
+    {
+      "policy": "margin",
+      "per_product": {
+        "PRD-A": {
+          "p50_total": 306.5,
+          "demand_total": 735.0,
+          "fill_rate_pct": 41.70068027210884
+        },
+        "PRD-B": {
+          "p50_total": 161.0,
+          "demand_total": 608.0,
+          "fill_rate_pct": 26.480263157894736
+        },
+        "PRD-C": {
+          "p50_total": 288.5,
+          "demand_total": 591.0,
+          "fill_rate_pct": 48.8155668358714
+        },
+        "PRD-D": {
+          "p50_total": 156.0,
+          "demand_total": 483.0,
+          "fill_rate_pct": 32.298136645962735
+        }
+      },
+      "total_p50": 912.0,
+      "worst_product_fill_pct": 26.480263157894736
+    },
+    {
+      "policy": "contract",
+      "per_product": {
+        "PRD-A": {
+          "p50_total": 306.5,
+          "demand_total": 735.0,
+          "fill_rate_pct": 41.70068027210884
+        },
+        "PRD-B": {
+          "p50_total": 161.0,
+          "demand_total": 608.0,
+          "fill_rate_pct": 26.480263157894736
+        },
+        "PRD-C": {
+          "p50_total": 288.5,
+          "demand_total": 591.0,
+          "fill_rate_pct": 48.8155668358714
+        },
+        "PRD-D": {
+          "p50_total": 156.0,
+          "demand_total": 483.0,
+          "fill_rate_pct": 32.298136645962735
+        }
+      },
+      "total_p50": 912.0,
+      "worst_product_fill_pct": 26.480263157894736
+    }
+  ],
+  "calibration": {
+    "PRD-A": {
+      "pct_below_p50": 11.35897435897436,
+      "pct_inside_p10_p90": 99.25641025641025
+    },
+    "PRD-B": {
+      "pct_below_p50": 18.17948717948718,
+      "pct_inside_p10_p90": 94.15384615384616
+    },
+    "PRD-C": {
+      "pct_below_p50": 29.97435897435897,
+      "pct_inside_p10_p90": 96.51282051282051
+    },
+    "PRD-D": {
+      "pct_below_p50": 3.230769230769231,
+      "pct_inside_p10_p90": 96.76923076923077
+    }
+  },
+  "wall_seconds": 61.351180300000124
+}
