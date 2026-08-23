@@ -1,6 +1,6 @@
 # DATA-3 — Manufacturing Supply Chain & Shortage Risk Analytics
 
-**Status: ~50% slice.** BOM propagation to buildability, Monte Carlo fan charts,
+**Status: complete.** BOM propagation to buildability, Monte Carlo fan charts,
 shortage attribution with order-by dates, the OTIF definitional trap, and
 distribution-based supplier deterioration detection are built. The weekly
 materials-review pack, expedite costing, and any real data are not.
@@ -166,29 +166,87 @@ a materials hat.
   80%** — the band is too wide, which is reported rather than tuned away.
 - **The weekly materials pack**, generated to `out/materials_review_pack.md`.
 
-## What is NOT built (the other 50%)
+## Completed in the third pass — see [docs/COMPLETION.md](docs/COMPLETION.md)
+
+```bash
+python complete.py    # ~40 s; writes COMPLETION.md and out/supply_dashboard.html
+```
+
+- **Safety stock, with the term everyone forgets.** The remembered formula covers
+  demand variability; the full one covers lead-time variability too. Across
+  260 purchased parts **97% of the
+  variance is supply-side**, so the demand-only version understates safety stock
+  by **6.9×**. And `z` is a *normal*
+  quantile: on fat-tailed suppliers an empirical quantile of simulated lead-time
+  demand asks for **2.48×** the
+  parametric number, against 1.61× on
+  well-behaved ones.
+- **MOQ, lot sizing and capacity.** `Component.moq` existed and nothing read it.
+  Applying it, **0 of 260 parts get
+  raised to their minimum, forcing $6,351,226 of inventory
+  nobody wanted.** That figure counts *only* what the minimum imposed — EOQ
+  excess is a deliberate purchase and is reported separately, because conflating
+  them overstates the one number here a supplier would check.
+- **Supplier capacity**, which the README's item 7 said did not exist:
+  2 suppliers over-committed. The distinction
+  changes the remedy completely — a lead-time problem is solved by ordering
+  earlier, and a capacity problem **is not solved by ordering earlier at all**.
+- **The detector threshold sweep**, turning one measured point into a curve. Best
+  F1 at scale 1.40 (precision 0.60, recall
+  0.50), and an ablation showing the **P95 trigger carries the
+  detection** — a detector watching only the average misses half of it.
+- **Alert routing with severity tiers and SLAs.** Severity is consequence ×
+  urgency, *not* risk score: measured correlation between the two is
+  **-0.03**. Slack is judged against the
+  lead time rather than an absolute number of days, because ten days is
+  comfortable on a 5-day lead and an emergency on a 60-day one.
+- **The invented financial score, replaced.** `financial_score` was a Beta draw,
+  and that cannot be fixed by inventing a better distribution. Three *observable*
+  signals — lead-time inflation, promise slippage against the original promise,
+  and quality drift — predict the planted disruptions at **AUROC
+  0.839** where the invented score sits at
+  0.327, i.e. chance, which is exactly what a Beta draw
+  should do.
+- **Charts** at `out/supply_dashboard.html`, self-contained. The buildability fan
+  is the point: a point forecast is the least useful number available, because
+  the decision is how much cover to buy and that is set by the width of the band.
+
+### Two things the checks caught that I would otherwise have shipped
+
+**The variance trigger is dead weight.** The ablation shows removing it leaves
+recall unchanged while precision improves — it contributes false positives and no
+detections. I would have kept all three triggers on the reasoning in the
+docstring; the measurement says otherwise, and it is now recommended for removal.
+
+**The severity tiering does not survive its own load check.**
+114 parts land in P1 and
+221
+alerts route to a single buyer. That is a list, not a prioritised queue. The
+cause is that severity is computed per *part* while the remedy is usually per
+*supplier* — one late supplier puts every part it ships into P1 at once — and the
+fix (group by supplier, route one item with its parts list) is **not built**.
+Reporting the alert count without the load-by-role table would have hidden it.
+
+## What is NOT built
 
 1. **No real data.** Everything is `src/supply.py`. No ERP extract, no real BOM,
    no real supplier history.
-2. **No weekly materials-review pack.** The spec asks for a generated document
-   with shortage drivers, supplier risk movers, buildability fan charts and
-   recommended expedites *with cost estimates*. The ingredients are in
-   `results.json`; the pack and the expedite costing are not built.
-3. **No charts.** "Fan chart" is a table of P10/P50/P90 in markdown.
-4. **No alert routing, severity tiers, or escalation SLAs.** The order-by dates
-   exist; nothing delivers them to a buyer, and the spec is explicit that
-   analytics without process integration is a dashboard.
-5. **No threshold sweep on the deterioration detector**, so the precision/recall
-   tradeoff is a single measured point rather than a curve.
-6. **No MOQ, no lot-sizing, no safety-stock policy.** `Component.moq` exists and
-   nothing reads it, which means the recommended order quantities would be wrong.
-7. **No supplier capacity constraints.** A supplier can ship unlimited quantity;
-   in reality the constraint is often the supplier's line, not their lead time.
-8. **No calibration against realised outcomes.** See §2 of the report.
-9. **The financial score is invented.** `financial_score` is a Beta draw standing
-   in for a credit rating. It is a placeholder in a risk model, and a risk model
-   with a placeholder input should be read as a demonstration of the *structure*,
-   not as a risk assessment.
+2. **Alerts are objects, not messages.** Nothing is sent — no email, no ticket,
+   no ERP write-back. The module produces routed, prioritised, deduplicated
+   alerts with SLAs and an escalation chain, and a deployment attaches a
+   transport.
+3. **Severity is per part, and it should be per supplier.** See above: the load
+   check fails and the fix is named but not implemented.
+4. **Supplier capacity is assumed, not sourced.** It is not in the dataset, so it
+   is assigned as a multiple of current commitment and flagged as an assumption
+   everywhere it is used.
+5. **The distress proxy is still a proxy.** Its weights are stated rather than
+   fitted, because there are no realised bankruptcies here to fit against —
+   inventing some would be the same mistake the Beta draw was.
+6. **No calibration against realised outcomes over time.** The risk bands were
+   measured at 97.9% against an 80% target in pass 2, which means the band is too
+   wide, and widening or narrowing it properly needs outcomes this simulation
+   does not run long enough to produce.
 
 ## Layout
 
