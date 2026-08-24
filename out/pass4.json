@@ -1,0 +1,382 @@
+{
+  "incidents": {
+    "load_check": {
+      "alerts": 260,
+      "incidents": 108,
+      "reduction_pct": 58.46153846153845,
+      "parts_covered_before": 260,
+      "parts_covered_after": 260,
+      "value_before": 848103.7636159097,
+      "value_after": 848103.7636159097,
+      "p1_alerts": 109,
+      "p1_incidents": 36,
+      "busiest_before": {
+        "role": "BUYER",
+        "items": 218
+      },
+      "busiest_after": {
+        "role": "BUYER",
+        "items": 82
+      },
+      "worst_p1_before": {
+        "role": "BUYER",
+        "items": 67
+      },
+      "worst_p1_after": {
+        "role": "SUPPLY_CHAIN_MANAGER",
+        "items": 26
+      },
+      "per_owner_limit": 15,
+      "p1_limit": 10,
+      "passes_before": false,
+      "passes_after": false,
+      "caveat": "grouping reduces the COUNT an owner sees and not the work; the parts and the value at risk are carried through unchanged so the comparison is like for like"
+    },
+    "concentration": {
+      "top": [
+        {
+          "supplier_id": "SUP-016",
+          "alerts": 12,
+          "P1": 4,
+          "n_parts": 12,
+          "value_at_risk": 39847.666598858515,
+          "share_of_alerts": 0.046153846153846156
+        },
+        {
+          "supplier_id": "SUP-031",
+          "alerts": 10,
+          "P1": 6,
+          "n_parts": 10,
+          "value_at_risk": 2195.6819269911916,
+          "share_of_alerts": 0.038461538461538464
+        },
+        {
+          "supplier_id": "SUP-044",
+          "alerts": 10,
+          "P1": 0,
+          "n_parts": 10,
+          "value_at_risk": 0.0,
+          "share_of_alerts": 0.038461538461538464
+        },
+        {
+          "supplier_id": "SUP-035",
+          "alerts": 9,
+          "P1": 6,
+          "n_parts": 9,
+          "value_at_risk": 11297.566968232857,
+          "share_of_alerts": 0.03461538461538462
+        },
+        {
+          "supplier_id": "SUP-029",
+          "alerts": 8,
+          "P1": 6,
+          "n_parts": 8,
+          "value_at_risk": 205088.12583073313,
+          "share_of_alerts": 0.03076923076923077
+        }
+      ],
+      "n_suppliers": 48,
+      "top_share": 0.18846153846153846
+    },
+    "calibration": {
+      "sweep": [
+        {
+          "p1_ratio": 0.25,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 91,
+          "p1_incidents": 32,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 16,
+          "busiest_items": 92,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.2,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 83,
+          "p1_incidents": 32,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 16,
+          "busiest_items": 92,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.15,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 74,
+          "p1_incidents": 30,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 15,
+          "busiest_items": 93,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.1,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 69,
+          "p1_incidents": 29,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 15,
+          "busiest_items": 93,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.07,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 64,
+          "p1_incidents": 29,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 15,
+          "busiest_items": 94,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.05,
+          "alerts": 260,
+          "incidents": 109,
+          "p1_alerts": 62,
+          "p1_incidents": 29,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 15,
+          "busiest_items": 95,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.03,
+          "alerts": 260,
+          "incidents": 108,
+          "p1_alerts": 59,
+          "p1_incidents": 28,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 14,
+          "busiest_items": 94,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.02,
+          "alerts": 260,
+          "incidents": 107,
+          "p1_alerts": 57,
+          "p1_incidents": 27,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 14,
+          "busiest_items": 93,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        },
+        {
+          "p1_ratio": 0.01,
+          "alerts": 260,
+          "incidents": 107,
+          "p1_alerts": 56,
+          "p1_incidents": 26,
+          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
+          "worst_p1_items": 13,
+          "busiest_items": 94,
+          "p1_value_at_risk": 848103.7636159097,
+          "p1_value_share": 1.0,
+          "p1_passes": false,
+          "fully_passes": false
+        }
+      ],
+      "p1_limit": 10,
+      "per_owner_limit": 15,
+      "first_passing_p1": null,
+      "any_fully_passes": false,
+      "caveat": "the P1 threshold is calibrated against how many items an owner can chase in a day, which is an external constraint and not a property of the data; the parts that leave P1 land in P2, which has an SLA, and the value that moves with them is the size of the bet"
+    },
+    "value_triage": {
+      "n_p1_incidents": 36,
+      "top_n": 10,
+      "top_n_value": 770444.2953362039,
+      "top_n_share_of_p1_value": 0.9084316429058127,
+      "top_n_share_of_all_value": 0.9084316429058127,
+      "top_n_parts": 39,
+      "parts_in_p1": 109,
+      "incidents_for_80pct_of_p1_value": 8,
+      "p1_value": 848103.7636159097,
+      "all_value": 848103.7636159097,
+      "verdict": "workable: a top-N queue carries most of the exposure"
+    },
+    "already_short": 54,
+    "n_rows": 260,
+    "load_before": {
+      "BUYER": {
+        "total": 218,
+        "P1": 67,
+        "P2": 71,
+        "P3": 37,
+        "P4": 43,
+        "value": 660183.3587877533
+      },
+      "SUPPLY_CHAIN_MANAGER": {
+        "total": 42,
+        "P1": 42,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "value": 187920.40482815672
+      }
+    },
+    "load_after": {
+      "SUPPLY_CHAIN_MANAGER": {
+        "total": 26,
+        "P1": 26,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "value": 678943.0327071509,
+        "parts": 87
+      },
+      "BUYER": {
+        "total": 82,
+        "P1": 10,
+        "P2": 34,
+        "P3": 21,
+        "P4": 17,
+        "value": 169160.73090875885,
+        "parts": 173
+      }
+    },
+    "sample_incident": {
+      "supplier_id": "SUP-044",
+      "severity": "P4",
+      "n_parts": 7,
+      "value_at_risk": 0.0,
+      "units_at_risk": 0.0,
+      "worst_slack_days": 33.35238856515427,
+      "n_single_sourced": 0,
+      "any_single_sourced": false,
+      "over_capacity": false,
+      "max_risk_score": 0.44794049825295285,
+      "route_to": "BUYER",
+      "response_hours": 168,
+      "escalate_after_hours": null,
+      "escalation_chain": [
+        "BUYER"
+      ],
+      "reason": "7 part(s) from SUP-044 at P4: worst slack 33 days",
+      "key": "4455c05e8dfe",
+      "parts": [
+        "PRT-0006",
+        "PRT-0044",
+        "PRT-0210",
+        "PRT-0216",
+        "PRT-0228",
+        "PRT-S005",
+        "PRT-S014"
+      ]
+    }
+  },
+  "transport": {
+    "messages_prepared": 72,
+    "incidents": 108,
+    "urgent_messages": 70,
+    "digest_messages": 2,
+    "first_pass": {
+      "queued": 72,
+      "sent": 30,
+      "failed": 0,
+      "deferred": 42,
+      "dead": 0
+    },
+    "received": 30,
+    "counts": {
+      "DEFERRED": 42,
+      "SENT": 30
+    },
+    "rerun": {
+      "duplicate_enqueues": 72,
+      "sent": 0
+    },
+    "receiver_duplicates_after_rerun": 0,
+    "retry": {
+      "messages": 2,
+      "first_pass_failed": 2,
+      "receiver_failed_first": 3,
+      "rounds": [
+        {
+          "t": 1.0,
+          "sent": 1,
+          "failed": 1,
+          "dead": 0,
+          "deferred": 0
+        },
+        {
+          "t": 5.0,
+          "sent": 1,
+          "failed": 0,
+          "dead": 0,
+          "deferred": 0
+        }
+      ],
+      "counts": {
+        "SENT": 2
+      },
+      "delivered": 2,
+      "receiver_saw_requests": 5,
+      "receiver_duplicates": 0,
+      "dead_letters": 0
+    },
+    "dead_letter": {
+      "counts": {
+        "DEAD": 2
+      },
+      "dead_letters": 2,
+      "still_in_outbox": 2
+    },
+    "crash_window": {
+      "state_after_crash": {
+        "PENDING": 1
+      },
+      "resent_on_restart": 1,
+      "receiver_requests": 2,
+      "receiver_distinct_deliveries": 1,
+      "receiver_duplicates_suppressed": 1,
+      "final_counts": {
+        "SENT": 1
+      }
+    },
+    "rate_limit": {
+      "limit_per_recipient": 5,
+      "messages": 72,
+      "sent": 10,
+      "deferred": 62,
+      "delivered_per_recipient": {
+        "SUPPLY_CHAIN_MANAGER": 5,
+        "BUYER": 5
+      },
+      "max_to_one_recipient": 5,
+      "nothing_dropped": true
+    }
+  },
+  "elapsed_s": 24.667505741119385
+}

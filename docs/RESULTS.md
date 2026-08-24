@@ -11,15 +11,15 @@ Deterministic pass (promise dates taken at face value), units per week:
 | product | w1 | w2 | w3 | w4 | w5 | w6 | w7 | w8 | w9 | w10 | w11 | w12 | w13 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | PRD-A demand | 69 | 56 | 56 | 59 | 61 | 61 | 48 | 54 | 52 | 45 | 61 | 62 | 51 |
-| PRD-A buildable | 69 | 56 | **41** | **0** | **0** | **0** | **0** | **0** | **0** | **0** | 61 | **12** | **49** |
+| PRD-A buildable | 69 | 56 | **43** | **0** | **2** | 61 | 48 | **10** | **0** | **0** | **0** | **0** | **0** |
 | PRD-B demand | 52 | 57 | 40 | 33 | 64 | 64 | 21 | 36 | 69 | 49 | 37 | 25 | 61 |
-| PRD-B buildable | 52 | 57 | 40 | **12** | **0** | **38** | **7** | **12** | **15** | **0** | **0** | **0** | **0** |
+| PRD-B buildable | 52 | 57 | **10** | **0** | **0** | **0** | **0** | 36 | **6** | **0** | **0** | **0** | **0** |
 | PRD-C demand | 65 | 26 | 40 | 21 | 38 | 58 | 45 | 39 | 69 | 22 | 61 | 66 | 41 |
-| PRD-C buildable | 65 | 26 | 40 | 21 | **28** | **34** | **15** | 39 | **33** | **0** | **39** | **0** | **0** |
+| PRD-C buildable | 65 | 26 | **33** | **1** | **1** | **20** | **0** | **0** | **0** | **0** | **0** | **0** | **0** |
 | PRD-D demand | 37 | 40 | 28 | 34 | 40 | 26 | 22 | 50 | 32 | 52 | 26 | 41 | 55 |
-| PRD-D buildable | 37 | 40 | 28 | 34 | **17** | **0** | **0** | **0** | **0** | **0** | **0** | **0** | **0** |
+| PRD-D buildable | 37 | 40 | **23** | **2** | **1** | 26 | 22 | **30** | **0** | **5** | **0** | **0** | **0** |
 
-37 (product, week) pairs are short under the deterministic plan. Bold = short.
+39 (product, week) pairs are short under the deterministic plan. Bold = short.
 
 ## 2. The same plan as a distribution
 
@@ -32,17 +32,17 @@ Deterministic pass (promise dates taken at face value), units per week:
 |---|---|---|---|---|
 | 1 | 69 | 69 | 69 | 69 |
 | 2 | 56 | 56 | 56 | 56 |
-| 3 | 56 | 41 | 41 | 41 |
-| 4 | 59 | 0 | 0 | 0 |
-| 5 | 61 | 0 | 0 | 0 |
-| 6 | 61 | 0 | 0 | 0 |
-| 7 | 48 | 0 | 0 | 0 |
-| 8 | 54 | 0 | 0 | 0 |
-| 9 | 52 | 0 | 0 | 0 |
-| 10 | 45 | 0 | 0 | 45 |
-| 11 | 61 | 0 | 57 | 61 |
-| 12 | 62 | 4 | 25 | 62 |
-| 13 | 51 | 0 | 24 | 51 |
+| 3 | 56 | 41 | 43 | 43 |
+| 4 | 59 | 0 | 0 | 3 |
+| 5 | 61 | 0 | 0 | 61 |
+| 6 | 61 | 0 | 16 | 61 |
+| 7 | 48 | 0 | 21 | 48 |
+| 8 | 54 | 0 | 12 | 54 |
+| 9 | 52 | 0 | 0 | 52 |
+| 10 | 45 | 0 | 0 | 17 |
+| 11 | 61 | 0 | 0 | 1 |
+| 12 | 62 | 0 | 0 | 0 |
+| 13 | 51 | 0 | 0 | 0 |
 
 **PRD-B**
 
@@ -50,16 +50,16 @@ Deterministic pass (promise dates taken at face value), units per week:
 |---|---|---|---|---|
 | 1 | 52 | 52 | 52 | 52 |
 | 2 | 57 | 57 | 57 | 57 |
-| 3 | 40 | 10 | 40 | 40 |
-| 4 | 33 | 1 | 12 | 33 |
-| 5 | 64 | 0 | 0 | 49 |
-| 6 | 64 | 0 | 1 | 41 |
-| 7 | 21 | 0 | 0 | 19 |
-| 8 | 36 | 0 | 3 | 36 |
-| 9 | 69 | 0 | 7 | 36 |
-| 10 | 49 | 0 | 1 | 19 |
-| 11 | 37 | 0 | 0 | 14 |
-| 12 | 25 | 0 | 0 | 4 |
+| 3 | 40 | 10 | 10 | 10 |
+| 4 | 33 | 0 | 0 | 0 |
+| 5 | 64 | 0 | 0 | 42 |
+| 6 | 64 | 0 | 0 | 42 |
+| 7 | 21 | 0 | 0 | 21 |
+| 8 | 36 | 0 | 0 | 36 |
+| 9 | 69 | 0 | 0 | 32 |
+| 10 | 49 | 0 | 0 | 0 |
+| 11 | 37 | 0 | 0 | 0 |
+| 12 | 25 | 0 | 0 | 0 |
 | 13 | 61 | 0 | 0 | 0 |
 
 **PRD-C**
@@ -68,17 +68,17 @@ Deterministic pass (promise dates taken at face value), units per week:
 |---|---|---|---|---|
 | 1 | 65 | 65 | 65 | 65 |
 | 2 | 26 | 26 | 26 | 26 |
-| 3 | 40 | 35 | 40 | 40 |
-| 4 | 21 | 7 | 21 | 21 |
-| 5 | 38 | 0 | 28 | 38 |
-| 6 | 58 | 0 | 34 | 58 |
-| 7 | 45 | 6 | 32 | 45 |
-| 8 | 39 | 2 | 15 | 39 |
-| 9 | 69 | 0 | 13 | 69 |
-| 10 | 22 | 0 | 7 | 22 |
-| 11 | 61 | 0 | 24 | 61 |
-| 12 | 66 | 0 | 0 | 58 |
-| 13 | 41 | 0 | 0 | 23 |
+| 3 | 40 | 33 | 33 | 40 |
+| 4 | 21 | 1 | 1 | 21 |
+| 5 | 38 | 0 | 1 | 21 |
+| 6 | 58 | 0 | 0 | 20 |
+| 7 | 45 | 0 | 0 | 0 |
+| 8 | 39 | 0 | 0 | 0 |
+| 9 | 69 | 0 | 0 | 0 |
+| 10 | 22 | 0 | 0 | 0 |
+| 11 | 61 | 0 | 0 | 0 |
+| 12 | 66 | 0 | 0 | 0 |
+| 13 | 41 | 0 | 0 | 0 |
 
 **PRD-D**
 
@@ -86,17 +86,17 @@ Deterministic pass (promise dates taken at face value), units per week:
 |---|---|---|---|---|
 | 1 | 37 | 37 | 37 | 37 |
 | 2 | 40 | 40 | 40 | 40 |
-| 3 | 28 | 24 | 28 | 28 |
-| 4 | 34 | 12 | 34 | 34 |
-| 5 | 40 | 16 | 17 | 21 |
-| 6 | 26 | 0 | 0 | 1 |
-| 7 | 22 | 0 | 0 | 0 |
-| 8 | 50 | 0 | 0 | 0 |
-| 9 | 32 | 0 | 0 | 0 |
-| 10 | 52 | 0 | 0 | 0 |
-| 11 | 26 | 0 | 0 | 0 |
-| 12 | 41 | 0 | 0 | 0 |
-| 13 | 55 | 0 | 0 | 0 |
+| 3 | 28 | 23 | 23 | 28 |
+| 4 | 34 | 2 | 3 | 34 |
+| 5 | 40 | 1 | 21 | 40 |
+| 6 | 26 | 0 | 13 | 26 |
+| 7 | 22 | 0 | 8 | 22 |
+| 8 | 50 | 0 | 6 | 34 |
+| 9 | 32 | 0 | 0 | 25 |
+| 10 | 52 | 0 | 0 | 6 |
+| 11 | 26 | 0 | 0 | 5 |
+| 12 | 41 | 0 | 0 | 5 |
+| 13 | 55 | 0 | 0 | 4 |
 
 This is the artifact that changes the materials meeting. "P50 says 120" invites a commitment; "P10 84, P50 120, P90 140, and the gating part is PRT-0041 from a single source" invites a decision. A point estimate on a supply plan is a forecast pretending to be a fact.
 
@@ -104,10 +104,10 @@ This is the artifact that changes the materials meeting. "P50 says 120" invites 
 
 | product | % of simulations below the P50 | % inside P10–P90 |
 |---|---|---|
-| PRD-A | 11.4% | 99.3% |
-| PRD-B | 18.2% | 94.2% |
-| PRD-C | 30.0% | 96.5% |
-| PRD-D | 3.2% | 96.8% |
+| PRD-A | 12.8% | 97.1% |
+| PRD-B | 0.0% | 97.5% |
+| PRD-C | 2.0% | 98.7% |
+| PRD-D | 17.6% | 95.5% |
 
 These should be near 50% and 80%. They are *self-consistency* checks — the percentiles are computed from the same simulations they are scored against, so this verifies the arithmetic, not the model. Deviations come from discreteness (buildable units are integers, so many simulations tie exactly at the percentile). **Genuine calibration would require comparing the fan against realised outcomes, which needs a simulated future this project does not run** — that is named in the README as not built.
 
@@ -115,18 +115,18 @@ These should be near 50% and 80%. They are *self-consistency* checks — the per
 
 | part | supplier | single source | times gating | first impact | lead mean | lead P95 | **order by (day)** | too late? |
 |---|---|---|---|---|---|---|---|---|
-| PRT-0180 | SUP-033 | no | 2599 | week 5 | 45 d | 66 d | **day -31** | **ALREADY LATE** |
-| PRT-0047 | SUP-042 | no | 2572 | week 3 | 21 d | 28 d | **day -7** | **ALREADY LATE** |
-| PRT-0079 | SUP-049 | no | 1152 | week 9 | 45 d | 64 d | **day -1** | **ALREADY LATE** |
-| PRT-0096 | SUP-003 | **yes** | 702 | week 4 | 68 d | 83 d | **day -55** | **ALREADY LATE** |
-| PRT-S012 | SUP-016 | no | 681 | — | 46 d | 67 d | **day +24** | no |
-| PRT-0105 | SUP-015 | no | 666 | week 6 | 15 d | 22 d | **day +20** | no |
-| PRT-0125 | SUP-023 | no | 652 | week 11 | 54 d | 73 d | **day +4** | no |
-| PRT-0162 | SUP-035 | **yes** | 385 | — | 53 d | 67 d | **day +24** | no |
-| PRT-0144 | SUP-005 | no | 273 | week 9 | 68 d | 90 d | **day -27** | **ALREADY LATE** |
-| PRT-0008 | SUP-034 | no | 156 | week 13 | 37 d | 51 d | **day +40** | no |
+| PRT-0146 | SUP-038 | no | 2654 | week 6 | 43 d | 52 d | **day -10** | **ALREADY LATE** |
+| PRT-0100 | SUP-038 | no | 1895 | week 9 | 43 d | 52 d | **day +11** | no |
+| PRT-0008 | SUP-034 | no | 1676 | week 8 | 37 d | 51 d | **day +5** | no |
+| PRT-0109 | SUP-043 | no | 1227 | week 3 | 61 d | 84 d | **day -63** | **ALREADY LATE** |
+| PRT-0177 | SUP-016 | **yes** | 1056 | week 8 | 46 d | 67 d | **day -11** | **ALREADY LATE** |
+| PRT-0200 | SUP-032 | no | 978 | week 10 | 27 d | 46 d | **day +24** | no |
+| PRT-0062 | SUP-031 | no | 642 | week 3 | 69 d | 89 d | **day -68** | **ALREADY LATE** |
+| PRT-S021 | SUP-049 | no | 573 | week 4 | 45 d | 64 d | **day -36** | **ALREADY LATE** |
+| PRT-0027 | SUP-030 | no | 174 | — | 60 d | 93 d | **day -2** | **ALREADY LATE** |
+| PRT-0192 | SUP-050 | no | 159 | — | 23 d | 37 d | **day +54** | no |
 
-5 of 10 top drivers are **already past their order-by date** — the runway was consumed before anyone looked.
+6 of 10 top drivers are **already past their order-by date** — the runway was consumed before anyone looked.
 
 The order-by date is computed from the **P95** lead time, not the mean. Ordering a gating part to its mean lead time means arriving late half the time, which for the part that stops the line is not a plan. That single substitution is the difference between an alert that is a fact ("you will be short in week 7") and an alert that is a decision ("order by day −3 or the line stops in week 7").
 
@@ -197,9 +197,9 @@ The weights are printed and the score decomposes into contributions, because the
 
 | policy | total P50 units | worst product fill rate | PRD-A | PRD-B | PRD-C | PRD-D |
 |---|---|---|---|---|---|---|
-| even | 912 | 28.3% | 38.0% | 28.3% | 51.6% | 32.3% |
-| margin | 912 | 26.5% | 41.7% | 26.5% | 48.8% | 32.3% |
-| contract | 912 | 26.5% | 41.7% | 26.5% | 48.8% | 32.3% |
+| even | 620 | 19.6% | 30.6% | 19.6% | 21.3% | 31.1% |
+| margin | 630 | 19.6% | 30.2% | 19.6% | 24.5% | 29.7% |
+| contract | 629 | 19.6% | 30.1% | 19.6% | 24.5% | 29.7% |
 
 Shared components are where the shortage maths gets interesting, because someone has to decide who gets the part. That is a business policy, not an arithmetic fact, and the three policies produce different plans and different angry people. The job of the analysis is to make the tradeoff explicit and quantified — not to pick.
 

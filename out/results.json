@@ -445,28 +445,28 @@
       "PRD-A": [
         69.0,
         56.0,
-        41.0,
+        43.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        2.0,
         61.0,
-        12.0,
-        49.0
+        48.0,
+        10.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "PRD-B": [
         52.0,
         57.0,
-        40.0,
-        12.0,
+        10.0,
         0.0,
-        38.0,
-        7.0,
-        12.0,
-        15.0,
+        0.0,
+        0.0,
+        0.0,
+        36.0,
+        6.0,
         0.0,
         0.0,
         0.0,
@@ -475,29 +475,29 @@
       "PRD-C": [
         65.0,
         26.0,
-        40.0,
-        21.0,
-        28.0,
-        34.0,
-        15.0,
-        39.0,
         33.0,
+        1.0,
+        1.0,
+        20.0,
         0.0,
-        39.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.0,
         0.0
       ],
       "PRD-D": [
         37.0,
         40.0,
-        28.0,
-        34.0,
-        17.0,
+        23.0,
+        2.0,
+        1.0,
+        26.0,
+        22.0,
+        30.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        5.0,
         0.0,
         0.0,
         0.0
@@ -565,7 +565,7 @@
         55.0
       ]
     },
-    "gating_events": 37
+    "gating_events": 39
   },
   "monte_carlo": {
     "fan": {
@@ -582,38 +582,38 @@
           0.0,
           0.0,
           0.0,
-          4.0,
+          0.0,
           0.0
         ],
         "p50": [
           69.0,
           56.0,
-          41.0,
+          43.0,
+          0.0,
+          0.0,
+          16.0,
+          21.0,
+          12.0,
           0.0,
           0.0,
           0.0,
           0.0,
-          0.0,
-          0.0,
-          0.0,
-          57.0,
-          25.0,
-          24.0
+          0.0
         ],
         "p90": [
           69.0,
           56.0,
-          41.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          45.0,
+          43.0,
+          3.2000000000000455,
           61.0,
-          62.0,
-          51.0
+          61.0,
+          48.0,
+          54.0,
+          52.0,
+          17.0,
+          1.0,
+          0.0,
+          0.0
         ],
         "demand": [
           69.0,
@@ -636,7 +636,7 @@
           52.0,
           57.0,
           10.0,
-          1.0,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -650,14 +650,14 @@
         "p50": [
           52.0,
           57.0,
-          40.0,
-          12.0,
+          10.0,
           0.0,
-          1.0,
           0.0,
-          3.0,
-          7.0,
-          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0,
           0.0
@@ -665,16 +665,16 @@
         "p90": [
           52.0,
           57.0,
-          40.0,
-          33.0,
-          49.0,
-          41.200000000000045,
-          19.0,
+          10.0,
+          0.0,
+          42.0,
+          42.0,
+          21.0,
           36.0,
-          36.0,
-          19.0,
-          14.0,
-          4.400000000000091,
+          32.30000000000007,
+          0.0,
+          0.0,
+          0.0,
           0.0
         ],
         "demand": [
@@ -697,12 +697,12 @@
         "p10": [
           65.0,
           26.0,
-          35.0,
-          7.0,
+          33.0,
+          1.0,
           0.0,
           0.0,
-          6.0,
-          2.0,
+          0.0,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -712,15 +712,15 @@
         "p50": [
           65.0,
           26.0,
-          40.0,
-          21.0,
-          28.0,
-          34.0,
-          31.5,
-          15.0,
-          13.0,
-          7.0,
-          23.5,
+          33.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0
         ],
@@ -729,15 +729,15 @@
           26.0,
           40.0,
           21.0,
-          38.0,
-          58.0,
-          45.0,
-          39.0,
-          69.0,
-          22.0,
-          61.0,
-          58.10000000000002,
-          23.0
+          21.0,
+          20.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
         ],
         "demand": [
           65.0,
@@ -759,9 +759,9 @@
         "p10": [
           37.0,
           40.0,
-          24.0,
-          12.0,
-          16.0,
+          23.0,
+          2.0,
+          1.0,
           0.0,
           0.0,
           0.0,
@@ -774,12 +774,12 @@
         "p50": [
           37.0,
           40.0,
-          28.0,
-          34.0,
-          17.0,
-          0.0,
-          0.0,
-          0.0,
+          23.0,
+          3.0,
+          21.0,
+          13.0,
+          8.0,
+          6.0,
           0.0,
           0.0,
           0.0,
@@ -791,15 +791,15 @@
           40.0,
           28.0,
           34.0,
-          21.0,
-          1.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
+          40.0,
+          26.0,
+          22.0,
+          34.10000000000002,
+          25.0,
+          6.0,
+          5.0,
+          5.0,
+          4.0
         ],
         "demand": [
           37.0,
@@ -822,199 +822,207 @@
     "allocation": "even",
     "top_gating_parts": [
       {
-        "part": "PRT-0180",
-        "times_gating": 2599
+        "part": "PRT-0146",
+        "times_gating": 2654
       },
       {
-        "part": "PRT-0047",
-        "times_gating": 2572
-      },
-      {
-        "part": "PRT-0079",
-        "times_gating": 1152
-      },
-      {
-        "part": "PRT-0096",
-        "times_gating": 702
-      },
-      {
-        "part": "PRT-S012",
-        "times_gating": 681
-      },
-      {
-        "part": "PRT-0105",
-        "times_gating": 666
-      },
-      {
-        "part": "PRT-0125",
-        "times_gating": 652
-      },
-      {
-        "part": "PRT-0162",
-        "times_gating": 385
-      },
-      {
-        "part": "PRT-0144",
-        "times_gating": 273
+        "part": "PRT-0100",
+        "times_gating": 1895
       },
       {
         "part": "PRT-0008",
-        "times_gating": 156
+        "times_gating": 1676
       },
       {
-        "part": "PRT-0040",
-        "times_gating": 88
+        "part": "PRT-0109",
+        "times_gating": 1227
       },
       {
-        "part": "PRT-0126",
-        "times_gating": 16
+        "part": "PRT-0177",
+        "times_gating": 1056
       },
       {
-        "part": "PRT-0210",
-        "times_gating": 15
+        "part": "PRT-0200",
+        "times_gating": 978
+      },
+      {
+        "part": "PRT-0062",
+        "times_gating": 642
+      },
+      {
+        "part": "PRT-S021",
+        "times_gating": 573
+      },
+      {
+        "part": "PRT-0027",
+        "times_gating": 174
+      },
+      {
+        "part": "PRT-0192",
+        "times_gating": 159
+      },
+      {
+        "part": "PRT-0061",
+        "times_gating": 134
+      },
+      {
+        "part": "PRT-S025",
+        "times_gating": 82
+      },
+      {
+        "part": "PRT-0227",
+        "times_gating": 21
+      },
+      {
+        "part": "PRT-0190",
+        "times_gating": 10
+      },
+      {
+        "part": "PRT-0187",
+        "times_gating": 4
       }
     ]
   },
   "drivers": [
     {
-      "part": "PRT-0180",
-      "supplier": "SUP-033",
+      "part": "PRT-0146",
+      "supplier": "SUP-038",
       "single_sourced": false,
-      "times_gating_in_sim": 2599,
-      "first_impact_week": 5,
-      "lead_mean_days": 44.64815091141556,
-      "lead_p95_days": 66.10901007338848,
-      "order_by_day": -31.109010073388475,
-      "runway_days": -31.109010073388475,
-      "already_too_late": true,
-      "on_hand": 1569.0,
-      "unit_cost": 4.177261500052803
-    },
-    {
-      "part": "PRT-0047",
-      "supplier": "SUP-042",
-      "single_sourced": false,
-      "times_gating_in_sim": 2572,
-      "first_impact_week": 3,
-      "lead_mean_days": 21.288258018948543,
-      "lead_p95_days": 27.901724348648095,
-      "order_by_day": -6.901724348648095,
-      "runway_days": -6.901724348648095,
-      "already_too_late": true,
-      "on_hand": 667.0,
-      "unit_cost": 62.13173251229705
-    },
-    {
-      "part": "PRT-0079",
-      "supplier": "SUP-049",
-      "single_sourced": false,
-      "times_gating_in_sim": 1152,
-      "first_impact_week": 9,
-      "lead_mean_days": 45.19096321854669,
-      "lead_p95_days": 64.28370366378402,
-      "order_by_day": -1.2837036637840242,
-      "runway_days": -1.2837036637840242,
-      "already_too_late": true,
-      "on_hand": 2336.0,
-      "unit_cost": 7.6324667256330585
-    },
-    {
-      "part": "PRT-0096",
-      "supplier": "SUP-003",
-      "single_sourced": true,
-      "times_gating_in_sim": 702,
-      "first_impact_week": 4,
-      "lead_mean_days": 68.2810589886667,
-      "lead_p95_days": 82.82922083285442,
-      "order_by_day": -54.82922083285442,
-      "runway_days": -54.82922083285442,
-      "already_too_late": true,
-      "on_hand": 966.0,
-      "unit_cost": 54.29403836857869
-    },
-    {
-      "part": "PRT-S012",
-      "supplier": "SUP-016",
-      "single_sourced": false,
-      "times_gating_in_sim": 681,
-      "first_impact_week": null,
-      "lead_mean_days": 45.95880046648969,
-      "lead_p95_days": 67.26786866526709,
-      "order_by_day": 23.732131334732912,
-      "runway_days": 23.732131334732912,
-      "already_too_late": false,
-      "on_hand": 10293.0,
-      "unit_cost": 35.42304488591876
-    },
-    {
-      "part": "PRT-0105",
-      "supplier": "SUP-015",
-      "single_sourced": false,
-      "times_gating_in_sim": 666,
+      "times_gating_in_sim": 2654,
       "first_impact_week": 6,
-      "lead_mean_days": 14.516678632368915,
-      "lead_p95_days": 21.856550725513593,
-      "order_by_day": 20.143449274486407,
-      "runway_days": 20.143449274486407,
-      "already_too_late": false,
-      "on_hand": 1075.0,
-      "unit_cost": 2.351682739351755
-    },
-    {
-      "part": "PRT-0125",
-      "supplier": "SUP-023",
-      "single_sourced": false,
-      "times_gating_in_sim": 652,
-      "first_impact_week": 11,
-      "lead_mean_days": 54.39899377783799,
-      "lead_p95_days": 72.88188075620162,
-      "order_by_day": 4.118119243798375,
-      "runway_days": 4.118119243798375,
-      "already_too_late": false,
-      "on_hand": 2725.0,
-      "unit_cost": 7.135476796226773
-    },
-    {
-      "part": "PRT-0162",
-      "supplier": "SUP-035",
-      "single_sourced": true,
-      "times_gating_in_sim": 385,
-      "first_impact_week": null,
-      "lead_mean_days": 52.5339992065923,
-      "lead_p95_days": 66.56214747736982,
-      "order_by_day": 24.43785252263018,
-      "runway_days": 24.43785252263018,
-      "already_too_late": false,
-      "on_hand": 1463.0,
-      "unit_cost": 25.982913993209447
-    },
-    {
-      "part": "PRT-0144",
-      "supplier": "SUP-005",
-      "single_sourced": false,
-      "times_gating_in_sim": 273,
-      "first_impact_week": 9,
-      "lead_mean_days": 68.3036249405668,
-      "lead_p95_days": 90.04850945592099,
-      "order_by_day": -27.048509455920993,
-      "runway_days": -27.048509455920993,
+      "lead_mean_days": 42.9292184131546,
+      "lead_p95_days": 52.445255263913005,
+      "order_by_day": -10.445255263913005,
+      "runway_days": -10.445255263913005,
       "already_too_late": true,
-      "on_hand": 1207.0,
-      "unit_cost": 6.162624919301776
+      "on_hand": 2634.0,
+      "unit_cost": 17.542554550132113
+    },
+    {
+      "part": "PRT-0100",
+      "supplier": "SUP-038",
+      "single_sourced": false,
+      "times_gating_in_sim": 1895,
+      "first_impact_week": 9,
+      "lead_mean_days": 42.9292184131546,
+      "lead_p95_days": 52.445255263913005,
+      "order_by_day": 10.554744736086995,
+      "runway_days": 10.554744736086995,
+      "already_too_late": false,
+      "on_hand": 2416.0,
+      "unit_cost": 1.7133777479417467
     },
     {
       "part": "PRT-0008",
       "supplier": "SUP-034",
       "single_sourced": false,
-      "times_gating_in_sim": 156,
-      "first_impact_week": 13,
+      "times_gating_in_sim": 1676,
+      "first_impact_week": 8,
       "lead_mean_days": 36.88797395489122,
       "lead_p95_days": 50.718402817621765,
-      "order_by_day": 40.281597182378235,
-      "runway_days": 40.281597182378235,
+      "order_by_day": 5.281597182378235,
+      "runway_days": 5.281597182378235,
       "already_too_late": false,
       "on_hand": 1445.0,
       "unit_cost": 2.86672494261427
+    },
+    {
+      "part": "PRT-0109",
+      "supplier": "SUP-043",
+      "single_sourced": false,
+      "times_gating_in_sim": 1227,
+      "first_impact_week": 3,
+      "lead_mean_days": 60.55642964974743,
+      "lead_p95_days": 83.66560610908455,
+      "order_by_day": -62.66560610908455,
+      "runway_days": -62.66560610908455,
+      "already_too_late": true,
+      "on_hand": 358.0,
+      "unit_cost": 18.597411848540506
+    },
+    {
+      "part": "PRT-0177",
+      "supplier": "SUP-016",
+      "single_sourced": true,
+      "times_gating_in_sim": 1056,
+      "first_impact_week": 8,
+      "lead_mean_days": 45.95880046648969,
+      "lead_p95_days": 67.26786866526709,
+      "order_by_day": -11.267868665267088,
+      "runway_days": -11.267868665267088,
+      "already_too_late": true,
+      "on_hand": 1868.0,
+      "unit_cost": 34.200584143771906
+    },
+    {
+      "part": "PRT-0200",
+      "supplier": "SUP-032",
+      "single_sourced": false,
+      "times_gating_in_sim": 978,
+      "first_impact_week": 10,
+      "lead_mean_days": 26.52104756902098,
+      "lead_p95_days": 45.93438624148837,
+      "order_by_day": 24.06561375851163,
+      "runway_days": 24.06561375851163,
+      "already_too_late": false,
+      "on_hand": 372.0,
+      "unit_cost": 1.3781962827751462
+    },
+    {
+      "part": "PRT-0062",
+      "supplier": "SUP-031",
+      "single_sourced": false,
+      "times_gating_in_sim": 642,
+      "first_impact_week": 3,
+      "lead_mean_days": 68.88843193117695,
+      "lead_p95_days": 89.0008605597262,
+      "order_by_day": -68.0008605597262,
+      "runway_days": -68.0008605597262,
+      "already_too_late": true,
+      "on_hand": 337.0,
+      "unit_cost": 2.1510172555110834
+    },
+    {
+      "part": "PRT-S021",
+      "supplier": "SUP-049",
+      "single_sourced": false,
+      "times_gating_in_sim": 573,
+      "first_impact_week": 4,
+      "lead_mean_days": 45.19096321854669,
+      "lead_p95_days": 64.28370366378402,
+      "order_by_day": -36.283703663784024,
+      "runway_days": -36.283703663784024,
+      "already_too_late": true,
+      "on_hand": 5004.0,
+      "unit_cost": 1.4018498291048038
+    },
+    {
+      "part": "PRT-0027",
+      "supplier": "SUP-030",
+      "single_sourced": false,
+      "times_gating_in_sim": 174,
+      "first_impact_week": null,
+      "lead_mean_days": 59.88335763494412,
+      "lead_p95_days": 92.65124907972427,
+      "order_by_day": -1.6512490797242663,
+      "runway_days": -1.6512490797242663,
+      "already_too_late": true,
+      "on_hand": 667.0,
+      "unit_cost": 7.042214262457291
+    },
+    {
+      "part": "PRT-0192",
+      "supplier": "SUP-050",
+      "single_sourced": false,
+      "times_gating_in_sim": 159,
+      "first_impact_week": null,
+      "lead_mean_days": 23.002333655130368,
+      "lead_p95_days": 36.906596799825074,
+      "order_by_day": 54.093403200174926,
+      "runway_days": 54.093403200174926,
+      "already_too_late": false,
+      "on_hand": 344.0,
+      "unit_cost": 0.7188039338516776
     }
   ],
   "allocation": [
@@ -1022,101 +1030,101 @@
       "policy": "even",
       "per_product": {
         "PRD-A": {
-          "p50_total": 279.0,
+          "p50_total": 225.0,
           "demand_total": 735.0,
-          "fill_rate_pct": 37.95918367346939
+          "fill_rate_pct": 30.612244897959183
         },
         "PRD-B": {
-          "p50_total": 172.0,
+          "p50_total": 119.0,
           "demand_total": 608.0,
-          "fill_rate_pct": 28.289473684210527
+          "fill_rate_pct": 19.57236842105263
         },
         "PRD-C": {
-          "p50_total": 305.0,
+          "p50_total": 126.0,
           "demand_total": 591.0,
-          "fill_rate_pct": 51.60744500846024
+          "fill_rate_pct": 21.31979695431472
         },
         "PRD-D": {
-          "p50_total": 156.0,
+          "p50_total": 150.0,
           "demand_total": 483.0,
-          "fill_rate_pct": 32.298136645962735
+          "fill_rate_pct": 31.055900621118013
         }
       },
-      "total_p50": 912.0,
-      "worst_product_fill_pct": 28.289473684210527
+      "total_p50": 620.0,
+      "worst_product_fill_pct": 19.57236842105263
     },
     {
       "policy": "margin",
       "per_product": {
         "PRD-A": {
-          "p50_total": 306.5,
+          "p50_total": 222.0,
           "demand_total": 735.0,
-          "fill_rate_pct": 41.70068027210884
+          "fill_rate_pct": 30.20408163265306
         },
         "PRD-B": {
-          "p50_total": 161.0,
+          "p50_total": 119.0,
           "demand_total": 608.0,
-          "fill_rate_pct": 26.480263157894736
+          "fill_rate_pct": 19.57236842105263
         },
         "PRD-C": {
-          "p50_total": 288.5,
+          "p50_total": 145.0,
           "demand_total": 591.0,
-          "fill_rate_pct": 48.8155668358714
+          "fill_rate_pct": 24.534686971235196
         },
         "PRD-D": {
-          "p50_total": 156.0,
+          "p50_total": 143.5,
           "demand_total": 483.0,
-          "fill_rate_pct": 32.298136645962735
+          "fill_rate_pct": 29.71014492753623
         }
       },
-      "total_p50": 912.0,
-      "worst_product_fill_pct": 26.480263157894736
+      "total_p50": 629.5,
+      "worst_product_fill_pct": 19.57236842105263
     },
     {
       "policy": "contract",
       "per_product": {
         "PRD-A": {
-          "p50_total": 306.5,
+          "p50_total": 221.5,
           "demand_total": 735.0,
-          "fill_rate_pct": 41.70068027210884
+          "fill_rate_pct": 30.13605442176871
         },
         "PRD-B": {
-          "p50_total": 161.0,
+          "p50_total": 119.0,
           "demand_total": 608.0,
-          "fill_rate_pct": 26.480263157894736
+          "fill_rate_pct": 19.57236842105263
         },
         "PRD-C": {
-          "p50_total": 288.5,
+          "p50_total": 145.0,
           "demand_total": 591.0,
-          "fill_rate_pct": 48.8155668358714
+          "fill_rate_pct": 24.534686971235196
         },
         "PRD-D": {
-          "p50_total": 156.0,
+          "p50_total": 143.5,
           "demand_total": 483.0,
-          "fill_rate_pct": 32.298136645962735
+          "fill_rate_pct": 29.71014492753623
         }
       },
-      "total_p50": 912.0,
-      "worst_product_fill_pct": 26.480263157894736
+      "total_p50": 629.0,
+      "worst_product_fill_pct": 19.57236842105263
     }
   ],
   "calibration": {
     "PRD-A": {
-      "pct_below_p50": 11.35897435897436,
-      "pct_inside_p10_p90": 99.25641025641025
+      "pct_below_p50": 12.846153846153847,
+      "pct_inside_p10_p90": 97.12820512820512
     },
     "PRD-B": {
-      "pct_below_p50": 18.17948717948718,
-      "pct_inside_p10_p90": 94.15384615384616
+      "pct_below_p50": 0.0,
+      "pct_inside_p10_p90": 97.46153846153847
     },
     "PRD-C": {
-      "pct_below_p50": 29.97435897435897,
-      "pct_inside_p10_p90": 96.51282051282051
+      "pct_below_p50": 2.0,
+      "pct_inside_p10_p90": 98.71794871794873
     },
     "PRD-D": {
-      "pct_below_p50": 3.230769230769231,
-      "pct_inside_p10_p90": 96.76923076923077
+      "pct_below_p50": 17.64102564102564,
+      "pct_inside_p10_p90": 95.53846153846153
     }
   },
-  "wall_seconds": 61.351180300000124
+  "wall_seconds": 36.507902999999715
 }

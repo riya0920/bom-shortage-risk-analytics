@@ -21,7 +21,7 @@ The parametric formula puts a **normal** tail on a quantity whose tail is set by
 
 ## 2. Lot sizing, MOQ and capacity
 
-`Component.moq` existed and nothing read it, which the README noted meant the recommended quantities were wrong. Applying it: **0 of 260 parts get raised to their minimum, forcing $6,351,226 of excess inventory.**
+`Component.moq` existed and nothing read it, which the README noted meant the recommended quantities were wrong. Applying it: **0 of 260 parts get raised to their minimum, forcing $0 of excess inventory.**
 
 | part | need | MOQ | ordered | excess value | months of cover |
 |---|---|---|---|---|---|
@@ -29,7 +29,7 @@ The parametric formula puts a **normal** tail on a quantity whose tail is set by
 That table is a negotiating position. *"Your 1,000-piece minimum costs us this much in dead stock on a part we use 200 of a year"* is a conversation; "your MOQ is inconvenient" is not.
 
 
-**Supplier capacity: 2 suppliers over-committed**, total shortfall 29 units. This is the distinction the README's item 7 was about, and it changes the remedy completely: a lead-time problem is solved by ordering earlier, a capacity problem is not solved by ordering earlier **at all** — that just moves the queue — and needs a second source or a smaller order.
+**Supplier capacity: 1 suppliers over-committed**, total shortfall 21 units. This is the distinction the README's item 7 was about, and it changes the remedy completely: a lead-time problem is solved by ordering earlier, a capacity problem is not solved by ordering earlier **at all** — that just moves the queue — and needs a second source or a smaller order.
 
 *Capacity is not in the dataset. It is assigned here as a multiple of current commitment so some suppliers are genuinely tight, and it is flagged as an assumption rather than smuggled in as data.*
 
@@ -66,23 +66,23 @@ Removing **p95** costs the most recall (0.33 against 0.50) — that is the trigg
 
 | severity | count | meaning | response SLA |
 |---|---|---|---|
-| P1 | 114 | the line stops inside the lead time; no recovery by ordering | 4h |
-| P2 | 57 | recoverable, but only if the order is placed now | 24h |
-| P3 | 49 | comfortable slack; watch it | 72h |
-| P4 | 40 | informational; batch into the weekly review | 168h |
+| P1 | 109 | the line stops inside the lead time; no recovery by ordering | 4h |
+| P2 | 71 | recoverable, but only if the order is placed now | 24h |
+| P3 | 37 | comfortable slack; watch it | 72h |
+| P4 | 43 | informational; batch into the weekly review | 168h |
 
-**Severity is consequence × urgency, not risk score** — and that is the mistake worth avoiding. Measured correlation between severity and supplier risk score: **-0.03**. A part can carry a high risk score and matter not at all (plenty of stock, six weeks of slack, a cheap second source). Routing on risk score floods the top tier with parts nobody needs to act on, which is how an alert channel dies.
+**Severity is consequence × urgency, not risk score** — and that is the mistake worth avoiding. Measured correlation between severity and supplier risk score: **-0.01**. A part can carry a high risk score and matter not at all (plenty of stock, six weeks of slack, a cheap second source). Routing on risk score floods the top tier with parts nobody needs to act on, which is how an alert channel dies.
 
 Slack is compared against the **lead time**, not against a fixed number of days: ten days of slack is comfortable on a 5-day lead and an emergency on a 60-day one.
 
 | owner | total | P1 | P2 | value at risk |
 |---|---|---|---|---|
-| BUYER | 221 | 75 | 57 | $834,172 |
-| SUPPLY_CHAIN_MANAGER | 39 | 39 | 0 | $269,479 |
+| BUYER | 218 | 67 | 71 | $660,183 |
+| SUPPLY_CHAIN_MANAGER | 42 | 42 | 0 | $187,920 |
 
 Capacity problems route to the commodity manager rather than the buyer, because a buyer cannot create capacity — expediting a capacity-constrained supplier moves the queue and produces a week of phone calls and no parts.
 
-**And the load check fails, which is the point of having it.** 114 parts land in P1 and 221 alerts route to BUYER. That is not a prioritised queue — it is a list, and a buyer handed 200 items on a Monday will work them in the order they appear rather than the order they matter.
+**And the load check fails, which is the point of having it.** 109 parts land in P1 and 218 alerts route to BUYER. That is not a prioritised queue — it is a list, and a buyer handed 200 items on a Monday will work them in the order they appear rather than the order they matter.
 
 The cause is that severity is computed per PART while the remedy is usually per SUPPLIER: one late supplier puts every part it ships into P1 simultaneously. The fix is to group alerts by supplier and route one item carrying its parts list, which would collapse most of that queue — and it is not built. I would not ship this tiering as it stands, and reporting the alert count without the load-by-role table would have hidden that.
 
@@ -106,4 +106,4 @@ Against 6 planted disruptions across 46 suppliers with enough history. The inven
 `out/supply_dashboard.html`, 6 KB, self-contained. The buildability fan is the one that matters: a point forecast is the least useful number available here, because the decision is how much cover to buy and that is set by the width of the band, not its middle.
 
 ---
-*Generated in 29s.*
+*Generated in 31s.*

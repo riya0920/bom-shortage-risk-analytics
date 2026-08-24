@@ -227,26 +227,119 @@ cause is that severity is computed per *part* while the remedy is usually per
 fix (group by supplier, route one item with its parts list) is **not built**.
 Reporting the alert count without the load-by-role table would have hidden it.
 
+## Built in the fourth pass — see [docs/INCIDENTS_AND_TRANSPORT.md](docs/INCIDENTS_AND_TRANSPORT.md)
+
+```bash
+python run_pass4.py    # ~25 s
+```
+
+### First: every number in this project was irreproducible
+
+`supply.build()` contained `for sub in set(subs):`, and that loop makes `rng`
+calls. **Python salts string hashing per process** (PEP 456), so a set of strings
+iterates in a different order in every interpreter, the random draws are consumed
+in a different order, and the supply base differs on every run. Two runs of the
+same script gave a value at risk of **656,531 and 1,059,890** — a 61% swing with
+no input changed.
+
+It survived three passes because it is deterministic *within* one process: three
+builds in one interpreter agree exactly, three runs of the same script do not,
+and nothing in a normal test session looks at the second case. The test that
+catches it now shells out to three subprocesses. Fixed with `dict.fromkeys`.
+This is the fourth instance of this family of bug across the nine projects — the
+other three were `hash()` used as an RNG seed.
+
+### Severity per supplier, and the diagnosis that was half right
+
+An incident is one **decision** with one owner, not a summary: a supplier that
+has slipped puts every part it ships at risk at once, and the answer to all of
+them is the same phone call. One incident per *(supplier, severity)*, because a
+supplier with two P1 parts and nine P4s is two conversations on two clocks.
+
+| | alerts | incidents |
+|---|---:|---:|
+| items | 260 | **108** (58% fewer) |
+| P1 items | 109 | **36** |
+| busiest owner | BUYER 218 | BUYER **82** |
+| worst P1 queue | BUYER 67 | SUPPLY_CHAIN_MANAGER **26** |
+| parts covered | 260 | 260 |
+| value at risk | 848,104 | 848,104 |
+
+The last two rows are what keeps it honest: grouping changes the **count** an
+owner sees and not the work, so parts and value are carried through unchanged.
+
+**And it still fails the load check.** The stated diagnosis was that *one late
+supplier puts every part it ships into P1 at once*. That happens, and grouping is
+worth 58% — but the alerts are not concentrated: the top
+five suppliers are **19%** of them across
+48 suppliers. Sweeping the P1 threshold does not save it
+either: even at a slack ratio of 0.01 the worst queue is
+13, above the limit of 10. There is a
+floor and it is correct — **54 of 260 parts already
+have zero or negative slack**, and no threshold can argue that away.
+
+> The queue is not too long because the policy mis-ranks. It is too long because
+> the situation is bad.
+
+That is a different finding from the one this project expected to make, and
+tuning the threshold until the table looked acceptable would have buried it. The
+one honest lever left is to say what a top-N queue covers: the top 10
+P1 incidents by value carry **91%** of the
+P1 value at risk, and 8 incidents carry 80%
+of it.
+
+### A transport
+
+The receiver is a real HTTP server on a real socket — mocking it would test the
+code that calls the transport, which is not the part that goes wrong.
+
+- **Urgent is sent, routine is digested.** 108 incidents become
+  72 messages: 70 individual P1/P2
+  items and 2 digests. Forty separate messages saying
+  *look at it on Friday* is how a channel gets filtered to a folder — after
+  which the P1s go there too.
+- **At-least-once, and the receiver deduplicates.** A sender that marks before
+  the POST loses messages; one that marks after re-sends them. There is no third
+  option. The case that matters is the crash window — deliver, then die before
+  marking: the row stays `{'PENDING': 1}`, restart re-sends it, the
+  receiver sees **2 requests**, records
+  **1** and suppresses
+  **1** on the idempotency key. An ordinary
+  retry never produces a duplicate, so it never tests this.
+- **A dead letter is not a failure to hide.** Against an endpoint that never
+  answers: `{'DEAD': 2}`, **2 still in the outbox**.
+  Dropping them makes the transport look reliable and makes a P1 disappear.
+- **Rate limiting is part of the alert policy, not the plumbing.** With a budget
+  of 5 per recipient, **10 sent and
+  62 deferred**, nothing dropped, and the queue is drained in
+  severity order so the budget goes to P1s rather than to whatever was enqueued
+  first.
+
 ## What is NOT built
 
 1. **No real data.** Everything is `src/supply.py`. No ERP extract, no real BOM,
-   no real supplier history.
-2. **Alerts are objects, not messages.** Nothing is sent — no email, no ticket,
-   no ERP write-back. The module produces routed, prioritised, deduplicated
-   alerts with SLAs and an escalation chain, and a deployment attaches a
-   transport.
-3. **Severity is per part, and it should be per supplier.** See above: the load
-   check fails and the fix is named but not implemented.
-4. **Supplier capacity is assumed, not sourced.** It is not in the dataset, so it
+   no real supplier history — so every number here is a statement about the
+   generator, which is now at least a generator that reproduces.
+2. **The load check still fails, and grouping was not enough.** The remaining
+   answer is capacity or a top-N policy, not another threshold. Nothing here
+   implements the top-N policy; it measures what one would cover.
+3. **Supplier capacity is assumed, not sourced.** It is not in the dataset, so it
    is assigned as a multiple of current commitment and flagged as an assumption
    everywhere it is used.
-5. **The distress proxy is still a proxy.** Its weights are stated rather than
+4. **The distress proxy is still a proxy.** Its weights are stated rather than
    fitted, because there are no realised bankruptcies here to fit against —
    inventing some would be the same mistake the Beta draw was.
-6. **No calibration against realised outcomes over time.** The risk bands were
+5. **No calibration against realised outcomes over time.** The risk bands were
    measured at 97.9% against an 80% target in pass 2, which means the band is too
-   wide, and widening or narrowing it properly needs outcomes this simulation
-   does not run long enough to produce.
+   wide, and fixing it properly needs outcomes this simulation does not run long
+   enough to produce.
+6. **The transport has one sink and no scheduler.** A webhook, and a `drain()`
+   that a caller drives on a clock it supplies. No email, no ticketing system, no
+   ERP write-back, and nothing runs it at 06:00 — the outbox, the retry policy
+   and the dead-letter state are the parts that would survive attaching any of
+   those; the sink is the part that would be replaced.
+7. **Escalation is a chain in a dict, not a timer.** `escalate_after_hours` is
+   carried on every incident and nothing counts down or reassigns.
 
 ## Layout
 
@@ -256,5 +349,9 @@ src/supply.py              generator: BOMs, suppliers, lead-time distributions, 
 src/buildability.py        BOM explosion, weekly buildability, allocation policies,
                            Monte Carlo fan, shortage drivers with order-by dates
 src/supplier_analytics.py  OTIF both ways, deterioration triggers, composite risk
+src/routing.py             severity tiers, SLAs, routing and the escalation chain
+src/incidents.py           per-supplier grouping, the load check, threshold calibration
+src/transport.py           durable outbox, retries, dead letters, rate limits, a real sink
 run_supply.py              orchestration; writes docs/RESULTS.md
+run_pass4.py               incidents and the transport; writes the pass-4 doc
 ```

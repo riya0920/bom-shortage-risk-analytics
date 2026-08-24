@@ -6,34 +6,34 @@
 
 | product | 13-week demand | P50 buildable | P10 | fill at P50 |
 |---|---|---|---|---|
-| PRD-A | 735 | 166 | 166 | 23% |
+| PRD-A | 735 | 217 | 166 | 30% |
 | PRD-B | 608 | 119 | 119 | 20% |
-| PRD-C | 591 | 222 | 146 | 38% |
-| PRD-D | 483 | 171 | 170 | 35% |
+| PRD-C | 591 | 126 | 125 | 21% |
+| PRD-D | 483 | 150 | 103 | 31% |
 
 ## 2. Top shortage drivers — action required
 
 | part | supplier | single source | first impact | order by | status |
 |---|---|---|---|---|---|
-| PRT-0111 | SUP-004 | YES | week 3 | day -81 | **PAST DUE** |
-| PRT-0042 | SUP-040 | YES | week 7 | day -6 | **PAST DUE** |
-| PRT-0223 | SUP-031 | no | week 5 | day -54 | **PAST DUE** |
-| PRT-0137 | SUP-048 | no | week 4 | day -73 | **PAST DUE** |
-| PRT-0012 | SUP-005 | no | week 3 | day -69 | **PAST DUE** |
-| PRT-0166 | SUP-024 | no | week 11 | day +12 | on track |
+| PRT-0146 | SUP-038 | no | week 6 | day -10 | **PAST DUE** |
+| PRT-0100 | SUP-038 | no | week 9 | day +11 | on track |
+| PRT-0008 | SUP-034 | no | week 8 | day +5 | on track |
+| PRT-0109 | SUP-043 | no | week 3 | day -63 | **PAST DUE** |
+| PRT-0177 | SUP-016 | YES | week 8 | day -11 | **PAST DUE** |
+| PRT-0200 | SUP-032 | no | week 10 | day +24 | on track |
 
 ## 3. Recommended expedites
 
 | part | mode | days saved | premium | recovers runway? |
 |---|---|---|---|---|
-| PRT-0111 | air freight | 33 | $900 | no |
-| PRT-0111 | partial shipment | 18 | $240 | no |
-| PRT-0111 | supplier overtime | 9 | $75 | no |
-| PRT-0042 | air freight | 25 | $7,693 | yes |
-| PRT-0042 | partial shipment | 14 | $2,051 | yes |
-| PRT-0042 | supplier overtime | 7 | $641 | yes |
-| PRT-0223 | air freight | 38 | $574 | no |
-| PRT-0223 | partial shipment | 21 | $153 | no |
+| PRT-0146 | air freight | 24 | $4,673 | yes |
+| PRT-0146 | partial shipment | 13 | $1,246 | yes |
+| PRT-0146 | supplier overtime | 6 | $389 | no |
+| PRT-0100 | air freight | 24 | $333 | yes |
+| PRT-0100 | partial shipment | 13 | $89 | yes |
+| PRT-0100 | supplier overtime | 6 | $28 | yes |
+| PRT-0008 | air freight | 20 | $483 | yes |
+| PRT-0008 | partial shipment | 11 | $129 | yes |
 
 ## 4. Sub-tier concentration
 

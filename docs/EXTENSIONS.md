@@ -6,20 +6,20 @@ The first build identified shortage drivers and stopped there. An expedite recom
 
 | part | supplier | mode | lead mean | days saved | premium | recovers runway? |
 |---|---|---|---|---|---|---|
-| PRT-0111 | SUP-004 | air freight | 59 d | 33 d | $900 | no |
-| PRT-0111 | SUP-004 | partial shipment | 59 d | 18 d | $240 | no |
-| PRT-0111 | SUP-004 | supplier overtime | 59 d | 9 d | $75 | no |
-| PRT-0042 | SUP-040 | air freight | 46 d | 25 d | $7,693 | **yes** |
-| PRT-0042 | SUP-040 | partial shipment | 46 d | 14 d | $2,051 | **yes** |
-| PRT-0042 | SUP-040 | supplier overtime | 46 d | 7 d | $641 | **yes** |
-| PRT-0223 | SUP-031 | air freight | 69 d | 38 d | $574 | no |
-| PRT-0223 | SUP-031 | partial shipment | 69 d | 21 d | $153 | no |
-| PRT-0223 | SUP-031 | supplier overtime | 69 d | 10 d | $48 | no |
-| PRT-0137 | SUP-048 | air freight | 60 d | 33 d | $2,350 | no |
-| PRT-0137 | SUP-048 | partial shipment | 60 d | 18 d | $627 | no |
-| PRT-0137 | SUP-048 | supplier overtime | 60 d | 9 d | $196 | no |
+| PRT-0146 | SUP-038 | air freight | 43 d | 24 d | $4,673 | **yes** |
+| PRT-0146 | SUP-038 | partial shipment | 43 d | 13 d | $1,246 | **yes** |
+| PRT-0146 | SUP-038 | supplier overtime | 43 d | 6 d | $389 | no |
+| PRT-0100 | SUP-038 | air freight | 43 d | 24 d | $333 | **yes** |
+| PRT-0100 | SUP-038 | partial shipment | 43 d | 13 d | $89 | **yes** |
+| PRT-0100 | SUP-038 | supplier overtime | 43 d | 6 d | $28 | **yes** |
+| PRT-0008 | SUP-034 | air freight | 37 d | 20 d | $483 | **yes** |
+| PRT-0008 | SUP-034 | partial shipment | 37 d | 11 d | $129 | **yes** |
+| PRT-0008 | SUP-034 | supplier overtime | 37 d | 6 d | $40 | **yes** |
+| PRT-0109 | SUP-043 | air freight | 61 d | 33 d | $2,790 | no |
+| PRT-0109 | SUP-043 | partial shipment | 61 d | 18 d | $744 | no |
+| PRT-0109 | SUP-043 | supplier overtime | 61 d | 9 d | $232 | no |
 
-**12 of 24 options actually recover the runway** — i.e. the days saved exceed the days already lost past the order-by date. The rest are money spent on a part that will still be late, which is the expedite decision people get wrong most often: air freight on a part that needed ordering six weeks ago buys a faster arrival of something that is still after the line stops.
+**13 of 24 options actually recover the runway** — i.e. the days saved exceed the days already lost past the order-by date. The rest are money spent on a part that will still be late, which is the expedite decision people get wrong most often: air freight on a part that needed ordering six weeks ago buys a faster arrival of something that is still after the line stops.
 
 ## 2. Multi-tier risk — the concentration nobody sees
 
@@ -57,12 +57,12 @@ RESULTS.md §2 checked what fraction of simulations fell below their own P50, an
 
 | product | % inside P10–P90 | % below P10 | % above P90 | target |
 |---|---|---|---|---|
-| PRD-A | **98.8%** | 0.0% | 1.2% | 80% |
-| PRD-B | **100.0%** | 0.0% | 0.0% | 80% |
-| PRD-C | **99.1%** | 0.0% | 0.9% | 80% |
-| PRD-D | **97.3%** | 0.0% | 2.7% | 80% |
+| PRD-A | **97.1%** | 0.0% | 2.9% | 80% |
+| PRD-B | **98.2%** | 0.0% | 1.8% | 80% |
+| PRD-C | **97.1%** | 0.9% | 2.1% | 80% |
+| PRD-D | **94.5%** | 1.4% | 4.1% | 80% |
 
-**Mean coverage: 98.8% against a target of 80%.**
+**Mean coverage: 96.7% against a target of 80%.**
 
 The band is **too wide**. An interval that contains the outcome far more often than advertised is not conservative-and-therefore-safe: it is a forecast nobody will plan against, because the P10 stops being a meaningful floor. The likely cause is that the fan and the futures are drawn from the same lead-time distributions, so the only variation the fan sees is the variation it was built from — a real fan also has to carry parameter uncertainty, which would widen the *true* outcome spread rather than the predicted one.
 

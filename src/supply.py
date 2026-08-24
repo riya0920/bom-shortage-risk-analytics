@@ -144,7 +144,15 @@ def build(seed: int = 20260819, n_suppliers: int = 50) -> SupplyBase:
             subs.append(sub)
             bom.append(BomLine(prod, sub, float(rng.integers(1, 4))))
 
-        for sub in set(subs):
+        # dict.fromkeys, NOT set(). `set` iteration order over strings varies
+        # between PROCESSES, because Python salts string hashing (PEP 456) --
+        # and every rng call inside this loop then consumes randomness in a
+        # different order, so the whole supply base differs on every run. It is
+        # deterministic within one process, which is exactly why it survived:
+        # three builds in one interpreter agree, and three runs of the same
+        # script do not. dict.fromkeys deduplicates in insertion order, which is
+        # the order `subs` was built in and is itself deterministic.
+        for sub in dict.fromkeys(subs):
             if any(b.parent == sub for b in bom):
                 continue  # already exploded (shared sub-assembly)
             n_parts = int(rng.integers(10, 22))
