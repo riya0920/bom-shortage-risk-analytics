@@ -214,7 +214,7 @@ def report(d: dict) -> str:
     A("## 0. First: every number in this project was irreproducible\n")
     A("`supply.build()` contained `for sub in set(subs):`, and the loop body "
       "makes `rng` calls. **Python salts string hashing per process** (PEP 456), "
-      "so a set of strings iterates in a different order in every interpreter — "
+      "so a set of strings iterates in a different order in every interpreter, "
       "and the random draws are then consumed in a different order, producing a "
       "different supply base on every run. Two runs of the same script gave a "
       "value at risk of 656,531 and 1,059,890: a 61% swing with no input "
@@ -224,12 +224,12 @@ def report(d: dict) -> str:
       "the same script do not, and nothing in a normal test session looks at "
       "the second case. Fixed with `dict.fromkeys`, which deduplicates in "
       "insertion order. This is the fourth instance of the same family of bug "
-      "across these nine projects — the other three were `hash()` used as a "
+      "across these nine projects; the other three were `hash()` used as a "
       "seed.\n")
     A("Every figure below comes from the fixed generator and is identical "
       "across runs; the figures in the earlier passes did not and were not.\n")
 
-    A("\n## 1. Severity per supplier — the fix the README named\n")
+    A("\n## 1. Severity per supplier: the fix the README named\n")
     A("An incident is not a summary of alerts. It is one **decision** with one "
       "owner: a supplier that has slipped puts every part it ships at risk at "
       "once, and the response to all of them is the same phone call. The parts "
@@ -254,7 +254,7 @@ def report(d: dict) -> str:
 
     A(f"\n### And it still fails the load check\n")
     A(f"Against a limit of {lc['per_owner_limit']} open items per owner and "
-      f"{lc['p1_limit']} P1s — judgements, stated as such — the queue passes "
+      f"{lc['p1_limit']} P1s, judgements, stated as such, the queue passes "
       f"**neither** before nor after: `passes_before={lc['passes_before']}`, "
       f"`passes_after={lc['passes_after']}`. The busiest owner still has "
       f"{lc['busiest_after']['items']} items and the worst P1 queue still has "
@@ -283,7 +283,7 @@ def report(d: dict) -> str:
     A(f"\nEven at a ratio of {floor['p1_ratio']:.2f} the worst queue is "
       f"{floor['worst_p1_items']}, still above {cal['p1_limit']}. There is a "
       f"floor, and it is correct: **{ic['already_short']} of {ic['n_rows']} "
-      "parts have zero or negative slack** — they are already below their lead "
+      "parts have zero or negative slack**; they are already below their lead "
       "time, ordering now does not recover them, and no ratio threshold can or "
       "should argue that away.\n")
     A("**The queue is not too long because the policy mis-ranks. It is too long "
@@ -303,7 +303,7 @@ def report(d: dict) -> str:
     A("\n## 2. A transport\n")
     A("Alerts were objects, and the README said a deployment attaches a "
       "transport. Attaching one is where the problems are, and none of them are "
-      "about the protocol. The receiver is a real HTTP server on a real socket — "
+      "about the protocol. The receiver is a real HTTP server on a real socket; "
       "mocking it would test the code that calls the transport, which is not the "
       "part that goes wrong.\n")
 
@@ -312,7 +312,7 @@ def report(d: dict) -> str:
       f"messages**: {tr['urgent_messages']} individual P1/P2 items and "
       f"{tr['digest_messages']} digests. The response to a P4 is *look at it on "
       "Friday*, and forty separate messages saying that is how a channel gets "
-      "filtered to a folder — after which the P1s go there too.\n")
+      "filtered to a folder, after which the P1s go there too.\n")
 
     A("\n### At-least-once, and the receiver deduplicates\n")
     rt = tr["retry"]
@@ -334,17 +334,17 @@ def report(d: dict) -> str:
       f"has seen {tr['receiver_duplicates_after_rerun']} duplicates.\n")
     cw = tr["crash_window"]
     A(f"\n**And the ordinary retry never produces a duplicate**, because a "
-      f"failed send was never delivered — so receiver-side dedupe is untested "
+      f"failed send was never delivered, so receiver-side dedupe is untested "
       f"by it. The case it exists for is the crash window: deliver the message, "
       f"then die before marking the outbox. State after the crash: "
-      f"`{cw['state_after_crash']}` — still pending. On restart it is sent again "
+      f"`{cw['state_after_crash']}`, still pending. On restart it is sent again "
       f"({cw['resent_on_restart']} send), the receiver sees "
       f"**{cw['receiver_requests']} requests** and records "
       f"**{cw['receiver_distinct_deliveries']} delivery**, suppressing "
       f"**{cw['receiver_duplicates_suppressed']}** on the idempotency key. "
       "That is the whole contract, and it only works because both halves are "
       "there.\n")
-    A("The key is a SHA-256 of recipient plus canonical payload — deliberately "
+    A("The key is a SHA-256 of recipient plus canonical payload, deliberately "
       "not `hash()`, which is the bug found at the top of this document and "
       "which here would mean every restart re-sending everything.\n")
 
@@ -367,7 +367,7 @@ def report(d: dict) -> str:
       f"**{rl['max_to_one_recipient']}**.\n")
     A("The queue is drained in severity order, so the budget is spent on P1s "
       "rather than on whatever was enqueued first, and what exceeds it is "
-      "deferred visibly — a silently held P1 is worse than a noisy one.\n")
+      "deferred visibly; a silently held P1 is worse than a noisy one.\n")
     return "\n".join(L) + "\n"
 
 

@@ -11,7 +11,7 @@
 | PRD-C | 591 | 126 | 125 | 21% |
 | PRD-D | 483 | 150 | 103 | 31% |
 
-## 2. Top shortage drivers — action required
+## 2. Top shortage drivers: action required
 
 | part | supplier | single source | first impact | order by | status |
 |---|---|---|---|---|---|
