@@ -1769,8 +1769,8 @@
  },
  "charts": {
   "path": "C:\\Users\\riyas\\Desktop\\manufacturing-hm\\data3-supply-risk\\out\\supply_dashboard.html",
-  "bytes": 6387,
+  "bytes": 8366,
   "self_contained": true
  },
- "wall_seconds": 30.545017299999927
+ "wall_seconds": 15.580840600014199
 }

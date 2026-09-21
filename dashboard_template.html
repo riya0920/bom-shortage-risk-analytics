@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BOM Shortage Risk</title>
+<meta name="description" content="Can a factory build its 13-week plan? Shortage risk from the bill of materials, supplier lead times and Monte Carlo simulation.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --card: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --good: #0ca30c; --warn: #fab219; --crit: #d03b3b;
+  --good-ink: #006300; --crit-ink: #b02a2a;
+  --chip: #f0efec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --card: #1a1a19;
+    --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --good-ink: #0ca30c; --crit-ink: #e66767; --chip: #262624;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --card: #1a1a19;
+  --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --good-ink: #0ca30c; --crit-ink: #e66767; --chip: #262624;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 40px 16px 64px; }
+header .eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+h1 { font-size: 30px; line-height: 1.2; margin: 6px 0 10px; letter-spacing: -.01em; }
+.lede { color: var(--ink-2); max-width: 760px; margin: 0; font-size: 16px; }
+.meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 12.5px; color: var(--ink-2); background: var(--chip); border-radius: 999px; padding: 3px 10px; }
+.pill a { color: inherit; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0 8px; }
+.kpi { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 16px 18px; }
+.kpi .v { font-size: 30px; font-weight: 650; letter-spacing: -.01em; line-height: 1.1; }
+.kpi .l { color: var(--ink-2); font-size: 13.5px; margin-top: 6px; }
+.kpi .s { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+section { margin-top: 40px; }
+h2 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.005em; }
+.q { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+.sub { color: var(--ink-2); margin: 2px 0 14px; max-width: 780px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 18px 18px 14px; min-width: 0; }
+.card h3 { font-size: 15px; margin: 0 0 2px; }
+.card .cap { color: var(--ink-2); font-size: 13.5px; margin: 0 0 10px; }
+.note { color: var(--ink-2); font-size: 13.5px; border-top: 1px solid var(--grid); margin-top: 10px; padding-top: 10px; }
+.note b { color: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-2); margin: 4px 0 6px; }
+.legend i { display: inline-block; vertical-align: middle; margin-right: 6px; }
+.key-line { width: 16px; height: 2px; border-radius: 2px; }
+.key-dot { width: 9px; height: 9px; border-radius: 50%; }
+.key-area { width: 14px; height: 10px; border-radius: 3px; }
+.seg { display: inline-flex; flex-wrap: wrap; max-width: 100%; background: var(--chip); border-radius: 8px; padding: 3px; gap: 2px; margin-bottom: 8px; }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2); padding: 4px 12px; border-radius: 6px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 0 0 1px var(--ring); font-weight: 600; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: inherit; }
+.ax { fill: var(--muted); font-size: 11px; }
+.axl { fill: var(--ink-2); font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-weight: 600; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--axis); padding: 6px 8px; white-space: nowrap; }
+td { border-bottom: 1px solid var(--grid); padding: 7px 8px; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge.late { color: var(--crit-ink); }
+.badge.ok { color: var(--good-ink); }
+.mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12.5px; }
+.decisions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.dec { background: var(--card); border: 1px solid var(--ring); border-radius: 12px; padding: 16px; }
+.dec .n { color: var(--muted); font-size: 12px; font-weight: 600; }
+.dec h3 { font-size: 15px; margin: 4px 0 6px; }
+.dec p { margin: 0; color: var(--ink-2); font-size: 13.5px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.stat .v { font-size: 22px; font-weight: 650; }
+.stat .l { color: var(--ink-2); font-size: 13px; }
+#tip {
+  position: fixed; pointer-events: none; z-index: 10; opacity: 0; transition: opacity .08s;
+  background: var(--card); color: var(--ink); border: 1px solid var(--ring); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.14); padding: 8px 10px; font-size: 12.5px; min-width: 140px;
+}
+#tip .t { color: var(--muted); font-size: 11.5px; margin-bottom: 4px; }
+#tip .r { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+#tip .r span { color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+#tip .r b { font-variant-numeric: tabular-nums; }
+footer { margin-top: 48px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--grid); padding-top: 16px; }
+footer a { color: var(--ink-2); }
+.theme { position: absolute; top: 16px; right: 16px; }
+.theme button { font: inherit; font-size: 12.5px; border: 1px solid var(--ring); background: var(--card); color: var(--ink-2); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+@media (max-width: 860px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .grid2, .decisions, .stats { grid-template-columns: 1fr; }
+  h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="theme"><button id="themeBtn" type="button">Theme</button></div>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Manufacturing supply chain · shortage risk</div>
+  <h1>Can the factory build its 13-week plan?</h1>
+  <p class="lede">A factory makes 4 products from <span id="h-parts"></span> purchased parts bought from
+  <span id="h-sup"></span> suppliers. This project runs the bill of materials, supplier lead times and
+  a Monte Carlo simulation to answer: how much of the plan can we actually build, which parts will stop
+  the line, which suppliers can we trust, and who needs to act first.</p>
+  <div class="meta">
+    <span class="pill">Simulated supply base with known ground truth</span>
+    <span class="pill" id="h-sims"></span>
+    <span class="pill"><a href="https://github.com/riya0920/bom-shortage-risk-analytics">Code on GitHub</a></span>
+  </div>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<section>
+  <div class="q">1 · Can we build the plan?</div>
+  <h2>Buildable units per week, as a range, not one number</h2>
+  <p class="sub">Each simulation draws a new lead time for every supplier. The band is the middle 80% of outcomes
+  (P10 to P90); the line is the median. The gap to the demand line is the shortfall.</p>
+  <div class="card">
+    <div class="seg" id="prodSeg" role="group" aria-label="Product"></div>
+    <div class="legend">
+      <span><i class="key-line" style="background:var(--s2)"></i>Demand</span>
+      <span><i class="key-line" style="background:var(--s1)"></i>Median buildable (P50)</span>
+      <span><i class="key-area" style="background:var(--s1);opacity:.18"></i>P10 to P90 range</span>
+    </div>
+    <div id="fan"></div>
+    <div class="note" id="fanNote"></div>
+  </div>
+</section>
+
+<section>
+  <div class="q">2 · What is stopping it?</div>
+  <h2>The parts that gate production, and when to order them</h2>
+  <p class="sub">Ranked by how often each part was the one that stopped a product in the simulation. The
+  order-by date uses the supplier's <b>P95</b> lead time (a bad-case delivery), not the average. Ordering to the
+  average means arriving late half the time. Day 0 is today.</p>
+  <div class="card tbl"><table id="drivers"></table></div>
+</section>
+
+<section>
+  <div class="q">3 · Which suppliers can we trust?</div>
+  <h2>On-time scores depend on which promise you measure against</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>On-time-in-full: original promise vs latest reschedule</h3>
+      <p class="cap">Suppliers that reschedule early look perfect against the rescheduled date.</p>
+      <div class="legend">
+        <span><i class="key-dot" style="background:var(--s2)"></i>vs original promise</span>
+        <span><i class="key-dot" style="background:var(--s1)"></i>vs latest reschedule</span>
+      </div>
+      <div id="otif"></div>
+    </div>
+    <div class="card">
+      <h3>Early-warning detector: precision and recall by threshold</h3>
+      <p class="cap" id="detCap"></p>
+      <div class="legend">
+        <span><i class="key-line" style="background:var(--s1)"></i>Precision</span>
+        <span><i class="key-line" style="background:var(--s2)"></i>Recall</span>
+      </div>
+      <div id="sweep"></div>
+      <div class="note" id="ablNote"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="q">4 · Who acts first?</div>
+  <h2>Urgent (P1) items per person, before and after grouping by supplier</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>P1 items in each owner's queue</h3>
+      <p class="cap" id="loadCap"></p>
+      <div class="legend">
+        <span><i class="key-area" style="background:var(--s2)"></i>One alert per part</span>
+        <span><i class="key-area" style="background:var(--s1)"></i>One incident per supplier</span>
+        <span><i class="key-line" style="background:var(--crit)"></i>Daily limit</span>
+      </div>
+      <div id="load"></div>
+    </div>
+    <div class="card">
+      <h3>Other checks</h3>
+      <p class="cap">Numbers from the same run.</p>
+      <div class="stats" id="stats"></div>
+      <div class="tbl" style="margin-top:14px"><table id="alloc"></table></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="q">5 · What we decided</div>
+  <h2>Decisions and why</h2>
+  <div class="decisions" id="decisions"></div>
+</section>
+
+<footer>
+  All data is simulated so every result can be checked against a known answer (planted supplier disruptions,
+  known lead-time distributions). Every number on this page is read from the pipeline's output files by
+  <span class="mono">build_dashboard.py</span>.
+  <a href="https://github.com/riya0920/bom-shortage-risk-analytics">Source and how to run it</a>.
+</footer>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const D = /*__DATA__*/null;
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+const fmt = (n, d = 0) => Number(n).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (x, d = 0) => fmt(x * 100, d) + "%";
+const money = (n) => "$" + (n >= 1e6 ? fmt(n / 1e6, 2) + "M" : n >= 1e3 ? fmt(n / 1e3, 0) + "K" : fmt(n));
+
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function h(tag, props = {}, parent) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "text") e.textContent = v; else if (k === "cls") e.className = v; else e.setAttribute(k, v);
+  }
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function niceMax(v) {
+  const p = Math.pow(10, Math.floor(Math.log10(v || 1)));
+  for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+
+// ---- tooltip -----------------------------------------------------------
+const tip = $("tip");
+function showTip(evt, title, rows) {
+  tip.replaceChildren();
+  h("div", { cls: "t", text: title }, tip);
+  for (const [label, value, color] of rows) {
+    const r = h("div", { cls: "r" }, tip);
+    const s = h("span", {}, r);
+    if (color) { const k = h("i", { cls: "key-line" }, s); k.style.background = color; k.style.display = "inline-block"; }
+    s.appendChild(document.createTextNode(label));
+    h("b", { text: value }, r);
+  }
+  const x = Math.min(evt.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+  const y = Math.min(evt.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+  tip.style.left = x + "px"; tip.style.top = y + "px"; tip.style.opacity = 1;
+}
+const hideTip = () => { tip.style.opacity = 0; };
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// ---- header + KPIs -----------------------------------------------------
+$("h-parts").textContent = D.base.purchased_parts;
+$("h-sup").textContent = D.base.suppliers;
+$("h-sims").textContent = `${D.base.horizon_weeks}-week horizon · ${D.base.bom_lines} BOM lines · ${D.base.single_sourced_parts} single-sourced parts`;
+const K = D.kpis;
+[
+  [pct(K.fill_p50), "of planned units buildable", `median case: ${fmt(K.units_p50)} of ${fmt(K.units_demand)} units`],
+  [`${K.late_drivers} of ${K.n_drivers}`, "top shortage parts already past order-by date", "ordering today is already too late"],
+  [money(K.value_at_risk), "value of output at risk", `across ${K.n_parts} purchased parts`],
+  [`${K.zero_slack}`, "parts with zero or negative slack", "short before any delay happens"],
+].forEach(([v, l, s]) => {
+  const k = h("div", { cls: "kpi" }, $("kpis"));
+  h("div", { cls: "v", text: v }, k); h("div", { cls: "l", text: l }, k); h("div", { cls: "s", text: s }, k);
+});
+
+// ---- 1. fan chart ------------------------------------------------------
+const products = ["total", ...Object.keys(D.fan).filter((k) => k !== "total")];
+let current = "total";
+products.forEach((p) => {
+  const b = h("button", { type: "button", text: p === "total" ? "All products" : p.replace("PRD-", "Product "), "aria-pressed": String(p === current) }, $("prodSeg"));
+  b.onclick = () => { current = p; [...$("prodSeg").children].forEach((c, i) => c.setAttribute("aria-pressed", String(products[i] === p))); drawFan(); };
+});
+
+function drawFan() {
+  const f = D.fan[current];
+  const W = 1040, H = 320, L = 44, R = 16, T = 12, B = 30;
+  const n = f.p50.length, pw = W - L - R, ph = H - T - B;
+  const ymax = niceMax(Math.max(...f.demand, ...f.p90) * 1.05);
+  const x = (i) => L + (pw * i) / (n - 1), y = (v) => T + ph - (ph * v) / ymax;
+  const host = $("fan"); host.replaceChildren();
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Buildable units by week" }, host);
+  const nt = Number.isInteger(ymax / 4) ? 4 : 5;
+  for (let t = 0; t <= nt; t++) {
+    const v = (ymax * t) / nt;
+    el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: t ? "var(--grid)" : "var(--axis)", "stroke-width": 1 }, svg);
+    el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", class: "ax" }, svg).textContent = fmt(v);
+  }
+  for (let i = 0; i < n; i++) el("text", { x: x(i), y: H - 8, "text-anchor": "middle", class: "ax" }, svg).textContent = "W" + (i + 1);
+  const band = f.p90.map((v, i) => `${x(i)},${y(v)}`).concat(f.p10.map((v, i) => `${x(i)},${y(v)}`).reverse());
+  el("polygon", { points: band.join(" "), fill: "var(--s1)", "fill-opacity": 0.14 }, svg);
+  const line = (arr, color) => el("polyline", { points: arr.map((v, i) => `${x(i)},${y(v)}`).join(" "), fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+  line(f.demand, "var(--s2)"); line(f.p50, "var(--s1)");
+  const lastI = n - 1;
+  el("circle", { cx: x(lastI), cy: y(f.demand[lastI]), r: 4, fill: "var(--s2)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+  el("circle", { cx: x(lastI), cy: y(f.p50[lastI]), r: 4, fill: "var(--s1)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+  const cross = el("line", { y1: T, y2: T + ph, stroke: "var(--axis)", "stroke-width": 1, opacity: 0 }, svg);
+  const hit = el("rect", { x: L, y: T, width: pw, height: ph, fill: "transparent" }, svg);
+  hit.addEventListener("pointermove", (evt) => {
+    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const i = Math.max(0, Math.min(n - 1, Math.round(((loc.x - L) / pw) * (n - 1))));
+    cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
+    showTip(evt, "Week " + (i + 1), [
+      ["Demand", fmt(f.demand[i]), css("--s2")],
+      ["Median (P50)", fmt(f.p50[i]), css("--s1")],
+      ["P10 to P90", `${fmt(f.p10[i])} to ${fmt(f.p90[i])}`, null],
+    ]);
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); hideTip(); });
+  const dem = f.demand.reduce((a, b) => a + b, 0), med = f.p50.reduce((a, b) => a + b, 0);
+  const firstShort = f.p50.findIndex((v, i) => v < f.demand[i]);
+  $("fanNote").replaceChildren();
+  const b1 = h("b", { text: `${pct(med / dem)} of demand` });
+  $("fanNote").append("Median case: ", b1, ` is buildable over 13 weeks (${fmt(med)} of ${fmt(dem)} units). ` +
+    (firstShort >= 0 ? `Shortfalls start in week ${firstShort + 1}, once today's stock runs out and parts on order have not arrived.` : ""));
+}
+drawFan();
+
+// ---- 2. drivers table ---------------------------------------------------
+(function () {
+  const t = $("drivers");
+  const hr = h("tr", {}, h("thead", {}, t));
+  [["Part", ""], ["Supplier", ""], ["Single source", ""], ["First short week", "n"], ["Avg lead (days)", "n"], ["P95 lead (days)", "n"], ["Order by (day)", "n"], ["Status", ""]]
+    .forEach(([c, cl]) => h("th", { text: c, cls: cl }, hr));
+  const tb = h("tbody", {}, t);
+  D.drivers.forEach((d) => {
+    const r = h("tr", {}, tb);
+    h("td", { cls: "mono", text: d.part }, r);
+    h("td", { cls: "mono", text: d.supplier }, r);
+    h("td", { text: d.single ? "Yes" : "No" }, r);
+    h("td", { cls: "n", text: d.week == null ? "not in median" : "W" + d.week }, r);
+    h("td", { cls: "n", text: d.mean }, r);
+    h("td", { cls: "n", text: d.p95 }, r);
+    h("td", { cls: "n", text: d.order_by }, r);
+    const s = h("td", {}, r);
+    const b = h("span", { cls: "badge " + (d.late ? "late" : "ok") }, s);
+    b.textContent = d.late ? `✕ ${Math.abs(d.order_by)} days late` : `✓ ${d.order_by} days left`;
+  });
+})();
+
+// ---- 3a. OTIF dumbbell ---------------------------------------------------
+(function () {
+  const rows = D.otif;
+  const W = 520, rowH = 26, L = 70, R = 44, T = 6, B = 26, H = T + B + rows.length * rowH;
+  const pw = W - L - R, x = (v) => L + (pw * v) / 100;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "OTIF by supplier" }, $("otif"));
+  for (const v of [0, 25, 50, 75, 100]) {
+    el("line", { x1: x(v), x2: x(v), y1: T, y2: H - B, stroke: v ? "var(--grid)" : "var(--axis)" }, svg);
+    el("text", { x: x(v), y: H - 8, "text-anchor": "middle", class: "ax" }, svg).textContent = v + "%";
+  }
+  rows.forEach((o, i) => {
+    const cy = T + i * rowH + rowH / 2;
+    el("text", { x: L - 8, y: cy + 4, "text-anchor": "end", class: "axl" }, svg).textContent = o.s;
+    el("line", { x1: x(o.orig), x2: x(o.latest), y1: cy, y2: cy, stroke: "var(--axis)", "stroke-width": 2 }, svg);
+    el("circle", { cx: x(o.orig), cy, r: 5, fill: "var(--s2)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+    el("circle", { cx: x(o.latest), cy, r: 5, fill: "var(--s1)", stroke: "var(--card)", "stroke-width": 2 }, svg);
+    el("text", { x: x(o.latest) + 10, y: cy + 4, class: "ax" }, svg).textContent = "+" + fmt(o.latest - o.orig) + " pts";
+    const hit = el("rect", { x: 0, y: cy - rowH / 2, width: W, height: rowH, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", (evt) => showTip(evt, `${o.s} · ${o.n} deliveries`, [
+      ["vs original promise", fmt(o.orig, 1) + "%", css("--s2")],
+      ["vs latest reschedule", fmt(o.latest, 1) + "%", css("--s1")],
+    ]));
+    hit.addEventListener("pointerleave", hideTip);
+  });
+})();
+
+// ---- 3b. detector sweep ---------------------------------------------------
+(function () {
+  const s = D.sweep;
+  const W = 520, H = 250, L = 40, R = 14, T = 10, B = 34, pw = W - L - R, ph = H - T - B;
+  const xs = s.map((d) => d.scale), xmin = Math.min(...xs), xmax = Math.max(...xs);
+  const x = (v) => L + (pw * (v - xmin)) / (xmax - xmin), y = (v) => T + ph - ph * v;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Precision and recall by threshold" }, $("sweep"));
+  for (const v of [0, .25, .5, .75, 1]) {
+    el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: v ? "var(--grid)" : "var(--axis)" }, svg);
+    el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", class: "ax" }, svg).textContent = pct(v);
+  }
+  s.forEach((d) => el("text", { x: x(d.scale), y: H - 16, "text-anchor": "middle", class: "ax" }, svg).textContent = d.scale.toFixed(2));
+  el("text", { x: L + pw / 2, y: H - 1, "text-anchor": "middle", class: "ax" }, svg).textContent = "threshold (× baseline)  →  stricter";
+  const bx = x(D.best.scale);
+  el("line", { x1: bx, x2: bx, y1: T, y2: T + ph, stroke: "var(--axis)", "stroke-width": 1 }, svg);
+  el("text", { x: bx + 5, y: T + 11, class: "ax" }, svg).textContent = "best F1";
+  const line = (key, color) => {
+    el("polyline", { points: s.map((d) => `${x(d.scale)},${y(d[key])}`).join(" "), fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }, svg);
+    s.forEach((d) => el("circle", { cx: x(d.scale), cy: y(d[key]), r: 4, fill: color, stroke: "var(--card)", "stroke-width": 2 }, svg));
+  };
+  line("recall", "var(--s2)"); line("precision", "var(--s1)");
+  const cross = el("line", { y1: T, y2: T + ph, stroke: "var(--axis)", opacity: 0 }, svg);
+  const hit = el("rect", { x: L, y: T, width: pw, height: ph, fill: "transparent" }, svg);
+  hit.addEventListener("pointermove", (evt) => {
+    const pt = svg.createSVGPoint(); pt.x = evt.clientX; pt.y = evt.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let best = 0; s.forEach((d, i) => { if (Math.abs(x(d.scale) - loc.x) < Math.abs(x(s[best].scale) - loc.x)) best = i; });
+    const d = s[best];
+    cross.setAttribute("x1", x(d.scale)); cross.setAttribute("x2", x(d.scale)); cross.setAttribute("opacity", 1);
+    showTip(evt, `Threshold ${d.scale.toFixed(2)}× · ${d.flagged} suppliers flagged`, [
+      ["Precision", pct(d.precision), css("--s1")], ["Recall", pct(d.recall), css("--s2")],
+    ]);
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); hideTip(); });
+  $("detCap").textContent = `Scored against ${D.base.planted_disruptions} supplier disruptions planted in the data. Best setting: ${D.best.scale}× (precision ${pct(D.best.precision)}, recall ${pct(D.best.recall)}).`;
+  const a = D.ablation;
+  $("ablNote").replaceChildren();
+  $("ablNote").append("Remove the P95 (bad-case) trigger and recall drops from ",
+    h("b", { text: pct(a["all three"].recall) }), " to ", h("b", { text: pct(a["without p95"].recall) }),
+    `. Remove the variance trigger and nothing is lost while precision rises to ${pct(a["without variance"].precision)}, so it only adds false alarms.`);
+})();
+
+// ---- 4a. load ------------------------------------------------------------
+(function () {
+  const L0 = D.load, roles = Object.keys(L0.before);
+  const name = (r) => r === "BUYER" ? "Buyer" : r === "SUPPLY_CHAIN_MANAGER" ? "Supply chain mgr" : r;
+  const W = 520, L = 120, R = 40, T = 6, group = 64, B = 24, H = T + B + roles.length * group;
+  const vmax = niceMax(Math.max(...roles.map((r) => L0.before[r])));
+  const pw = W - L - R, x = (v) => L + (pw * v) / vmax, bh = 20;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "P1 items per owner" }, $("load"));
+  for (let t = 0; t <= 4; t++) {
+    const v = (vmax * t) / 4;
+    el("line", { x1: x(v), x2: x(v), y1: T, y2: H - B, stroke: t ? "var(--grid)" : "var(--axis)" }, svg);
+    el("text", { x: x(v), y: H - 6, "text-anchor": "middle", class: "ax" }, svg).textContent = fmt(v);
+  }
+  const bar = (x0, yy, v, color, label, r) => {
+    const w = Math.max(2, x(v) - x0), rr = 4;
+    el("path", { d: `M${x0},${yy} h${w - rr} a${rr},${rr} 0 0 1 ${rr},${rr} v${bh - 2 * rr} a${rr},${rr} 0 0 1 -${rr},${rr} h-${w - rr} z`, fill: color }, svg);
+    el("text", { x: x0 + w + 6, y: yy + bh / 2 + 4, class: "axl" }, svg).textContent = fmt(v);
+    const hit = el("rect", { x: x0, y: yy - 2, width: Math.max(w, 40), height: bh + 4, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", (evt) => showTip(evt, name(r), [[label, fmt(v), css(color.slice(4, -1))]]));
+    hit.addEventListener("pointerleave", hideTip);
+  };
+  roles.forEach((r, i) => {
+    const y0 = T + i * group + 6;
+    el("text", { x: L - 10, y: y0 + bh + 4, "text-anchor": "end", class: "axl" }, svg).textContent = name(r);
+    bar(x(0), y0, L0.before[r], "var(--s2)", "One alert per part", r);
+    bar(x(0), y0 + bh + 2, L0.after[r] || 0, "var(--s1)", "One incident per supplier", r);
+  });
+  el("line", { x1: x(L0.limit), x2: x(L0.limit), y1: T, y2: H - B, stroke: "var(--crit)", "stroke-width": 2 }, svg);
+  $("loadCap").textContent = `Grouping ${L0.alerts} part alerts into ${L0.incidents} supplier incidents cuts the queue, but one owner is still above the limit of ${L0.limit} urgent items a day.`;
+})();
+
+// ---- 4b. stats + allocation --------------------------------------------------
+(function () {
+  [
+    [pct(D.load.top10_share), `of urgent value sits in the top 10 incidents (${D.load.n80} carry 80%)`],
+    [fmt(D.safety.understate, 1) + "×", "safety stock understated if you ignore lead-time variation"],
+    [`${D.expedite.no_recover} of ${D.expedite.n}`, "expedite options that still arrive too late"],
+    [D.tier2[0].parts, `parts depend on one tier-2 supplier (${D.tier2[0].t}), across all ${D.tier2[0].products} products`],
+    [D.distress.observed.toFixed(2), `AUROC of observable supplier-distress signals (old made-up score: ${D.distress.invented.toFixed(2)})`],
+    [fmt(D.calibration.inside, 0) + "%", `of real outcomes inside the P10 to P90 band (target ${D.calibration.target}%): the band is too wide`],
+  ].forEach(([v, l]) => {
+    const s = h("div", { cls: "stat" }, $("stats"));
+    h("div", { cls: "v", text: String(v) }, s); h("div", { cls: "l", text: l }, s);
+  });
+  const t = $("alloc");
+  const prods = Object.keys(D.allocation[0].per);
+  const hr = h("tr", {}, h("thead", {}, t));
+  h("th", { text: "Who gets a short part?" }, hr);
+  prods.forEach((p) => h("th", { cls: "n", text: p.replace("PRD-", "Prod ") }, hr));
+  h("th", { cls: "n", text: "Units" }, hr);
+  const tb = h("tbody", {}, t);
+  const nm = { even: "Even split", margin: "Highest margin first", contract: "Contract priority" };
+  D.allocation.forEach((a) => {
+    const r = h("tr", {}, tb);
+    h("td", { text: nm[a.policy] || a.policy }, r);
+    prods.forEach((p) => h("td", { cls: "n", text: fmt(a.per[p], 0) + "%" }, r));
+    h("td", { cls: "n", text: fmt(a.total) }, r);
+  });
+})();
+
+// ---- 5. decisions -----------------------------------------------------------
+(function () {
+  const K = D.kpis;
+  [
+    ["Plan with a range, not a single number", `The median says ${pct(K.fill_p50)} of the plan is buildable, but the range is wide. Buying cover is set by the bad case, so the plan is shown as P10 / P50 / P90.`],
+    ["Order to the P95 lead time", `Order-by dates use the bad-case lead time. On that basis ${K.late_drivers} of the top ${K.n_drivers} shortage parts are already late and need an expedite decision now.`],
+    ["Score suppliers on the original promise", "Against reschedules, habitual reschedulers score 100%. The scorecard uses the first promise and reports the gap as its own metric."],
+    ["Keep the P95 trigger, drop the variance trigger", "Measured, not assumed: the bad-case trigger carries the detection; the variance trigger adds only false alarms."],
+    ["Group alerts by supplier, then work a top-10 list", `One late supplier is one phone call. Grouping cut the queue; the top 10 incidents still hold ${pct(D.load.top10_share)} of the value at risk.`],
+    ["Don't pick an allocation policy for the business", "Who gets a short part is a business call. The policies are compared side by side; the worst-off product barely changes across them."],
+  ].forEach(([t, p], i) => {
+    const d = h("div", { cls: "dec" }, $("decisions"));
+    h("div", { cls: "n", text: String(i + 1).padStart(2, "0") }, d); h("h3", { text: t }, d); h("p", { text: p }, d);
+  });
+})();
+
+// ---- theme toggle --------------------------------------------------------
+(function () {
+  const root = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  $("themeBtn").onclick = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-"""DATA-3 tests: BOM explosion, buildability, allocation, and the OTIF trap."""
+"""Tests: BOM explosion, buildability, allocation, and the OTIF trap."""
 from __future__ import annotations
 
 import pathlib
