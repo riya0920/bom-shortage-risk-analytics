@@ -1,19 +1,10 @@
-"""Safety stock, lot sizing, MOQ, supplier capacity, a
-threshold sweep on the deterioration detector, alert routing with SLAs, and
+"""Safety stock, lot sizing, MOQ, supplier capacity, a threshold sweep on the
+deterioration detector, alert routing with SLAs, a supplier-distress proxy, and
 charts.
 
     python complete.py
     python complete.py --quick
     python complete.py --report-only
-
-Mapping to the README's not-built list:
-
-  3  no charts                                        -> stage 5
-  4  no alert routing, severity tiers, escalation SLA -> stage 4
-  5  no threshold sweep on the detector               -> stage 3
-  6  no MOQ, no lot sizing, no safety stock           -> stages 1-2
-  7  no supplier capacity constraints                 -> stage 2
-  9  the financial score is invented                  -> stage 6
 """
 from __future__ import annotations
 
@@ -42,30 +33,41 @@ QUICK = "--quick" in sys.argv
 # 1. safety stock
 # ---------------------------------------------------------------------------
 
+def part_lead_samples(base, part: str, n: int, rng) -> np.ndarray:
+    """Lead-time samples for one part: its real Willems distribution, plus
+    the mapped vendor's real lateness (as a share of the quoted lead)."""
+    c = base.components[part]
+    s = base.suppliers[c.supplier_id]
+    draws = rng.choice(np.asarray(c.lead_values, float), size=n,
+                       p=np.asarray(c.lead_probs, float))
+    slip = s.rel_late[rng.integers(0, len(s.rel_late), size=n)]
+    return draws * (1.0 + slip)
+
+
 def stage_safety_stock(base) -> dict:
-    rl = SA.realised_lead_times(base)
+    """Both variance terms, with REAL inputs on both sides.
+
+    demand side: the product demand standard deviations in Willems, pushed
+                 through the BOM (products treated as independent)
+    supply side: the part's Willems lead-time spread, plus vendor lateness
+    """
+    rng = np.random.default_rng(5)
+    d_day = supply.part_daily_demand(base)
+    sd_day = supply.part_daily_demand_sd(base)
     rows = []
     for part, c in sorted(base.components.items()):
-        if c.supplier_id is None:
+        if c.level != 2 or c.supplier_id is None or d_day.get(part, 0) <= 0:
             continue
-        s = base.suppliers[c.supplier_id]
-        # Weekly demand for this part, from the BOM explosion across products.
-        weekly = 0.0
-        for prod in base.products:
-            need = supply.explode(base, prod, 1.0).get(part, 0.0)
-            weekly += need * float(np.mean(base.demand[prod]))
-        d_day = weekly / 7.0
-        if d_day <= 0:
-            continue
-        sigma_d = d_day * 0.25
-        par = INV.safety_stock(d_day, sigma_d, s.lead_mean_days, s.lead_sd_days)
-        emp = INV.empirical_safety_stock(
-            d_day, sigma_d, np.array([v for _, v in rl.get(c.supplier_id, [])]))
+        samples = part_lead_samples(base, part, 400, rng)
+        L, sL = float(samples.mean()), float(samples.std())
+        par = INV.safety_stock(d_day[part], sd_day[part], L, sL)
+        emp = INV.empirical_safety_stock(d_day[part], sd_day[part], samples)
+        spread = float(np.quantile(samples, 0.95) / max(np.quantile(samples, 0.5), 1e-9))
         rows.append({"part": part, "supplier_id": c.supplier_id,
-                     "fat_tail": s.fat_tail, "demand_per_day": d_day,
-                     "lead_mean": s.lead_mean_days, "lead_sd": s.lead_sd_days,
-                     "unit_cost": c.unit_cost, **par,
-                     "empirical": emp})
+                     "fat_tail": spread >= 1.3, "demand_per_day": d_day[part],
+                     "demand_sd_per_day": sd_day[part],
+                     "lead_mean": L, "lead_sd": sL, "lead_p95_over_p50": spread,
+                     "unit_cost": c.unit_cost, **par, "empirical": emp})
     fat = [r for r in rows if r["fat_tail"] and not r["empirical"].get("insufficient_history")]
     thin = [r for r in rows if not r["fat_tail"] and not r["empirical"].get("insufficient_history")]
 
@@ -80,6 +82,12 @@ def stage_safety_stock(base) -> dict:
                 np.mean([r["understatement_factor"] for r in rows])),
             "mean_supply_variance_share": float(
                 np.mean([r["supply_variance_share"] for r in rows])),
+            "parts_supply_dominated": int(sum(r["supply_variance_share"] > 0.5
+                                              for r in rows)),
+            "median_demand_cv": float(np.median([r["demand_sd_per_day"]
+                                                 / r["demand_per_day"] for r in rows])),
+            "median_lead_cv": float(np.median([r["lead_sd"] / max(r["lead_mean"], 1e-9)
+                                               for r in rows])),
             "empirical_over_parametric_fat_tail": gap(fat),
             "empirical_over_parametric_thin_tail": gap(thin),
             "n_fat": len(fat), "n_thin": len(thin)}
@@ -91,32 +99,28 @@ def stage_safety_stock(base) -> dict:
 
 def stage_lot_sizing(base) -> dict:
     rng = np.random.default_rng(11)
+    d_day = supply.part_daily_demand(base)
     comps = []
     demands: dict[str, float] = {}
     for part, c in sorted(base.components.items()):
-        if c.supplier_id is None:
+        if c.level != 2 or c.supplier_id is None:
             continue
-        annual = 0.0
-        for prod in base.products:
-            need = supply.explode(base, prod, 1.0).get(part, 0.0)
-            annual += need * float(np.mean(base.demand[prod])) * 52
+        annual = d_day.get(part, 0.0) * 365
         if annual <= 0:
             continue
         need_now = max(annual / 12 - c.on_hand, 0.0)
         comps.append({"part": part, "need": need_now, "moq": c.moq,
                       "pack_size": 1.0, "annual_demand": annual,
-                      "unit_cost": c.unit_cost, "supplier_id": c.supplier_id})
+                      "unit_cost": max(c.unit_cost, 0.01),
+                      "supplier_id": c.supplier_id})
         demands[c.supplier_id] = demands.get(c.supplier_id, 0.0) + need_now
 
     waste = INV.moq_waste(comps)
 
-    # Supplier capacity is not in the dataset -- the README's item 7 is exactly
-    # that it does not exist. Assigned here as a multiple of current commitment
-    # so some suppliers are genuinely tight, and flagged as an assumption rather
-    # than smuggled in as data.
-    capacity = {}
-    for sid, need in demands.items():
-        capacity[sid] = need * float(rng.uniform(0.6, 2.5))
+    # Supplier capacity is in no public dataset. Assigned as a multiple of
+    # current commitment so some suppliers are tight, and flagged as assumed.
+    capacity = {sid: need * float(rng.uniform(0.6, 2.5))
+                for sid, need in demands.items()}
     cap = INV.capacity_check(demands, capacity)
 
     examples = []
@@ -131,46 +135,25 @@ def stage_lot_sizing(base) -> dict:
                                              if k != "rows"},
             "capacity_worst": sorted(cap["rows"], key=lambda r: -r["utilisation"])[:8],
             "examples": examples, "n_components": len(comps),
-            "capacity_is_assumed": True}
+            "parts_with_zero_need": sum(1 for c in comps if c["need"] <= 0),
+            "capacity_is_assumed": True, "moq_is_simulated": True}
 
 
 # ---------------------------------------------------------------------------
-# 3. threshold sweep
+# 3. threshold sweep (sandbox: real baselines + planted disruptions)
 # ---------------------------------------------------------------------------
 
 def stage_threshold_sweep(base) -> dict:
-    """Turn one measured point into a curve.
-
-    The README's item 5: the precision/recall of the deterioration detector was a
-    single point, so nobody could see the trade. Sweeping the three trigger
-    thresholds independently also answers a question the single point could not:
-    which trigger is carrying the detection.
-    """
-    rl = SA.realised_lead_times(base)
+    """Precision/recall across thresholds, and which trigger earns its place."""
     planted = {d["supplier_id"] for d in base.planted_disruptions}
 
-    def run(mean_t, p95_t, sd_t, min_n=5):
-        flagged = set()
-        by_trigger = {"mean": set(), "p95": set(), "variance": set()}
-        for sid, series in rl.items():
-            recent = [v for d, v in series if d >= -120]
-            bpts = [v for d, v in series if -365 <= d < -120]
-            if len(recent) < min_n or len(bpts) < min_n:
-                continue
-            bm, rm = float(np.mean(bpts)), float(np.mean(recent))
-            bp, rp = float(np.percentile(bpts, 95)), float(np.percentile(recent, 95))
-            bs, rs = float(np.std(bpts, ddof=1)), float(np.std(recent, ddof=1))
-            if rm > bm * mean_t:
-                flagged.add(sid)
-                by_trigger["mean"].add(sid)
-            if rp > bp * p95_t:
-                flagged.add(sid)
-                by_trigger["p95"].add(sid)
-            if rs > bs * sd_t:
-                flagged.add(sid)
-                by_trigger["variance"].add(sid)
+    def run(mean_t, p95_t, sd_t):
+        flags = SA.detect_deterioration(base, thresholds=(mean_t, p95_t, sd_t))
+        flagged = {r["supplier_id"] for r in flags if r["flagged"]}
+        by_trigger = {k: {r["supplier_id"] for r in flags if k in r["triggers"]}
+                      for k in ("mean", "p95", "variance")}
         tp = planted & flagged
-        return {"n_flagged": len(flagged),
+        return {"n_flagged": len(flagged), "n_evaluated": len(flags),
                 "precision": len(tp) / max(len(flagged), 1),
                 "recall": len(tp) / max(len(planted), 1),
                 "by_trigger_recall": {k: len(planted & v) / max(len(planted), 1)
@@ -183,16 +166,14 @@ def stage_threshold_sweep(base) -> dict:
               / max(r["precision"] + r["recall"], 1e-9))
         curve.append({"scale": scale, **r, "f1": f1})
 
-    # Which trigger earns its place: recall with each one removed.
-    ablation = {}
     big = 99.0
-    ablation["all three"] = run(1.25, 1.30, 1.50)
-    ablation["without mean"] = run(big, 1.30, 1.50)
-    ablation["without p95"] = run(1.25, big, 1.50)
-    ablation["without variance"] = run(1.25, 1.30, big)
+    ablation = {"all three": run(1.25, 1.30, 1.50),
+                "without mean": run(big, 1.30, 1.50),
+                "without p95": run(1.25, big, 1.50),
+                "without variance": run(1.25, 1.30, big)}
     return {"curve": curve, "ablation": ablation,
             "n_planted": len(planted),
-            "best_f1": max(curve, key=lambda r: r["f1"])}
+            "best_f1": max(curve, key=lambda r: (r["f1"], -r["scale"]))}
 
 
 # ---------------------------------------------------------------------------
@@ -200,29 +181,7 @@ def stage_threshold_sweep(base) -> dict:
 # ---------------------------------------------------------------------------
 
 def stage_routing(base, lot) -> dict:
-    risk = {r["supplier_id"]: r for r in SA.risk_score(base)}
-    rows = []
-    for part, c in sorted(base.components.items()):
-        if c.supplier_id is None:
-            continue
-        s = base.suppliers[c.supplier_id]
-        weekly = 0.0
-        for prod in base.products:
-            weekly += (supply.explode(base, prod, 1.0).get(part, 0.0)
-                       * float(np.mean(base.demand[prod])))
-        d_day = weekly / 7.0
-        if d_day <= 0:
-            continue
-        cover_days = c.on_hand / d_day
-        slack = cover_days - s.lead_mean_days
-        rows.append({
-            "part": part, "supplier_id": c.supplier_id,
-            "days_of_slack": slack, "lead_days": s.lead_mean_days,
-            "units_at_risk": max(-slack, 0.0) * d_day,
-            "value_at_risk": max(-slack, 0.0) * d_day * c.unit_cost,
-            "single_sourced": c.single_sourced,
-            "risk_score": risk.get(c.supplier_id, {}).get("risk_score", 0.0)})
-
+    rows = SA.part_risk_rows(base)
     over = {r["supplier_id"] for r in lot["capacity_worst"] if r["over"]}
     alerts = RT.build_alerts(rows, over_capacity_suppliers=over)
     alerts, dropped = RT.dedupe(alerts)
@@ -230,93 +189,84 @@ def stage_routing(base, lot) -> dict:
     by_sev: dict[str, int] = {}
     for a in alerts:
         by_sev[a.severity] = by_sev.get(a.severity, 0) + 1
-
-    # Is severity actually different from risk score? If they correlate ~1 the
-    # tiering is doing nothing and the honest thing is to say so.
     sev_num = {"P1": 4, "P2": 3, "P3": 2, "P4": 1}
-    corr = float(np.corrcoef([sev_num[a.severity] for a in alerts],
-                             [a.risk_score for a in alerts])[0, 1]) \
-        if len(alerts) > 2 else float("nan")
+    xs = [sev_num[a.severity] for a in alerts]
+    ys = [a.risk_score for a in alerts]
+    corr = (float(np.corrcoef(xs, ys)[0, 1])
+            if len(alerts) > 2 and np.std(xs) > 0 and np.std(ys) > 0 else float("nan"))
     return {"n_alerts": len(alerts), "deduped": dropped, "by_severity": by_sev,
             "load_by_role": load,
             "severity_vs_riskscore_correlation": corr,
+            "runs_out_in_horizon": sum(1 for r in rows
+                                       if r["runout_day"] < supply.WEEKS * 7),
+            "earliest_runout_day": min(r["runout_day"] for r in rows),
             "top": [a.as_dict() for a in alerts[:10]],
             "n_parts_considered": len(rows)}
 
 
 # ---------------------------------------------------------------------------
-# 6. the invented financial score, replaced
+# 6. supplier distress proxy
 # ---------------------------------------------------------------------------
 
-def stage_financial(base) -> dict:
-    """Derive a distress proxy from OBSERVABLE behaviour instead of a Beta draw.
-
-    The README's item 9 is blunt: `financial_score` is a Beta draw standing in
-    for a credit rating, and a risk model with a placeholder input demonstrates a
-    structure rather than assessing a risk. It cannot be fixed by inventing a
-    better distribution -- the fix is to stop using an input nobody can observe
-    and use ones a buyer actually sees.
-
-    Three observable signals, each a documented early indicator of supplier
-    distress in the procurement literature and, more usefully, each visible in
-    data a plant already has:
-
-      lead-time inflation  a supplier short of working capital buys materials
-                           later and ships later
-      promise slippage     re-promising an existing PO rather than missing it is
-                           the cheapest way to hide a problem, which is exactly
-                           why the ORIGINAL promise has to be kept
-      quality drift        deferred maintenance and lost staff show up in the
-                           reject rate before they show up anywhere else
-
-    This is still a proxy and it is still not a credit rating. The difference is
-    that every input is measurable from a plant's own ERP, so the model can be
-    validated against realised outcomes rather than against my prior.
-    """
-    rl = SA.realised_lead_times(base)
-    gaps = {r["supplier_id"]: r for r in SA.otif_gap(base)}
+def _distress_rows(base, source: str) -> list[dict]:
     rows = []
-    for sid, s in base.suppliers.items():
-        series = rl.get(sid, [])
-        if len(series) < 10:
-            continue
-        recent = [v for d, v in series if d >= -120]
-        older = [v for d, v in series if d < -120]
+    by: dict[str, list] = {}
+    deliveries = base.sandbox if source == "sandbox" else base.history
+    for d in deliveries:
+        by.setdefault(d.supplier_id, []).append(d)
+
+    def lead(xs):
+        return float(np.mean([d.received_day - d.order_day for d in xs]))
+
+    def late(xs):
+        return float(np.mean([d.received_day > d.promise_day for d in xs]))
+
+    for sid, ds in sorted(by.items()):
+        last = max(d.order_day for d in ds)
+        recent = [d for d in ds if d.order_day >= last - 365]
+        older = [d for d in ds if d.order_day < last - 365]
         if len(recent) < 3 or len(older) < 3:
             continue
-        infl = float(np.mean(recent)) / max(float(np.mean(older)), 1e-9)
-        g = gaps.get(sid, {})
-        slip = float(g.get("otif_original", 1.0) and
-                     (g.get("otif_current", 1.0) - g.get("otif_original", 1.0)))
-        # Higher = more distressed. Weights are stated, not fitted -- there are no
-        # realised bankruptcies here to fit against, and pretending otherwise
-        # would be the same mistake in a new costume.
-        distress = (0.5 * max(infl - 1.0, 0.0) * 2
-                    + 0.3 * max(slip, 0.0) * 2
-                    + 0.2 * min(s.quality_reject_rate / 0.05, 1.0))
-        rows.append({"supplier_id": sid, "lead_inflation": infl,
-                     "promise_slippage": slip,
-                     "reject_rate": s.quality_reject_rate,
-                     "observed_distress": float(np.clip(distress, 0, 1)),
-                     "invented_financial_score": s.financial_score})
+        infl = lead(recent) / max(lead(older), 1e-9)
+        slip = late(recent) - late(older)
+        distress = (0.6 * min(max(infl - 1.0, 0.0), 1.0)
+                    + 0.4 * min(max(slip, 0.0) * 5, 1.0))
+        rows.append({"supplier_id": sid, "name": base.suppliers[sid].name,
+                     "lead_inflation": infl, "late_rate_change": slip,
+                     "observed_distress": distress,
+                     "on_time_vs_scheduled_all_time": 1.0 - late(ds)})
+    return rows
+
+
+def stage_financial(base) -> dict:
+    """A distress proxy from behaviour a buyer can observe.
+
+    The simulated version compared this with an invented "financial score" (a
+    random draw). Real vendors come with no credit data at all, so the
+    comparison is now with the number a scorecard would normally show: on-time
+    rate against the scheduled date. Both are scored as predictors of the
+    planted disruptions in the sandbox, then the proxy is run on the real
+    history. Weights (0.6 lead inflation, 0.4 rise in late rate) are stated,
+    not fitted.
+    """
+    from sklearn.metrics import roc_auc_score
+    sb = _distress_rows(base, "sandbox")
     planted = {d["supplier_id"] for d in base.planted_disruptions}
-    if rows:
-        obs = np.array([r["observed_distress"] for r in rows])
-        inv = np.array([1 - r["invented_financial_score"] for r in rows])
-        lab = np.array([r["supplier_id"] in planted for r in rows], dtype=int)
-        from sklearn.metrics import roc_auc_score
-        auc_obs = float(roc_auc_score(lab, obs)) if lab.any() and not lab.all() else float("nan")
-        auc_inv = float(roc_auc_score(lab, inv)) if lab.any() and not lab.all() else float("nan")
+    lab = np.array([r["supplier_id"] in planted for r in sb], dtype=int)
+    if lab.any() and not lab.all():
+        auc_obs = float(roc_auc_score(lab, [r["observed_distress"] for r in sb]))
+        auc_otd = float(roc_auc_score(lab, [1 - r["on_time_vs_scheduled_all_time"]
+                                           for r in sb]))
     else:
-        auc_obs = auc_inv = float("nan")
-    return {"n": len(rows), "rows": sorted(rows, key=lambda r: -r["observed_distress"])[:10],
+        auc_obs = auc_otd = float("nan")
+    real = _distress_rows(base, "real")
+    return {"n": len(sb), "n_planted": len(planted),
             "auc_observed_distress": auc_obs,
-            "auc_invented_score": auc_inv,
-            "n_planted": len(planted),
-            "caveat": ("still a proxy, and the weights are stated rather than "
-                       "fitted -- there are no realised bankruptcies here to fit "
-                       "against, and inventing some would be the same mistake in "
-                       "a new costume")}
+            "auc_on_time_scorecard": auc_otd,
+            "real_top": sorted(real, key=lambda r: -r["observed_distress"])[:8],
+            "caveat": ("still a proxy with stated weights; SCMS has no record of "
+                       "supplier failures, so the real-history ranking cannot be "
+                       "checked")}
 
 
 # ---------------------------------------------------------------------------
@@ -437,7 +387,9 @@ td.n{{text-align:right;font-variant-numeric:tabular-nums}}
 </style>
 <h1>Supply risk</h1>
 <div class="sub">{routed['n_parts_considered']} purchased parts &middot;
- {routed['n_alerts']} routed alerts &middot; generated by <code>complete.py</code></div>
+ {routed['n_alerts']} routed alerts &middot; generated by <code>complete.py</code>
+ &middot; BOM and lead times: Willems (2008), real &middot; vendors: USAID SCMS, real
+ &middot; stock and open orders: simulated</div>
 <div class="grid">
   <div class="card wide">
     <h2>Buildable units - P10 / P50 / P90 fan</h2>
@@ -458,7 +410,7 @@ td.n{{text-align:right;font-variant-numeric:tabular-nums}}
   <div class="card">
     <h2>Load by role</h2>
     {_bars_svg(role_rows)}
-    <div class="note">A policy that routes 300 P1s to one buyer has not
+    <div class="note">A policy that routes hundreds of P1s to one buyer has not
       prioritised anything.</div>
   </div>
   <div class="card">
@@ -487,6 +439,7 @@ td.n{{text-align:right;font-variant-numeric:tabular-nums}}
     return {"path": str(p), "bytes": p.stat().st_size, "self_contained": True}
 
 
+
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
@@ -507,7 +460,8 @@ def main() -> None:
     print("1/6 safety stock with both variance terms ...", flush=True)
     res["safety"] = stage_safety_stock(base)
     print(f"    demand-only understates by "
-          f"{res['safety']['mean_understatement_demand_only']:.2f}x", flush=True)
+          f"{res['safety']['mean_understatement_demand_only']:.2f}x; supply share "
+          f"{res['safety']['mean_supply_variance_share']:.2f}", flush=True)
 
     print("2/6 lot sizing, MOQ, supplier capacity ...", flush=True)
     res["lot"] = stage_lot_sizing(base)
@@ -522,7 +476,7 @@ def main() -> None:
     print(f"    {res['routing']['n_alerts']} alerts, "
           f"{res['routing']['by_severity']}", flush=True)
 
-    print("5/6 the invented financial score, replaced ...", flush=True)
+    print("5/6 supplier distress proxy ...", flush=True)
     res["financial"] = stage_financial(base)
 
     print("6/6 charts ...", flush=True)
@@ -544,168 +498,147 @@ def report(res: dict) -> str:
                             res["routing"], res["financial"])
     A("# Safety stock, lot sizing, detector sweep and alert routing - generated by `complete.py`, not hand-edited\n")
 
-    A("## 1. Safety stock, with the term everyone forgets\n")
-    A("The remembered formula covers demand variability only. The full one covers "
-      "both, because lead time is a random variable too:\n")
+    A("## 1. Safety stock, with both sources of variation\n")
     A("```\nSS = z * sqrt( L * sigma_d^2  +  d^2 * sigma_L^2 )\n"
       "                \\____________/    \\_____________/\n"
-      "                 demand varies      SUPPLY varies\n```\n")
+      "                 demand varies      supply varies\n```\n")
+    A("Both sides now use real inputs: demand spread from the Willems product "
+      "demand standard deviations, lead-time spread from the part's Willems "
+      "distribution plus its vendor's real SCMS lateness.\n")
     A(f"Across {sf['n']} purchased parts, **{sf['mean_supply_variance_share'] * 100:.0f}% "
-      f"of the variance is supply-side**, and the demand-only formula understates "
-      f"safety stock by **{sf['mean_understatement_demand_only']:.2f}×** on "
-      "average. That is the default in most textbook treatments and most ERP "
-      "configurations, and it understates most where lead-time variability is "
-      "highest - which is exactly where the stock was needed.\n")
-    A("| supplier tail | empirical SS / parametric SS | n |")
-    A("|---|---|---|")
-    A(f"| fat-tailed | **{sf['empirical_over_parametric_fat_tail']:.2f}×** "
+      f"of the variance is supply-side on average** ({sf['parts_supply_dominated']} "
+      f"parts are supply-dominated). The demand-only formula understates safety "
+      f"stock by only **{sf['mean_understatement_demand_only']:.2f}x**.\n")
+    A(f"**This finding flipped.** The simulated version said 97% of the variance "
+      f"came from suppliers and the textbook formula understated stock 6.9x. The "
+      f"real data says the opposite: daily demand in this chain swings a lot "
+      f"(median coefficient of variation {sf['median_demand_cv']:.2f}), while part "
+      f"lead times barely move (median CV {sf['median_lead_cv']:.2f}; many parts "
+      f"have a single fixed lead time). The two-term formula is still the right "
+      f"one; it just matters little here.\n")
+    A("| lead-time spread | empirical SS / parametric SS | parts |")
+    A("|---|---:|---:|")
+    A(f"| wide (P95/P50 >= 1.3) | {sf['empirical_over_parametric_fat_tail']:.2f}x "
       f"| {sf['n_fat']} |")
-    A(f"| well-behaved | {sf['empirical_over_parametric_thin_tail']:.2f}× "
-      f"| {sf['n_thin']} |")
-    A("\nThe parametric formula puts a **normal** tail on a quantity whose tail "
-      "is set by the supplier. Where the supplier is fat-tailed, `z = 1.65` does "
-      "not buy 95% service, and optimistic safety stock is a stockout with a "
-      "formula attached.\n")
+    A(f"| narrow | {sf['empirical_over_parametric_thin_tail']:.2f}x | {sf['n_thin']} |")
+    A("\nWith lead-time spreads this small, the normal formula and the empirical "
+      "quantile agree to within a few percent. **A bug the real data exposed:** "
+      "the empirical version drew one day's demand and multiplied it by the lead "
+      "time, so demand spread grew with L instead of sqrt(L). With the simulated "
+      "demand (CV 0.25) this barely showed; with the real demand (CV about 0.95) "
+      "it made the empirical safety stock 2.5-2.9x the formula. Fixed, with a "
+      "test that a fixed lead time gives the formula's answer.")
 
-    A("## 2. Lot sizing, MOQ and capacity\n")
+    A("\n## 2. Lot sizing, MOQ and capacity\n")
     w = lot["moq_waste"]
-    A(f"`Component.moq` existed and nothing read it, which the README noted meant "
-      f"the recommended quantities were wrong. Applying it: "
-      f"**{w['n_parts_raised_to_moq']} of {lot['n_components']} parts get raised "
-      f"to their minimum, forcing ${w['total_excess_value']:,.0f} of excess "
-      f"inventory.**\n")
-    A("| part | need | MOQ | ordered | excess value | months of cover |")
-    A("|---|---|---|---|---|---|")
-    for r in w["worst"][:6]:
-        A(f"| {r['part']} | {r['need']:,.0f} | {r['moq']:,.0f} "
-          f"| {r['ordered']:,.0f} | ${r['excess_value']:,.0f} "
-          f"| {r['months_of_cover']:.1f} |")
-    A("\nThat table is a negotiating position. *\"Your 1,000-piece minimum costs "
-      "us this much in dead stock on a part we use 200 of a year\"* is a "
-      "conversation; \"your MOQ is inconvenient\" is not.\n")
+    A("*MOQs are simulated (no public source) and supplier capacity is assumed.* "
+      f"Applying the minimums: **{w['n_parts_raised_to_moq']} of "
+      f"{lot['n_components']} parts get raised to their minimum, forcing "
+      f"${w['total_excess_value']:,.0f} of excess stock** at real unit costs. "
+      "The real parts are cheap (median $0.48) and used in large volumes, so "
+      "minimums rarely bind.\n")
+    if w["worst"]:
+        A("| part | need | MOQ | ordered | excess value | months of cover |")
+        A("|---|---:|---:|---:|---:|---:|")
+        for r in w["worst"][:6]:
+            A(f"| {r['part']} | {r['need']:,.0f} | {r['moq']:,.0f} "
+              f"| {r['ordered']:,.0f} | ${r['excess_value']:,.0f} "
+              f"| {r['months_of_cover']:.1f} |")
     cap = lot["capacity"]
-    A(f"\n**Supplier capacity: {cap['n_over_capacity']} suppliers over-committed**, "
-      f"total shortfall {cap['total_shortfall']:,.0f} units. This is the "
-      "distinction the README's item 7 was about, and it changes the remedy "
-      "completely: a lead-time problem is solved by ordering earlier, a capacity "
-      "problem is not solved by ordering earlier **at all** - that just moves the "
-      "queue - and needs a second source or a smaller order.\n")
-    A(f"*Capacity is not in the dataset. It is assigned here as a multiple of "
-      f"current commitment so some suppliers are genuinely tight, and it is "
-      f"flagged as an assumption rather than smuggled in as data.*\n")
+    A(f"\n**Supplier capacity (assumed): {cap['n_over_capacity']} vendors "
+      f"over-committed**, total shortfall {cap['total_shortfall']:,.0f} units. "
+      "Ordering earlier does not fix a capacity problem; a second source or a "
+      "smaller order does.\n")
 
     A("## 3. The detector threshold sweep\n")
-    A("| scale | flagged | precision | recall | F1 |")
-    A("|---|---|---|---|---|")
+    A("Scored in the sandbox (real vendor lead times resampled, disruptions "
+      "planted). A vendor needs 5+ orders in both windows to be judged.\n")
+    A("| scale | judged | flagged | precision | recall | F1 |")
+    A("|---:|---:|---:|---:|---:|---:|")
     for c in sw["curve"]:
-        A(f"| {c['scale']:.2f} | {c['n_flagged']} | {c['precision']:.2f} "
-          f"| {c['recall']:.2f} | {c['f1']:.2f} |")
+        A(f"| {c['scale']:.2f} | {c['n_evaluated']} | {c['n_flagged']} | "
+          f"{c['precision']:.2f} | {c['recall']:.2f} | {c['f1']:.2f} |")
     b = sw["best_f1"]
     A(f"\nBest F1 at scale {b['scale']:.2f}: precision {b['precision']:.2f}, "
-      f"recall {b['recall']:.2f} against {sw['n_planted']} planted disruptions. "
-      "One measured point could not have shown where the knee is.\n")
-    A("**And which trigger earns its place:**\n")
+      f"recall {b['recall']:.2f} against {sw['n_planted']} planted disruptions.\n")
+    A("**Which trigger earns its place:**\n")
     A("| trigger set | precision | recall |")
-    A("|---|---|---|")
+    A("|---|---:|---:|")
     for k, v in sw["ablation"].items():
         A(f"| {k} | {v['precision']:.2f} | {v['recall']:.2f} |")
-    base_ab = sw["ablation"]["all three"]
-    allr, allp = base_ab["recall"], base_ab["precision"]
-    worst = min(((k, v) for k, v in sw["ablation"].items() if k != "all three"),
-                key=lambda kv: kv[1]["recall"])
-    A(f"\nRemoving **{worst[0].replace('without ', '')}** costs the most recall "
-      f"({worst[1]['recall']:.2f} against {allr:.2f}) - that is the trigger doing "
-      "the work, and it is the tail trigger rather than the mean one. A detector "
-      "watching only the average would miss half of what this catches.\n")
-    # Any trigger that costs precision without buying recall should be removed,
-    # and saying so is the point of running the ablation at all.
-    dead = [(k, v) for k, v in sw["ablation"].items()
-            if k != "all three" and v["recall"] >= allr - 1e-9
-            and v["precision"] > allp + 1e-9]
-    for k, v in dead:
+    allr = sw["ablation"]["all three"]["recall"]
+    allp = sw["ablation"]["all three"]["precision"]
+    for k, v in sw["ablation"].items():
+        if k == "all three":
+            continue
         name = k.replace("without ", "")
-        A(f"**And the {name} trigger should be dropped.** Removing it leaves "
-          f"recall unchanged at {v['recall']:.2f} while precision improves "
-          f"{allp:.2f} → {v['precision']:.2f}. It is contributing false positives "
-          "and no detections, which is the ablation earning its keep: I would "
-          "have kept all three on the reasoning in the docstring, and the "
-          "measurement says otherwise.\n")
-    if not dead:
-        A("No trigger is dead weight: each one either adds recall or holds "
-          "precision.\n")
+        if v["recall"] < allr - 1e-9:
+            A(f"- Removing **{name}** drops recall {allr:.2f} -> {v['recall']:.2f}: "
+              "it is doing detection work.")
+        elif v["precision"] > allp + 1e-9:
+            A(f"- Removing **{name}** keeps recall at {v['recall']:.2f} and raises "
+              f"precision {allp:.2f} -> {v['precision']:.2f}: it only adds false alarms.")
+        else:
+            A(f"- Removing **{name}** changes nothing measurable here.")
+    A("")
 
     A("## 4. Alert routing, severity tiers and SLAs\n")
-    A(f"**{rt['n_alerts']} alerts** ({rt['deduped']} suppressed as duplicates) "
-      f"across {rt['n_parts_considered']} purchased parts.\n")
+    A(f"**{rt['n_alerts']} alerts** ({rt['deduped']} duplicates suppressed) across "
+      f"{rt['n_parts_considered']} purchased parts. Slack = projected run-out day "
+      f"(simulated stock and orders, real plan) minus the part's real lead time.\n")
     A("| severity | count | meaning | response SLA |")
-    A("|---|---|---|---|")
+    A("|---|---:|---|---|")
     for sev in ("P1", "P2", "P3", "P4"):
         t = RT.TIERS[sev]
         A(f"| {sev} | {rt['by_severity'].get(sev, 0)} | {t['meaning']} "
           f"| {t['response_hours']}h |")
-    A("\n**Severity is consequence × urgency, not risk score** - and that is the "
-      f"mistake worth avoiding. Measured correlation between severity and "
-      f"supplier risk score: **{rt['severity_vs_riskscore_correlation']:.2f}**. A "
-      "part can carry a high risk score and matter not at all (plenty of stock, "
-      "six weeks of slack, a cheap second source). Routing on risk score floods "
-      "the top tier with parts nobody needs to act on, which is how an alert "
-      "channel dies.\n")
-    A("Slack is compared against the **lead time**, not against a fixed number of "
-      "days: ten days of slack is comfortable on a 5-day lead and an emergency on "
-      "a 60-day one.\n")
+    A(f"\n{rt['runs_out_in_horizon']} parts run out inside the 13 weeks, the first "
+      f"on day {rt['earliest_runout_day']:.0f}. Every one of them can still be "
+      "reordered at its normal lead time (3-55 days), so **none is P1**. The "
+      "simulated version, with 14-75 day lead times, put 26 urgent items on one "
+      "owner. The difference comes from real lead times being short; the stock "
+      "rule is unchanged and simulated, so this says nothing about a real plant's "
+      "stock position.\n")
     A("| owner | total | P1 | P2 | value at risk |")
-    A("|---|---|---|---|---|")
+    A("|---|---:|---:|---:|---:|")
     for role, d in sorted(rt["load_by_role"].items(), key=lambda kv: -kv[1]["total"]):
         A(f"| {role} | {d['total']} | {d['P1']} | {d['P2']} | ${d['value']:,.0f} |")
-    A("\nCapacity problems route to the commodity manager rather than the buyer, "
-      "because a buyer cannot create capacity - expediting a capacity-constrained "
-      "supplier moves the queue and produces a week of phone calls and no parts.\n")
-    # The load check exists to catch an over-aggressive policy. If it fires, the
-    # report has to say so rather than present the tiering as finished.
-    heaviest = max(rt["load_by_role"].items(), key=lambda kv: kv[1]["total"])
-    n_p1 = rt["by_severity"].get("P1", 0)
-    if n_p1 > 25 or heaviest[1]["total"] > 60:
-        A(f"**And the load check fails, which is the point of having it.** "
-          f"{n_p1} parts land in P1 and {heaviest[1]['total']} alerts route to "
-          f"{heaviest[0]}. That is not a prioritised queue - it is a list, and a "
-          "buyer handed 200 items on a Monday will work them in the order they "
-          "appear rather than the order they matter.\n")
-        A("The cause is that severity is computed per PART while the remedy is "
-          "usually per SUPPLIER: one late supplier puts every part it ships into "
-          "P1 simultaneously. The fix is to group alerts by supplier and route "
-          "one item carrying its parts list, which would collapse most of that "
-          "queue - and it is not built. I would not ship this tiering as it "
-          "stands, and reporting the alert count without the load-by-role table "
-          "would have hidden that.\n")
+    corr = rt["severity_vs_riskscore_correlation"]
+    A(f"\nCorrelation between severity and supplier risk score: "
+      f"{'n/a' if corr != corr else f'{corr:.2f}'}. Severity is about "
+      "consequence and time, not supplier score.\n")
 
-    A("## 5. The invented financial score, replaced\n")
-    A("The README's item 9 was blunt: `financial_score` is a Beta draw standing "
-      "in for a credit rating, and a risk model with a placeholder input "
-      "demonstrates a structure rather than assessing a risk. **That cannot be "
-      "fixed by inventing a better distribution.** The fix is to stop using an "
-      "input nobody can observe.\n")
-    A("Three observable signals, all visible in data a plant already has: "
-      "lead-time inflation, promise slippage against the *original* promise, and "
-      "quality drift.\n")
-    A("| predictor of a planted disruption | AUROC |")
-    A("|---|---|")
-    A(f"| observed distress (lead inflation + slippage + quality) "
-      f"| **{fin['auc_observed_distress']:.3f}** |")
-    A(f"| the invented financial score | {fin['auc_invented_score']:.3f} |")
-    A(f"\nAgainst {fin['n_planted']} planted disruptions across {fin['n']} "
-      "suppliers with enough history. The invented score sits at chance, which is "
-      "exactly what a Beta draw should do - it was never correlated with anything "
-      "in the simulation, and reporting it as an input to a risk model was the "
-      "honest gap the README flagged.\n")
-    A(f"*{fin['caveat']}*\n")
+    A("## 5. Supplier distress proxy\n")
+    A("Two observable signals: lead-time inflation (last year vs before) and a "
+      "rise in the share of late lines. SCMS has no credit data, so the proxy is "
+      "compared with the usual scorecard number, on-time vs scheduled.\n")
+    A("| predictor of a planted disruption (sandbox) | AUROC |")
+    A("|---|---:|")
+    A(f"| distress proxy (lead inflation + late-rate rise) | "
+      f"**{fin['auc_observed_distress']:.3f}** |")
+    A(f"| on-time vs scheduled (the usual scorecard) | "
+      f"{fin['auc_on_time_scorecard']:.3f} |")
+    A(f"\n{fin['n_planted']} planted disruptions across {fin['n']} vendors with enough "
+      "history. Both separate them well, and the plain scorecard does slightly "
+      "better. That result flatters the scorecard: in the sandbox a disruption "
+      "delays the delivery but leaves the scheduled date where it was, so it "
+      "shows up as lateness. In the real file 89% of lines land exactly on the "
+      "scheduled date, which suggests the real date moves with the delay, and "
+      "then on-time vs scheduled would see nothing. Lead-time inflation does "
+      "not depend on the promise field at all.\n")
+    A("On the **real** history the proxy ranks these vendors highest (no ground "
+      "truth to check against):\n")
+    A("| vendor | lead inflation | late-rate change | proxy |")
+    A("|---|---:|---:|---:|")
+    for r in fin["real_top"][:6]:
+        A(f"| {r['supplier_id']} {r['name'][:30]} | {r['lead_inflation']:.2f}x | "
+          f"{r['late_rate_change']:+.2f} | {r['observed_distress']:.2f} |")
+    A(f"\n*{fin['caveat']}*\n")
 
     c = res["charts"]
     A("## 6. Charts\n")
     A(f"`out/supply_dashboard.html`, {c['bytes'] / 1024:.0f} KB, self-contained. "
-      "The buildability fan is the one that matters: a point forecast is the "
-      "least useful number available here, because the decision is how much cover "
-      "to buy and that is set by the width of the band, not its middle.\n")
-
+      "The public dashboard is `docs/index.html`, built by `build_dashboard.py`.\n")
     A("---")
     A(f"*Generated in {res.get('wall_seconds', 0):.0f}s.*")
     return "\n".join(L) + "\n"

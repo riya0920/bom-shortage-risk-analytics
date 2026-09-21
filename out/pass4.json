@@ -1,30 +1,31 @@
 {
   "incidents": {
+    "stock_scale": 1.0,
     "load_check": {
-      "alerts": 260,
-      "incidents": 108,
-      "reduction_pct": 58.46153846153845,
-      "parts_covered_before": 260,
-      "parts_covered_after": 260,
-      "value_before": 848103.7636159097,
-      "value_after": 848103.7636159097,
-      "p1_alerts": 109,
-      "p1_incidents": 36,
+      "alerts": 209,
+      "incidents": 30,
+      "reduction_pct": 85.64593301435407,
+      "parts_covered_before": 209,
+      "parts_covered_after": 209,
+      "value_before": 14730014.55000001,
+      "value_after": 14730014.55000001,
+      "p1_alerts": 0,
+      "p1_incidents": 0,
       "busiest_before": {
         "role": "BUYER",
-        "items": 218
+        "items": 209
       },
       "busiest_after": {
         "role": "BUYER",
-        "items": 82
+        "items": 30
       },
       "worst_p1_before": {
         "role": "BUYER",
-        "items": 67
+        "items": 0
       },
       "worst_p1_after": {
-        "role": "SUPPLY_CHAIN_MANAGER",
-        "items": 26
+        "role": "BUYER",
+        "items": 0
       },
       "per_owner_limit": 15,
       "p1_limit": 10,
@@ -35,286 +36,635 @@
     "concentration": {
       "top": [
         {
-          "supplier_id": "SUP-016",
-          "alerts": 12,
-          "P1": 4,
-          "n_parts": 12,
-          "value_at_risk": 39847.666598858515,
-          "share_of_alerts": 0.046153846153846156
-        },
-        {
-          "supplier_id": "SUP-031",
-          "alerts": 10,
-          "P1": 6,
-          "n_parts": 10,
-          "value_at_risk": 2195.6819269911916,
-          "share_of_alerts": 0.038461538461538464
-        },
-        {
-          "supplier_id": "SUP-044",
-          "alerts": 10,
-          "P1": 0,
-          "n_parts": 10,
-          "value_at_risk": 0.0,
-          "share_of_alerts": 0.038461538461538464
-        },
-        {
-          "supplier_id": "SUP-035",
-          "alerts": 9,
-          "P1": 6,
-          "n_parts": 9,
-          "value_at_risk": 11297.566968232857,
-          "share_of_alerts": 0.03461538461538462
-        },
-        {
-          "supplier_id": "SUP-029",
+          "supplier_id": "V02",
           "alerts": 8,
-          "P1": 6,
+          "P1": 0,
           "n_parts": 8,
-          "value_at_risk": 205088.12583073313,
-          "share_of_alerts": 0.03076923076923077
+          "value_at_risk": 7532903.020000006,
+          "share_of_alerts": 0.03827751196172249
+        },
+        {
+          "supplier_id": "V06",
+          "alerts": 8,
+          "P1": 0,
+          "n_parts": 8,
+          "value_at_risk": 578851.1100000002,
+          "share_of_alerts": 0.03827751196172249
+        },
+        {
+          "supplier_id": "V10",
+          "alerts": 8,
+          "P1": 0,
+          "n_parts": 8,
+          "value_at_risk": 51738.999999999985,
+          "share_of_alerts": 0.03827751196172249
+        },
+        {
+          "supplier_id": "V23",
+          "alerts": 8,
+          "P1": 0,
+          "n_parts": 8,
+          "value_at_risk": 484.4000000000001,
+          "share_of_alerts": 0.03827751196172249
+        },
+        {
+          "supplier_id": "V03",
+          "alerts": 8,
+          "P1": 0,
+          "n_parts": 8,
+          "value_at_risk": 6000219.600000005,
+          "share_of_alerts": 0.03827751196172249
         }
       ],
-      "n_suppliers": 48,
-      "top_share": 0.18846153846153846
+      "n_suppliers": 27,
+      "top_share": 0.19138755980861244
     },
     "calibration": {
       "sweep": [
         {
           "p1_ratio": 0.25,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 91,
-          "p1_incidents": 32,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 16,
-          "busiest_items": 92,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.2,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 83,
-          "p1_incidents": 32,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 16,
-          "busiest_items": 92,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.15,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 74,
-          "p1_incidents": 30,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 15,
-          "busiest_items": 93,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.1,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 69,
-          "p1_incidents": 29,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 15,
-          "busiest_items": 93,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.07,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 64,
-          "p1_incidents": 29,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
           "worst_p1_owner": "BUYER",
-          "worst_p1_items": 15,
-          "busiest_items": 94,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.05,
-          "alerts": 260,
-          "incidents": 109,
-          "p1_alerts": 62,
-          "p1_incidents": 29,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
           "worst_p1_owner": "BUYER",
-          "worst_p1_items": 15,
-          "busiest_items": 95,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.03,
-          "alerts": 260,
-          "incidents": 108,
-          "p1_alerts": 59,
-          "p1_incidents": 28,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 14,
-          "busiest_items": 94,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.02,
-          "alerts": 260,
-          "incidents": 107,
-          "p1_alerts": 57,
-          "p1_incidents": 27,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 14,
-          "busiest_items": 93,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         },
         {
           "p1_ratio": 0.01,
-          "alerts": 260,
-          "incidents": 107,
-          "p1_alerts": 56,
-          "p1_incidents": 26,
-          "worst_p1_owner": "SUPPLY_CHAIN_MANAGER",
-          "worst_p1_items": 13,
-          "busiest_items": 94,
-          "p1_value_at_risk": 848103.7636159097,
-          "p1_value_share": 1.0,
-          "p1_passes": false,
+          "alerts": 209,
+          "incidents": 30,
+          "p1_alerts": 0,
+          "p1_incidents": 0,
+          "worst_p1_owner": "BUYER",
+          "worst_p1_items": 0,
+          "busiest_items": 30,
+          "p1_value_at_risk": 0,
+          "p1_value_share": 0.0,
+          "p1_passes": true,
           "fully_passes": false
         }
       ],
       "p1_limit": 10,
       "per_owner_limit": 15,
-      "first_passing_p1": null,
+      "first_passing_p1": {
+        "p1_ratio": 0.25,
+        "alerts": 209,
+        "incidents": 30,
+        "p1_alerts": 0,
+        "p1_incidents": 0,
+        "worst_p1_owner": "BUYER",
+        "worst_p1_items": 0,
+        "busiest_items": 30,
+        "p1_value_at_risk": 0,
+        "p1_value_share": 0.0,
+        "p1_passes": true,
+        "fully_passes": false
+      },
       "any_fully_passes": false,
       "caveat": "the P1 threshold is calibrated against how many items an owner can chase in a day, which is an external constraint and not a property of the data; the parts that leave P1 land in P2, which has an SLA, and the value that moves with them is the size of the bet"
     },
     "value_triage": {
-      "n_p1_incidents": 36,
+      "n_p1_incidents": 0,
       "top_n": 10,
-      "top_n_value": 770444.2953362039,
-      "top_n_share_of_p1_value": 0.9084316429058127,
-      "top_n_share_of_all_value": 0.9084316429058127,
-      "top_n_parts": 39,
-      "parts_in_p1": 109,
-      "incidents_for_80pct_of_p1_value": 8,
-      "p1_value": 848103.7636159097,
-      "all_value": 848103.7636159097,
-      "verdict": "workable: a top-N queue carries most of the exposure"
+      "top_n_value": 0,
+      "top_n_share_of_p1_value": 0.0,
+      "top_n_share_of_all_value": 0.0,
+      "top_n_parts": 0,
+      "parts_in_p1": 0,
+      "incidents_for_80pct_of_p1_value": null,
+      "p1_value": 1e-09,
+      "all_value": 14730014.55000001,
+      "verdict": "workable: there are no P1 incidents to triage"
     },
-    "already_short": 54,
-    "n_rows": 260,
+    "already_short": 0,
+    "runs_out_in_horizon": 82,
+    "n_rows": 209,
     "load_before": {
       "BUYER": {
-        "total": 218,
-        "P1": 67,
-        "P2": 71,
-        "P3": 37,
-        "P4": 43,
-        "value": 660183.3587877533
-      },
-      "SUPPLY_CHAIN_MANAGER": {
-        "total": 42,
-        "P1": 42,
+        "total": 209,
+        "P1": 0,
         "P2": 0,
-        "P3": 0,
-        "P4": 0,
-        "value": 187920.40482815672
+        "P3": 34,
+        "P4": 175,
+        "value": 14730014.550000012
       }
     },
     "load_after": {
-      "SUPPLY_CHAIN_MANAGER": {
-        "total": 26,
-        "P1": 26,
-        "P2": 0,
-        "P3": 0,
-        "P4": 0,
-        "value": 678943.0327071509,
-        "parts": 87
-      },
       "BUYER": {
-        "total": 82,
-        "P1": 10,
-        "P2": 34,
-        "P3": 21,
-        "P4": 17,
-        "value": 169160.73090875885,
-        "parts": 173
+        "total": 30,
+        "P1": 0,
+        "P2": 0,
+        "P3": 7,
+        "P4": 23,
+        "value": 14730014.550000014,
+        "parts": 209
       }
     },
     "sample_incident": {
-      "supplier_id": "SUP-044",
-      "severity": "P4",
-      "n_parts": 7,
-      "value_at_risk": 0.0,
-      "units_at_risk": 0.0,
-      "worst_slack_days": 33.35238856515427,
-      "n_single_sourced": 0,
-      "any_single_sourced": false,
+      "supplier_id": "V02",
+      "severity": "P3",
+      "n_parts": 8,
+      "value_at_risk": 7532903.020000005,
+      "units_at_risk": 141479.00000000006,
+      "worst_slack_days": 49.12511280662892,
+      "n_single_sourced": 8,
+      "any_single_sourced": true,
       "over_capacity": false,
-      "max_risk_score": 0.44794049825295285,
+      "max_risk_score": 0.4511201561251893,
       "route_to": "BUYER",
-      "response_hours": 168,
-      "escalate_after_hours": null,
+      "response_hours": 72,
+      "escalate_after_hours": 120,
       "escalation_chain": [
-        "BUYER"
+        "BUYER",
+        "COMMODITY_MANAGER"
       ],
-      "reason": "7 part(s) from SUP-044 at P4: worst slack 33 days",
-      "key": "4455c05e8dfe",
+      "reason": "8 part(s) from V02 at P3: worst slack 49 days, 8 single-sourced",
+      "key": "853da3287235",
       "parts": [
-        "PRT-0006",
-        "PRT-0044",
-        "PRT-0210",
-        "PRT-0216",
-        "PRT-0228",
-        "PRT-S005",
-        "PRT-S014"
+        "Part_0003",
+        "Part_0017",
+        "Part_0046",
+        "Part_0120",
+        "Part_0148",
+        "Part_0153",
+        "Part_0194",
+        "Part_0199"
       ]
+    },
+    "sensitivity": [
+      {
+        "stock_scale": 1.0,
+        "p1_alerts": 0,
+        "p1_incidents": 0,
+        "alerts": 209,
+        "incidents": 30,
+        "worst_p1_before": 0,
+        "worst_p1_after": 0,
+        "busiest_after": 30,
+        "passes_after": false,
+        "already_short": 0,
+        "value_at_risk": 14730014.55000001,
+        "top10_share_of_p1_value": 0.0,
+        "incidents_for_80pct": null,
+        "top_supplier_share": 0.19138755980861244
+      },
+      {
+        "stock_scale": 0.5,
+        "p1_alerts": 5,
+        "p1_incidents": 3,
+        "alerts": 209,
+        "incidents": 48,
+        "worst_p1_before": 5,
+        "worst_p1_after": 3,
+        "busiest_after": 48,
+        "passes_after": false,
+        "already_short": 2,
+        "value_at_risk": 45732063.12500002,
+        "top10_share_of_p1_value": 1.0,
+        "incidents_for_80pct": 1,
+        "top_supplier_share": 0.19138755980861244
+      },
+      {
+        "stock_scale": 0.25,
+        "p1_alerts": 44,
+        "p1_incidents": 16,
+        "alerts": 209,
+        "incidents": 80,
+        "worst_p1_before": 41,
+        "worst_p1_after": 15,
+        "busiest_after": 79,
+        "passes_after": false,
+        "already_short": 23,
+        "value_at_risk": 74524349.91000003,
+        "top10_share_of_p1_value": 0.9964548595175374,
+        "incidents_for_80pct": 2,
+        "top_supplier_share": 0.19138755980861244
+      }
+    ],
+    "stress": {
+      "stock_scale": 0.25,
+      "load_check": {
+        "alerts": 209,
+        "incidents": 80,
+        "reduction_pct": 61.72248803827751,
+        "parts_covered_before": 209,
+        "parts_covered_after": 209,
+        "value_before": 74524349.91000003,
+        "value_after": 74524349.91000003,
+        "p1_alerts": 44,
+        "p1_incidents": 16,
+        "busiest_before": {
+          "role": "BUYER",
+          "items": 206
+        },
+        "busiest_after": {
+          "role": "BUYER",
+          "items": 79
+        },
+        "worst_p1_before": {
+          "role": "BUYER",
+          "items": 41
+        },
+        "worst_p1_after": {
+          "role": "BUYER",
+          "items": 15
+        },
+        "per_owner_limit": 15,
+        "p1_limit": 10,
+        "passes_before": false,
+        "passes_after": false,
+        "caveat": "grouping reduces the COUNT an owner sees and not the work; the parts and the value at risk are carried through unchanged so the comparison is like for like"
+      },
+      "concentration": {
+        "top": [
+          {
+            "supplier_id": "V06",
+            "alerts": 8,
+            "P1": 3,
+            "n_parts": 8,
+            "value_at_risk": 934843.8275,
+            "share_of_alerts": 0.03827751196172249
+          },
+          {
+            "supplier_id": "V09",
+            "alerts": 8,
+            "P1": 2,
+            "n_parts": 8,
+            "value_at_risk": 189197.25000000003,
+            "share_of_alerts": 0.03827751196172249
+          },
+          {
+            "supplier_id": "V21",
+            "alerts": 8,
+            "P1": 3,
+            "n_parts": 8,
+            "value_at_risk": 1424930.4225000003,
+            "share_of_alerts": 0.03827751196172249
+          },
+          {
+            "supplier_id": "V07",
+            "alerts": 8,
+            "P1": 1,
+            "n_parts": 8,
+            "value_at_risk": 74810.92749999999,
+            "share_of_alerts": 0.03827751196172249
+          },
+          {
+            "supplier_id": "V25",
+            "alerts": 8,
+            "P1": 6,
+            "n_parts": 8,
+            "value_at_risk": 54601.1375,
+            "share_of_alerts": 0.03827751196172249
+          }
+        ],
+        "n_suppliers": 27,
+        "top_share": 0.19138755980861244
+      },
+      "calibration": {
+        "sweep": [
+          {
+            "p1_ratio": 0.25,
+            "alerts": 209,
+            "incidents": 79,
+            "p1_alerts": 41,
+            "p1_incidents": 15,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 15,
+            "busiest_items": 79,
+            "p1_value_at_risk": 308154.075,
+            "p1_value_share": 0.004134944825042351,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.2,
+            "alerts": 209,
+            "incidents": 80,
+            "p1_alerts": 37,
+            "p1_incidents": 15,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 15,
+            "busiest_items": 80,
+            "p1_value_at_risk": 149071.895,
+            "p1_value_share": 0.0020003112429699548,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.15,
+            "alerts": 209,
+            "incidents": 78,
+            "p1_alerts": 33,
+            "p1_incidents": 13,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 13,
+            "busiest_items": 78,
+            "p1_value_at_risk": 140928.4325,
+            "p1_value_share": 0.0018910387366034515,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.1,
+            "alerts": 209,
+            "incidents": 77,
+            "p1_alerts": 31,
+            "p1_incidents": 12,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 12,
+            "busiest_items": 77,
+            "p1_value_at_risk": 139454.56999999998,
+            "p1_value_share": 0.0018712618113195685,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.07,
+            "alerts": 209,
+            "incidents": 77,
+            "p1_alerts": 31,
+            "p1_incidents": 12,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 12,
+            "busiest_items": 77,
+            "p1_value_at_risk": 139454.56999999998,
+            "p1_value_share": 0.0018712618113195685,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.05,
+            "alerts": 209,
+            "incidents": 77,
+            "p1_alerts": 26,
+            "p1_incidents": 11,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 11,
+            "busiest_items": 77,
+            "p1_value_at_risk": 113342.27749999998,
+            "p1_value_share": 0.0015208757625779863,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.03,
+            "alerts": 209,
+            "incidents": 77,
+            "p1_alerts": 25,
+            "p1_incidents": 11,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 11,
+            "busiest_items": 77,
+            "p1_value_at_risk": 112493.76249999998,
+            "p1_value_share": 0.0015094900208569957,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.02,
+            "alerts": 209,
+            "incidents": 77,
+            "p1_alerts": 25,
+            "p1_incidents": 11,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 11,
+            "busiest_items": 77,
+            "p1_value_at_risk": 112493.76249999998,
+            "p1_value_share": 0.0015094900208569957,
+            "p1_passes": false,
+            "fully_passes": false
+          },
+          {
+            "p1_ratio": 0.01,
+            "alerts": 209,
+            "incidents": 78,
+            "p1_alerts": 24,
+            "p1_incidents": 11,
+            "worst_p1_owner": "BUYER",
+            "worst_p1_items": 11,
+            "busiest_items": 78,
+            "p1_value_at_risk": 112493.76249999998,
+            "p1_value_share": 0.0015094900208569957,
+            "p1_passes": false,
+            "fully_passes": false
+          }
+        ],
+        "p1_limit": 10,
+        "per_owner_limit": 15,
+        "first_passing_p1": null,
+        "any_fully_passes": false,
+        "caveat": "the P1 threshold is calibrated against how many items an owner can chase in a day, which is an external constraint and not a property of the data; the parts that leave P1 land in P2, which has an SLA, and the value that moves with them is the size of the bet"
+      },
+      "value_triage": {
+        "n_p1_incidents": 16,
+        "top_n": 10,
+        "top_n_value": 1223788.5075000003,
+        "top_n_share_of_p1_value": 0.9964548595175374,
+        "top_n_share_of_all_value": 0.016421324157512532,
+        "top_n_parts": 29,
+        "parts_in_p1": 44,
+        "incidents_for_80pct_of_p1_value": 2,
+        "p1_value": 1228142.4450000003,
+        "all_value": 74524349.91000003,
+        "verdict": "workable: a top-N queue carries most of the exposure"
+      },
+      "already_short": 23,
+      "runs_out_in_horizon": 203,
+      "n_rows": 209,
+      "load_before": {
+        "SUPPLY_CHAIN_MANAGER": {
+          "total": 3,
+          "P1": 3,
+          "P2": 0,
+          "P3": 0,
+          "P4": 0,
+          "value": 919988.3700000001
+        },
+        "BUYER": {
+          "total": 206,
+          "P1": 41,
+          "P2": 39,
+          "P3": 52,
+          "P4": 74,
+          "value": 73604361.53999995
+        }
+      },
+      "load_after": {
+        "SUPPLY_CHAIN_MANAGER": {
+          "total": 1,
+          "P1": 1,
+          "P2": 0,
+          "P3": 0,
+          "P4": 0,
+          "value": 919988.3700000002,
+          "parts": 3
+        },
+        "BUYER": {
+          "total": 79,
+          "P1": 15,
+          "P2": 20,
+          "P3": 23,
+          "P4": 21,
+          "value": 73604361.54000002,
+          "parts": 206
+        }
+      },
+      "sample_incident": {
+        "supplier_id": "V03",
+        "severity": "P4",
+        "n_parts": 8,
+        "value_at_risk": 24134805.367500007,
+        "units_at_risk": 199893.75000000003,
+        "worst_slack_days": 7.712962962962964,
+        "n_single_sourced": 0,
+        "any_single_sourced": false,
+        "over_capacity": false,
+        "max_risk_score": 0.5322255790533736,
+        "route_to": "BUYER",
+        "response_hours": 168,
+        "escalate_after_hours": null,
+        "escalation_chain": [
+          "BUYER"
+        ],
+        "reason": "8 part(s) from V03 at P4: worst slack 8 days",
+        "key": "19639d7214b8",
+        "parts": [
+          "Part_0045",
+          "Part_0059",
+          "Part_0070",
+          "Part_0081",
+          "Part_0082",
+          "Part_0118",
+          "Part_0122",
+          "Part_0147"
+        ]
+      }
     }
   },
   "transport": {
-    "messages_prepared": 72,
-    "incidents": 108,
-    "urgent_messages": 70,
+    "messages_prepared": 38,
+    "incidents": 80,
+    "urgent_messages": 36,
     "digest_messages": 2,
     "first_pass": {
-      "queued": 72,
-      "sent": 30,
+      "queued": 38,
+      "sent": 16,
       "failed": 0,
-      "deferred": 42,
+      "deferred": 22,
       "dead": 0
     },
-    "received": 30,
+    "received": 16,
     "counts": {
-      "DEFERRED": 42,
-      "SENT": 30
+      "DEFERRED": 22,
+      "SENT": 16
     },
     "rerun": {
-      "duplicate_enqueues": 72,
+      "duplicate_enqueues": 38,
       "sent": 0
     },
     "receiver_duplicates_after_rerun": 0,
@@ -367,16 +717,16 @@
     },
     "rate_limit": {
       "limit_per_recipient": 5,
-      "messages": 72,
-      "sent": 10,
-      "deferred": 62,
+      "messages": 38,
+      "sent": 6,
+      "deferred": 32,
       "delivered_per_recipient": {
-        "SUPPLY_CHAIN_MANAGER": 5,
+        "SUPPLY_CHAIN_MANAGER": 1,
         "BUYER": 5
       },
       "max_to_one_recipient": 5,
       "nothing_dropped": true
     }
   },
-  "elapsed_s": 18.03570532798767
+  "elapsed_s": 17.882776260375977
 }

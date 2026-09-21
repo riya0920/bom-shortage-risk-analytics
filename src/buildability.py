@@ -1,18 +1,19 @@
 """BOM propagation to end-item buildability, and the shortage attribution.
 
-The centrepiece. Given on-hand inventory, open purchase orders, and lead-time
-DISTRIBUTIONS, compute how many units of each product can be built per week over a
-13-week horizon -- as a distribution, not a point estimate.
+Given on-hand stock, open orders and lead-time DISTRIBUTIONS, compute how many
+units of each product can be built per week over a 13-week horizon, as a
+distribution rather than one number.
 
-Why a distribution: supply plans are probabilistic and presenting them as a single
-number is how a materials meeting ends with a commitment nobody can keep. P50 = 120
-buildable and P10 = 84 are different conversations, and the second one is the
-useful one.
+Lead-time uncertainty in the Monte Carlo has two real parts:
+  * the part's own Willems lead-time distribution (drawn, minus its mean, so a
+    part with a fixed lead time in the data gets no spread), and
+  * the mapped vendor's real SCMS lateness against its scheduled date, as a
+    fraction of the quoted lead, applied to the part's lead time.
+Stock and open orders are simulated (see supply.py).
 
-Why 13 weeks: it covers most purchased-part lead times plus a planning cycle, so
-an order placed today still lands inside the window. Beyond it, FORECAST
-uncertainty starts to dominate SUPPLY uncertainty and the analysis is answering a
-sales question wearing a materials hat.
+Why 13 weeks: it covers every purchased-part lead time in this chain (the
+longest is 55 days) plus a planning cycle. Beyond it, forecast uncertainty
+starts to dominate supply uncertainty.
 """
 from __future__ import annotations
 
@@ -21,146 +22,115 @@ import numpy as np
 from supply import WEEKS, SupplyBase, unit_requirements
 
 
-def _receipt_schedule(base: SupplyBase, rng: np.random.Generator,
-                      stochastic: bool) -> dict[str, np.ndarray]:
-    """Quantity of each purchased part arriving in each week of the horizon.
+def _matrix(base: SupplyBase):
+    """Products x purchased-parts requirement matrix, cached on the base."""
+    cache = base.meta.get("_matrix")
+    if cache is not None:
+        return cache
+    parts = sorted(p for p, c in base.components.items() if c.level == 2)
+    col = {p: j for j, p in enumerate(parts)}
+    req = unit_requirements(base)
+    R = np.zeros((len(base.products), len(parts)))
+    for i, prod in enumerate(base.products):
+        for part, q in req[prod].items():
+            j = col.get(part)
+            if j is not None:
+                R[i, j] = q
+    cache = (parts, col, R)
+    base.meta["_matrix"] = cache
+    return cache
 
-    Open POs land at their promise date under the deterministic plan. Under Monte
-    Carlo they land at promise + a lead-time deviation drawn from that supplier's
-    distribution, and are reduced by the supplier's quality rejection rate --
-    because a receipt that fails inspection is not supply.
-    """
-    arrivals: dict[str, np.ndarray] = {}
+
+def _receipt_schedule(base: SupplyBase, rng: np.random.Generator,
+                      stochastic: bool) -> np.ndarray:
+    """Quantity of each purchased part arriving in each week (parts x weeks)."""
+    parts, col, _ = _matrix(base)
+    arr = np.zeros((len(parts), WEEKS))
     for po in base.pos:
         if po.received_day is not None:
-            continue  # already received; already in on_hand
-        s = base.suppliers[po.supplier_id]
+            continue
+        c = base.components[po.part]
         day = po.promise_day
-        qty = po.qty
         if stochastic:
-            dev = rng.normal(0, s.lead_sd_days)
-            if s.fat_tail and rng.random() < 0.12:
-                dev += abs(rng.normal(0, s.lead_mean_days * 0.9))
-            day += dev
-            qty *= (1.0 - min(0.5, max(0.0, rng.normal(s.quality_reject_rate,
-                                                       s.quality_reject_rate * 0.5))))
-        else:
-            qty *= (1.0 - s.quality_reject_rate)
-        wk = int(np.floor(day / 7.0))
-        if wk < 0:
-            wk = 0
+            if c.has_distribution:
+                day += float(rng.choice(c.lead_values, p=c.lead_probs)) - c.lead_mean
+            s = base.suppliers.get(po.supplier_id)
+            if s is not None and len(s.rel_late):
+                day += float(s.rel_late[rng.integers(len(s.rel_late))]) * c.lead_mean
+        wk = max(0, int(np.floor(day / 7.0)))
         if wk >= WEEKS:
             continue
-        a = arrivals.setdefault(po.part, np.zeros(WEEKS))
-        a[wk] += max(0.0, qty)
-    return arrivals
+        arr[col[po.part], wk] += max(0.0, po.qty)
+    return arr
 
 
 def buildable(base: SupplyBase, rng: np.random.Generator | None = None,
-              stochastic: bool = False,
-              allocation: str = "even") -> dict:
+              stochastic: bool = False, allocation: str = "even") -> dict:
     """Weekly buildable units per product, plus what gated each week.
 
-    The allocation policy matters because components are SHARED. When a common
-    part is short, somebody has to decide which product gets it, and the decision
-    is a business policy rather than an arithmetic fact:
+    Allocation matters because parts are SHARED (143 of the 209 purchased
+    parts in this chain feed more than one product). When a shared part is
+    short, somebody decides who gets it:
 
-      even     -- split the shortfall proportionally to demand
-      margin   -- highest-margin product first
-      contract -- contractual/priority order first
-
-    The three produce materially different plans and different angry people, which
-    is why `compare_allocation_policies()` runs all of them instead of picking.
+      even     -- split the shortfall in proportion to demand
+      margin   -- highest-value product first (BOM cost as the stand-in)
+      contract -- a fixed priority order (alphabetical, as a stand-in)
     """
     rng = rng or np.random.default_rng(0)
-    req = unit_requirements(base)
+    parts, _, R = _matrix(base)
     arrivals = _receipt_schedule(base, rng, stochastic)
-
-    on_hand = {p: c.on_hand for p, c in base.components.items() if c.level == 2}
+    on_hand = np.array([base.components[p].on_hand for p in parts], float)
+    P = len(base.products)
     built = {p: np.zeros(WEEKS) for p in base.products}
     gating: list[dict] = []
-
-    order = _priority_order(base, allocation)
+    order = [base.products.index(p) for p in _priority_order(base, allocation)]
+    uses = R > 0
 
     for wk in range(WEEKS):
-        for part, arr in arrivals.items():
-            on_hand[part] = on_hand.get(part, 0.0) + arr[wk]
+        on_hand = on_hand + arrivals[:, wk]
+        want = np.array([float(base.demand[p][wk]) for p in base.products])
 
-        want = {p: float(base.demand[p][wk]) for p in base.products}
+        # Which part binds each product if it had the stock to itself.
+        with np.errstate(divide="ignore", invalid="ignore"):
+            can = np.where(uses, on_hand[None, :] / np.where(uses, R, 1.0), np.inf)
+        j_min = np.argmin(can, axis=1)
+        binding = [parts[j_min[i]] if can[i, j_min[i]] < want[i] else None
+                   for i in range(P)]
 
-        # Which part binds each product, if it had the inventory to itself? Kept
-        # for shortage attribution -- the "who gated me" answer.
-        binding_of = {}
-        for p in base.products:
-            lim, binding = want[p], None
-            for part, per in req[p].items():
-                if per <= 0 or part not in on_hand:
-                    continue
-                can = on_hand[part] / per
-                if can < lim:
-                    lim, binding = can, part
-            binding_of[p] = binding
-
+        n = np.zeros(P)
         if allocation == "even":
-            # PROPORTIONAL split of every contended part, then rebuild.
-            #
-            # The first version consumed inventory in list order and called it
-            # "even", which meant the first product in the list took everything it
-            # wanted and the last one starved -- a worst-product fill rate of 7.7%
-            # that was an artifact of dict ordering rather than of any policy. An
-            # allocation policy that depends on the order of a Python list is not a
-            # policy.
-            share: dict[str, dict[str, float]] = {p: {} for p in base.products}
-            for part in on_hand:
-                total_need = sum(req[p].get(part, 0.0) * want[p] for p in base.products)
-                if total_need <= 0:
-                    continue
-                avail = on_hand[part]
-                if avail >= total_need:
-                    for p in base.products:
-                        share[p][part] = req[p].get(part, 0.0) * want[p]
-                else:
-                    for p in base.products:
-                        need_p = req[p].get(part, 0.0) * want[p]
-                        share[p][part] = avail * (need_p / total_need)
-            for p in base.products:
-                n = want[p]
-                for part, per in req[p].items():
-                    if per > 0 and part in on_hand:
-                        n = min(n, np.floor(share[p].get(part, 0.0) / per))
-                n = max(0.0, n)
-                for part, per in req[p].items():
-                    if part in on_hand:
-                        on_hand[part] -= n * per
-                built[p][wk] = n
+            need = R * want[:, None]                 # P x N
+            total = need.sum(axis=0)
+            with np.errstate(divide="ignore", invalid="ignore"):
+                frac = np.where(total > 0, np.minimum(1.0, on_hand / total), 1.0)
+                share = need * frac[None, :]
+                lim = np.where(uses, np.floor(share / np.where(uses, R, 1.0) + 1e-9),
+                               np.inf)
+            n = np.maximum(0.0, np.minimum(want, lim.min(axis=1)))
+            on_hand = on_hand - n @ R
         else:
-            # Strict priority: the highest-priority product takes what it needs,
-            # the next takes what is left, and so on.
-            for p in order:
-                n = want[p]
-                for part, per in req[p].items():
-                    if per > 0 and part in on_hand:
-                        n = min(n, np.floor(on_hand[part] / per))
-                n = max(0.0, n)
-                for part, per in req[p].items():
-                    if part in on_hand:
-                        on_hand[part] -= n * per
-                built[p][wk] = n
+            for i in order:
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    lim = np.where(uses[i], np.floor(on_hand / np.where(uses[i], R[i], 1.0)
+                                                     + 1e-9), np.inf)
+                n[i] = max(0.0, min(want[i], float(lim.min())))
+                on_hand = on_hand - n[i] * R[i]
+        on_hand = np.maximum(on_hand, 0.0)
 
-        for p in base.products:
-            if built[p][wk] < want[p] - 1e-9:
+        for i, p in enumerate(base.products):
+            built[p][wk] = n[i]
+            if n[i] < want[i] - 1e-9:
                 gating.append({
-                    "week": wk + 1, "product": p, "wanted": want[p],
-                    "built": float(built[p][wk]),
-                    "short_by": want[p] - float(built[p][wk]),
-                    "gating_part": binding_of[p],
+                    "week": wk + 1, "product": p, "wanted": float(want[i]),
+                    "built": float(n[i]), "short_by": float(want[i] - n[i]),
+                    "gating_part": binding[i],
                 })
     return {"built": built, "gating": gating, "allocation": allocation}
 
 
 def _priority_order(base: SupplyBase, allocation: str) -> list[str]:
     if allocation == "margin":
-        # Stand-in for margin: total BOM cost as a proxy for product value.
+        # Stand-in for margin: total purchased-part cost per unit.
         req = unit_requirements(base)
         val = {p: sum(base.components[c].unit_cost * q
                       for c, q in req[p].items() if c in base.components)
@@ -173,7 +143,7 @@ def _priority_order(base: SupplyBase, allocation: str) -> list[str]:
 
 def monte_carlo(base: SupplyBase, n_sims: int = 300, seed: int = 7,
                 allocation: str = "even") -> dict:
-    """Buildability as a DISTRIBUTION over lead-time and quality uncertainty."""
+    """Buildability as a DISTRIBUTION over lead-time uncertainty."""
     rng = np.random.default_rng(seed)
     sims = {p: np.zeros((n_sims, WEEKS)) for p in base.products}
     gate_counts: dict[str, int] = {}
@@ -193,7 +163,7 @@ def monte_carlo(base: SupplyBase, n_sims: int = 300, seed: int = 7,
             "p90": np.percentile(sims[p], 90, axis=0).tolist(),
             "demand": base.demand[p].tolist(),
         }
-    top = sorted(gate_counts.items(), key=lambda kv: -kv[1])[:15]
+    top = sorted(gate_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:15]
     return {
         "fan": fan, "n_sims": n_sims, "allocation": allocation,
         "top_gating_parts": [{"part": k, "times_gating": v} for k, v in top],
@@ -214,49 +184,50 @@ def compare_allocation_policies(base: SupplyBase, n_sims: int = 120) -> list[dic
                 "demand_total": float(d.sum()),
                 "fill_rate_pct": float(100 * s.sum() / max(1e-9, d.sum())),
             }
+        fills = [r["fill_rate_pct"] for r in rows.values()]
         out.append({
             "policy": pol,
             "per_product": rows,
             "total_p50": float(sum(r["p50_total"] for r in rows.values())),
-            "worst_product_fill_pct": float(min(r["fill_rate_pct"] for r in rows.values())),
+            "worst_product_fill_pct": float(min(fills)),
+            "median_product_fill_pct": float(np.median(fills)),
+            "products_below_50pct": int(sum(f < 50 for f in fills)),
         })
     return out
 
 
 def shortage_drivers(base: SupplyBase, mc: dict, top_n: int = 10) -> list[dict]:
-    """The Monday materials meeting list: which parts gate the plan, and by when.
+    """The Monday materials list: which parts gate the plan, and by when.
 
-    Each driver carries an ORDER-BY DATE, which is what makes it actionable. An
-    alert that says "you will be short in week 7" is a fact; an alert that says
-    "order by 3 March or the line stops 21 April" is a decision.
+    The order-by date uses the part's P95 lead time from its real Willems
+    distribution (for a part with a fixed lead time, P95 = that time).
     """
+    det = buildable(base)
     drivers = []
     for row in mc["top_gating_parts"][:top_n]:
         part = row["part"]
         c = base.components.get(part)
         if c is None or c.supplier_id is None:
             continue
-        s = base.suppliers[c.supplier_id]
-        # First week the part gates anything, from the deterministic pass.
-        det = buildable(base)
         first_wk = min((g["week"] for g in det["gating"] if g["gating_part"] == part),
                        default=None)
-        impact_day = (first_wk * 7) if first_wk else WEEKS * 7
-        # P95 lead time: ordering to the mean means arriving late half the time,
-        # which for a gating part is not a plan.
-        p95_lead = s.lead_mean_days + 1.645 * s.lead_sd_days
-        order_by_day = impact_day - p95_lead
+        impact_day = ((first_wk - 1) * 7) if first_wk else WEEKS * 7
+        order_by_day = impact_day - c.lead_p95
         drivers.append({
-            "part": part, "supplier": s.supplier_id,
+            "part": part, "supplier": c.supplier_id,
+            "supplier_name": base.suppliers[c.supplier_id].name,
             "single_sourced": c.single_sourced,
             "times_gating_in_sim": row["times_gating"],
             "first_impact_week": first_wk,
-            "lead_mean_days": s.lead_mean_days,
-            "lead_p95_days": p95_lead,
+            "lead_mean_days": c.lead_mean,
+            "lead_p95_days": c.lead_p95,
+            "lead_has_distribution": c.has_distribution,
             "order_by_day": order_by_day,
             "runway_days": order_by_day,
             "already_too_late": bool(order_by_day < 0),
             "on_hand": c.on_hand,
             "unit_cost": c.unit_cost,
+            "n_products_using": sum(1 for p in base.products
+                                    if part in unit_requirements(base)[p]),
         })
     return drivers

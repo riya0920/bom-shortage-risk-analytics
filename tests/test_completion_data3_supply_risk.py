@@ -1,4 +1,4 @@
-"""Tests for the third-pass modules."""
+"""Tests for safety stock, lot sizing and alert routing."""
 from __future__ import annotations
 
 import pathlib
@@ -183,3 +183,13 @@ def test_load_by_role_totals_match_the_alert_count():
     alerts, _ = RT.dedupe(RT.build_alerts(rows))
     load = RT.load_by_role(alerts)
     assert sum(d["total"] for d in load.values()) == len(alerts)
+
+
+def test_empirical_safety_stock_matches_the_formula_for_a_fixed_lead_time():
+    """Lead-time demand is a SUM of L daily demands (sd grows with sqrt(L)).
+    The first version multiplied one day's demand by L, which doubled the
+    safety stock once real demand (CV about 0.95) went in."""
+    lead = np.full(200, 10.0)
+    emp = INV.empirical_safety_stock(100, 95, lead, n_sims=100000)
+    par = INV.safety_stock(100, 95, 10.0, 0.0)
+    assert emp["safety_stock"] == pytest.approx(par["safety_stock"], rel=0.05)

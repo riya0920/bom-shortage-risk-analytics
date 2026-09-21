@@ -103,7 +103,12 @@ def empirical_safety_stock(demand_per_day: float, sigma_demand: float,
     if len(ls) < 5:
         return {"insufficient_history": True, "n_samples": int(len(ls))}
     draws = rng.choice(ls, size=n_sims, replace=True)
-    dld = rng.normal(demand_per_day, sigma_demand, n_sims) * draws
+    # Demand over a lead time of L days is the SUM of L daily demands: mean
+    # d*L, sd sigma_d*sqrt(L). The first version drew ONE daily demand and
+    # multiplied it by L, which scales the demand spread with L instead of
+    # sqrt(L). With the simulated data (demand CV 0.25) that hid; with the real
+    # Willems demand (median CV about 0.95) it doubled the safety stock.
+    dld = rng.normal(demand_per_day * draws, sigma_demand * np.sqrt(draws))
     q = float(np.quantile(dld, service_level))
     mean_dld = float(np.mean(dld))
     return {"n_samples": int(len(ls)), "insufficient_history": False,

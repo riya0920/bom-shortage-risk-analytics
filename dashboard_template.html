@@ -44,6 +44,15 @@ header .eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .04em; t
 h1 { font-size: 30px; line-height: 1.2; margin: 6px 0 10px; letter-spacing: -.01em; }
 .lede { color: var(--ink-2); max-width: 760px; margin: 0; font-size: 16px; }
 .meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.srcs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.src { background: var(--card); border: 1px solid var(--ring); border-left-width: 4px; border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--ink-2); }
+.src b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 3px; }
+.src.real { border-left-color: var(--good); }
+.src.assumed { border-left-color: var(--warn); }
+.src.sim { border-left-color: var(--s2); }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 6px; padding: 1px 6px; margin-left: 6px; vertical-align: 1px; }
+.tag.real { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good-ink); }
+.tag.sim { background: color-mix(in srgb, var(--s2) 18%, transparent); color: var(--s2); }
 .pill { font-size: 12.5px; color: var(--ink-2); background: var(--chip); border-radius: 999px; padding: 3px 10px; }
 .pill a { color: inherit; }
 .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0 8px; }
@@ -105,7 +114,7 @@ footer a { color: var(--ink-2); }
 .theme button { font: inherit; font-size: 12.5px; border: 1px solid var(--ring); background: var(--card); color: var(--ink-2); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
 @media (max-width: 860px) {
   .kpis { grid-template-columns: repeat(2, 1fr); }
-  .grid2, .decisions, .stats { grid-template-columns: 1fr; }
+  .grid2, .decisions, .stats, .srcs { grid-template-columns: 1fr; }
   h1 { font-size: 24px; }
 }
 </style>
@@ -116,12 +125,20 @@ footer a { color: var(--ink-2); }
 <header>
   <div class="eyebrow">Manufacturing supply chain · shortage risk</div>
   <h1>Can the factory build its 13-week plan?</h1>
-  <p class="lede">A factory makes 4 products from <span id="h-parts"></span> purchased parts bought from
-  <span id="h-sup"></span> suppliers. This project runs the bill of materials, supplier lead times and
-  a Monte Carlo simulation to answer: how much of the plan can we actually build, which parts will stop
-  the line, which suppliers can we trust, and who needs to act first.</p>
+  <p class="lede">A real power-tool supply chain makes <span id="h-prod"></span> products from
+  <span id="h-parts"></span> purchased parts. A bill of materials (BOM) is the recipe: which parts, and
+  which sub-assemblies, go into each product. We run that BOM, real lead times and a Monte Carlo
+  simulation to answer: how much of the plan can we build, which parts will stop the line, which
+  suppliers can we trust, and who needs to act first.</p>
+  <div class="srcs">
+    <div class="src real"><b>Real data</b><span id="h-real"></span></div>
+    <div class="src assumed"><b>Assumed</b><span>Quantity per parent is 1 (the BOM data has none). Which vendor
+      supplies which part is matched by lead-time band; the two datasets are unrelated.</span></div>
+    <div class="src sim"><b>Simulated</b><span>Stock on hand, open orders and minimum order sizes (no public
+      source has them), original promise dates, and the planted supplier disruptions used only to score the
+      early-warning detector.</span></div>
+  </div>
   <div class="meta">
-    <span class="pill">Simulated supply base with known ground truth</span>
     <span class="pill" id="h-sims"></span>
     <span class="pill"><a href="https://github.com/riya0920/bom-shortage-risk-analytics">Code on GitHub</a></span>
   </div>
@@ -132,8 +149,10 @@ footer a { color: var(--ink-2); }
 <section>
   <div class="q">1 · Can we build the plan?</div>
   <h2>Buildable units per week, as a range, not one number</h2>
-  <p class="sub">Each simulation draws a new lead time for every supplier. The band is the middle 80% of outcomes
-  (P10 to P90); the line is the median. The gap to the demand line is the shortfall.</p>
+  <p class="sub">Each simulation draws a new lead time for every open order from the part's real lead-time
+  distribution, plus its vendor's real lateness. The band is the middle 80% of outcomes (P10 to P90); the
+  line is the median. The gap to the demand line is the shortfall. Demand is the real average from the data;
+  stock and open orders are simulated.</p>
   <div class="card">
     <div class="seg" id="prodSeg" role="group" aria-label="Product"></div>
     <div class="legend">
@@ -150,8 +169,8 @@ footer a { color: var(--ink-2); }
   <div class="q">2 · What is stopping it?</div>
   <h2>The parts that gate production, and when to order them</h2>
   <p class="sub">Ranked by how often each part was the one that stopped a product in the simulation. The
-  order-by date uses the supplier's <b>P95</b> lead time (a bad-case delivery), not the average. Ordering to the
-  average means arriving late half the time. Day 0 is today.</p>
+  order-by date is the first short week minus the part's <b>P95</b> lead time (a bad-case delivery) from its
+  real distribution, not the average. Day 0 is today. Vendor = the SCMS vendor mapped to the part (an assumption).</p>
   <div class="card tbl"><table id="drivers"></table></div>
 </section>
 
@@ -160,11 +179,11 @@ footer a { color: var(--ink-2); }
   <h2>On-time scores depend on which promise you measure against</h2>
   <div class="grid2">
     <div class="card">
-      <h3>On-time-in-full: original promise vs latest reschedule</h3>
-      <p class="cap">Suppliers that reschedule early look perfect against the rescheduled date.</p>
+      <h3>On time: original promise vs the date on file</h3>
+      <p class="cap" id="otifCap"></p>
       <div class="legend">
-        <span><i class="key-dot" style="background:var(--s2)"></i>vs original promise</span>
-        <span><i class="key-dot" style="background:var(--s1)"></i>vs latest reschedule</span>
+        <span><i class="key-dot" style="background:var(--s2)"></i>vs original promise <span class="tag sim">simulated</span></span>
+        <span><i class="key-dot" style="background:var(--s1)"></i>vs SCMS scheduled date <span class="tag real">real</span></span>
       </div>
       <div id="otif"></div>
     </div>
@@ -183,10 +202,10 @@ footer a { color: var(--ink-2); }
 
 <section>
   <div class="q">4 · Who acts first?</div>
-  <h2>Urgent (P1) items per person, before and after grouping by supplier</h2>
+  <h2>The busiest owner's urgent (P1) queue, before and after grouping by supplier</h2>
   <div class="grid2">
     <div class="card">
-      <h3>P1 items in each owner's queue</h3>
+      <h3>Worst P1 queue at three stock levels</h3>
       <p class="cap" id="loadCap"></p>
       <div class="legend">
         <span><i class="key-area" style="background:var(--s2)"></i>One alert per part</span>
@@ -211,9 +230,11 @@ footer a { color: var(--ink-2); }
 </section>
 
 <footer>
-  All data is simulated so every result can be checked against a known answer (planted supplier disruptions,
-  known lead-time distributions). Every number on this page is read from the pipeline's output files by
-  <span class="mono">build_dashboard.py</span>.
+  Data: Sean P. Willems, "Real-world multiechelon supply chains used for inventory optimization",
+  <i>Manufacturing &amp; Service Operations Management</i> 10(1):19-23, 2008 (chain 24, power-driven hand tools);
+  USAID Supply Chain Management System (SCMS) Delivery History, US-government open data. Stock, open orders,
+  minimum order sizes, original promise dates and planted disruptions are simulated and labelled as such.
+  Every number on this page is read from the pipeline's output files by <span class="mono">build_dashboard.py</span>.
   <a href="https://github.com/riya0920/bom-shortage-risk-analytics">Source and how to run it</a>.
 </footer>
 </div>
@@ -267,15 +288,19 @@ const hideTip = () => { tip.style.opacity = 0; };
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 // ---- header + KPIs -----------------------------------------------------
-$("h-parts").textContent = D.base.purchased_parts;
-$("h-sup").textContent = D.base.suppliers;
-$("h-sims").textContent = `${D.base.horizon_weeks}-week horizon · ${D.base.bom_lines} BOM lines · ${D.base.single_sourced_parts} single-sourced parts`;
+const B0 = D.base;
+$("h-prod").textContent = B0.n_products;
+$("h-parts").textContent = B0.purchased_parts;
+$("h-real").textContent = `BOM structure, part costs, product demand and part lead-time distributions: Willems (2008) ` +
+  `chain 24, power hand tools (${B0.n_products} products, ${B0.sub_assemblies} sub-assemblies, ${B0.purchased_parts} parts). ` +
+  `Supplier behaviour: ${fmt(B0.real_delivery_lines)} USAID SCMS delivery lines from ${B0.suppliers} real vendors, 2006-2015.`;
+$("h-sims").textContent = `${B0.horizon_weeks}-week horizon · ${fmt(B0.bom_lines)} BOM lines · ${B0.parts_shared_by_2plus_products} parts shared by 2+ products · ${B0.n_sims} simulations`;
 const K = D.kpis;
 [
   [pct(K.fill_p50), "of planned units buildable", `median case: ${fmt(K.units_p50)} of ${fmt(K.units_demand)} units`],
-  [`${K.late_drivers} of ${K.n_drivers}`, "top shortage parts already past order-by date", "ordering today is already too late"],
-  [money(K.value_at_risk), "value of output at risk", `across ${K.n_parts} purchased parts`],
-  [`${K.zero_slack}`, "parts with zero or negative slack", "short before any delay happens"],
+  [`${K.late_drivers} of ${K.n_drivers}`, "top shortage parts past their order-by date", "real lead times are short: there is still time to order"],
+  [`${K.runs_out} of ${K.n_parts}`, "parts run out inside 13 weeks", `${money(K.value_at_risk)} of parts short, at real part cost`],
+  [pct(K.exact_date_pct / 100), "of real deliveries land exactly on the scheduled date", `${fmt(K.n_lines)} SCMS lines: a date that moves with the delivery`],
 ].forEach(([v, l, s]) => {
   const k = h("div", { cls: "kpi" }, $("kpis"));
   h("div", { cls: "v", text: v }, k); h("div", { cls: "l", text: l }, k); h("div", { cls: "s", text: s }, k);
@@ -285,7 +310,7 @@ const K = D.kpis;
 const products = ["total", ...Object.keys(D.fan).filter((k) => k !== "total")];
 let current = "total";
 products.forEach((p) => {
-  const b = h("button", { type: "button", text: p === "total" ? "All products" : p.replace("PRD-", "Product "), "aria-pressed": String(p === current) }, $("prodSeg"));
+  const b = h("button", { type: "button", text: p === "total" ? "All products" : p.replace("Manuf_00", "#"), "aria-pressed": String(p === current) }, $("prodSeg"));
   b.onclick = () => { current = p; [...$("prodSeg").children].forEach((c, i) => c.setAttribute("aria-pressed", String(products[i] === p))); drawFan(); };
 });
 
@@ -330,7 +355,8 @@ function drawFan() {
   $("fanNote").replaceChildren();
   const b1 = h("b", { text: `${pct(med / dem)} of demand` });
   $("fanNote").append("Median case: ", b1, ` is buildable over 13 weeks (${fmt(med)} of ${fmt(dem)} units). ` +
-    (firstShort >= 0 ? `Shortfalls start in week ${firstShort + 1}, once today's stock runs out and parts on order have not arrived.` : ""));
+    (firstShort >= 0 ? `Shortfalls start in week ${firstShort + 1}, once today's stock runs out and parts on order have not arrived. ` : "") +
+    "The band is thin: real part lead times vary by only a few days, so timing barely moves the answer. Quantity on hand and on order does.");
 }
 drawFan();
 
@@ -338,14 +364,16 @@ drawFan();
 (function () {
   const t = $("drivers");
   const hr = h("tr", {}, h("thead", {}, t));
-  [["Part", ""], ["Supplier", ""], ["Single source", ""], ["First short week", "n"], ["Avg lead (days)", "n"], ["P95 lead (days)", "n"], ["Order by (day)", "n"], ["Status", ""]]
+  [["Part", ""], ["Vendor", ""], ["Products using it", "n"], ["First short week", "n"], ["Avg lead (days)", "n"], ["P95 lead (days)", "n"], ["Order by (day)", "n"], ["Status", ""]]
     .forEach(([c, cl]) => h("th", { text: c, cls: cl }, hr));
   const tb = h("tbody", {}, t);
   D.drivers.forEach((d) => {
     const r = h("tr", {}, tb);
     h("td", { cls: "mono", text: d.part }, r);
-    h("td", { cls: "mono", text: d.supplier }, r);
-    h("td", { text: d.single ? "Yes" : "No" }, r);
+    const v = h("td", {}, r);
+    h("span", { cls: "mono", text: d.supplier + " " }, v);
+    h("span", { text: d.vendor.length > 26 ? d.vendor.slice(0, 25) + "…" : d.vendor, title: d.vendor }, v);
+    h("td", { cls: "n", text: d.products }, r);
     h("td", { cls: "n", text: d.week == null ? "not in median" : "W" + d.week }, r);
     h("td", { cls: "n", text: d.mean }, r);
     h("td", { cls: "n", text: d.p95 }, r);
@@ -359,6 +387,10 @@ drawFan();
 // ---- 3a. OTIF dumbbell ---------------------------------------------------
 (function () {
   const rows = D.otif;
+  const E = D.evidence;
+  $("otifCap").textContent = `Real: ${pct(E.exact_on_scheduled_pct / 100)} of SCMS vendor lines arrive exactly on the scheduled date, ` +
+    `and ${E.vendors_exact_over_90pct} of ${E.n_vendors} vendors hit it more than 90% of the time. That is what a date updated to match ` +
+    `the delivery looks like. SCMS keeps no original date, so for a third of vendors one is simulated to show how big the gap can be.`;
   const W = 520, rowH = 26, L = 70, R = 44, T = 6, B = 26, H = T + B + rows.length * rowH;
   const pw = W - L - R, x = (v) => L + (pw * v) / 100;
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "OTIF by supplier" }, $("otif"));
@@ -374,9 +406,10 @@ drawFan();
     el("circle", { cx: x(o.latest), cy, r: 5, fill: "var(--s1)", stroke: "var(--card)", "stroke-width": 2 }, svg);
     el("text", { x: x(o.latest) + 10, y: cy + 4, class: "ax" }, svg).textContent = "+" + fmt(o.latest - o.orig) + " pts";
     const hit = el("rect", { x: 0, y: cy - rowH / 2, width: W, height: rowH, fill: "transparent" }, svg);
-    hit.addEventListener("pointermove", (evt) => showTip(evt, `${o.s} · ${o.n} deliveries`, [
-      ["vs original promise", fmt(o.orig, 1) + "%", css("--s2")],
-      ["vs latest reschedule", fmt(o.latest, 1) + "%", css("--s1")],
+    hit.addEventListener("pointermove", (evt) => showTip(evt, `${o.s} ${o.name} · ${o.n} deliveries`, [
+      ["vs original promise (simulated)", fmt(o.orig, 1) + "%", css("--s2")],
+      ["vs SCMS scheduled date (real)", fmt(o.latest, 1) + "%", css("--s1")],
+      ["exactly on scheduled date (real)", fmt(o.exact, 0) + "%", null],
     ]));
     hit.addEventListener("pointerleave", hideTip);
   });
@@ -416,24 +449,34 @@ drawFan();
     ]);
   });
   hit.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); hideTip(); });
-  $("detCap").textContent = `Scored against ${D.base.planted_disruptions} supplier disruptions planted in the data. Best setting: ${D.best.scale}× (precision ${pct(D.best.precision)}, recall ${pct(D.best.recall)}).`;
-  const a = D.ablation;
+  $("detCap").textContent = `Order histories resampled from each real vendor's own lead times, with ${D.base.planted_disruptions} disruptions planted (simulated) to score against. ` +
+    `${D.judged} of ${D.base.suppliers} vendors order often enough to be judged. Best setting: ${D.best.scale}× (precision ${pct(D.best.precision)}, recall ${pct(D.best.recall)}).`;
+  const a = D.ablation, all = a["all three"];
+  const drops = Object.entries(a).filter(([k, v]) => k !== "all three" && v.recall < all.recall - 1e-9).map(([k]) => k.replace("without ", ""));
+  const noise = Object.entries(a).filter(([k, v]) => k !== "all three" && v.recall >= all.recall - 1e-9 && v.precision > all.precision + 1e-9).map(([k]) => k.replace("without ", ""));
+  const RS = D.real_scan;
   $("ablNote").replaceChildren();
-  $("ablNote").append("Remove the P95 (bad-case) trigger and recall drops from ",
-    h("b", { text: pct(a["all three"].recall) }), " to ", h("b", { text: pct(a["without p95"].recall) }),
-    `. Remove the variance trigger and nothing is lost while precision rises to ${pct(a["without variance"].precision)}, so it only adds false alarms.`);
+  $("ablNote").append(
+    drops.length ? `Removing the ${drops.join(" or ")} trigger lowers recall. ` : "No single trigger carries the detection here: removing any one keeps recall the same. ",
+    noise.length ? `Removing the ${noise.join(" or ")} trigger raises precision, so it only adds false alarms. ` : "",
+    `A 120-day window (the old setting) could judge only ${D.window120} vendors, so the window is now one year. On the real history, with no ground truth, `,
+    h("b", { text: `${RS.vendor_years_flagged} of ${RS.vendor_years_evaluated} vendor-years` }), " get flagged: real lead times move a lot from year to year.");
 })();
 
 // ---- 4a. load ------------------------------------------------------------
 (function () {
-  const L0 = D.load, roles = Object.keys(L0.before);
-  const name = (r) => r === "BUYER" ? "Buyer" : r === "SUPPLY_CHAIN_MANAGER" ? "Supply chain mgr" : r;
-  const W = 520, L = 120, R = 40, T = 6, group = 64, B = 24, H = T + B + roles.length * group;
-  const vmax = niceMax(Math.max(...roles.map((r) => L0.before[r])));
+  const L0 = D.load, S0 = L0.sens;
+  const roles = S0.map((s) => s.stock_scale);
+  const before = Object.fromEntries(S0.map((s) => [s.stock_scale, s.worst_p1_before]));
+  const after = Object.fromEntries(S0.map((s) => [s.stock_scale, s.worst_p1_after]));
+  const name = (r) => r === 1 ? "Stock as simulated" : `Stock ×${r}`;
+  const W = 520, L = 130, R = 40, T = 6, group = 64, B = 24, H = T + B + roles.length * group;
+  const vmax = niceMax(Math.max(L0.limit, ...roles.map((r) => before[r])));
   const pw = W - L - R, x = (v) => L + (pw * v) / vmax, bh = 20;
   const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "P1 items per owner" }, $("load"));
-  for (let t = 0; t <= 4; t++) {
-    const v = (vmax * t) / 4;
+  const nt = Number.isInteger(vmax / 4) ? 4 : 5;
+  for (let t = 0; t <= nt; t++) {
+    const v = (vmax * t) / nt;
     el("line", { x1: x(v), x2: x(v), y1: T, y2: H - B, stroke: t ? "var(--grid)" : "var(--axis)" }, svg);
     el("text", { x: x(v), y: H - 6, "text-anchor": "middle", class: "ax" }, svg).textContent = fmt(v);
   }
@@ -448,38 +491,41 @@ drawFan();
   roles.forEach((r, i) => {
     const y0 = T + i * group + 6;
     el("text", { x: L - 10, y: y0 + bh + 4, "text-anchor": "end", class: "axl" }, svg).textContent = name(r);
-    bar(x(0), y0, L0.before[r], "var(--s2)", "One alert per part", r);
-    bar(x(0), y0 + bh + 2, L0.after[r] || 0, "var(--s1)", "One incident per supplier", r);
+    bar(x(0), y0, before[r], "var(--s2)", "One alert per part", r);
+    bar(x(0), y0 + bh + 2, after[r] || 0, "var(--s1)", "One incident per supplier", r);
   });
   el("line", { x1: x(L0.limit), x2: x(L0.limit), y1: T, y2: H - B, stroke: "var(--crit)", "stroke-width": 2 }, svg);
-  $("loadCap").textContent = `Grouping ${L0.alerts} part alerts into ${L0.incidents} supplier incidents cuts the queue, but one owner is still above the limit of ${L0.limit} urgent items a day.`;
+  const st = S0.find((s) => s.stock_scale === L0.stress) || S0[S0.length - 1];
+  $("loadCap").textContent = `At the simulated stock level nothing is urgent: every part that runs out can still be ordered in time, ` +
+    `because real lead times are short. Stock is simulated, so we also cut it. At ×${st.stock_scale}, grouping turns ${st.p1_alerts} urgent part alerts ` +
+    `into ${st.p1_incidents} supplier incidents, and the worst queue drops from ${st.worst_p1_before} to ${st.worst_p1_after}, still above the limit of ${L0.limit}.`;
 })();
 
 // ---- 4b. stats + allocation --------------------------------------------------
 (function () {
   [
-    [pct(D.load.top10_share), `of urgent value sits in the top 10 incidents (${D.load.n80} carry 80%)`],
-    [fmt(D.safety.understate, 1) + "×", "safety stock understated if you ignore lead-time variation"],
-    [`${D.expedite.no_recover} of ${D.expedite.n}`, "expedite options that still arrive too late"],
-    [D.tier2[0].parts, `parts depend on one tier-2 supplier (${D.tier2[0].t}), across all ${D.tier2[0].products} products`],
-    [D.distress.observed.toFixed(2), `AUROC of observable supplier-distress signals (old made-up score: ${D.distress.invented.toFixed(2)})`],
-    [fmt(D.calibration.inside, 0) + "%", `of real outcomes inside the P10 to P90 band (target ${D.calibration.target}%): the band is too wide`],
+    [pct(D.safety.supply_share), `of safety-stock variance comes from lead times; real demand swings more, so ignoring lead-time spread understates stock only ${fmt(D.safety.understate, 2)}×`],
+    [`${D.expedite.needed} of ${D.expedite.n}`, "expedite options needed: every top shortage part can still be ordered in time"],
+    [`${D.tier2.shared} of ${D.tier2.n}`, `real factories ship through more than one vendor (top: ${D.tier2.site}, behind ${D.tier2.vendors})`],
+    [D.distress.proxy.toFixed(2), `AUROC of a lead-time-drift distress signal on planted disruptions (plain on-time score: ${D.distress.scorecard.toFixed(2)})`],
+    [fmt(D.calibration.inside, 0) + "%", `of simulated futures inside the P10 to P90 band (target ${D.calibration.target}%): too wide for its label`],
+    [`${D.judged} of ${D.base.suppliers}`, "real vendors order often enough for the one-year detector to judge them"],
   ].forEach(([v, l]) => {
     const s = h("div", { cls: "stat" }, $("stats"));
     h("div", { cls: "v", text: String(v) }, s); h("div", { cls: "l", text: l }, s);
   });
   const t = $("alloc");
-  const prods = Object.keys(D.allocation[0].per);
   const hr = h("tr", {}, h("thead", {}, t));
-  h("th", { text: "Who gets a short part?" }, hr);
-  prods.forEach((p) => h("th", { cls: "n", text: p.replace("PRD-", "Prod ") }, hr));
-  h("th", { cls: "n", text: "Units" }, hr);
+  [["Who gets a short part?", ""], ["Worst product", "n"], ["Median product", "n"], ["Under 50%", "n"], ["Units", "n"]]
+    .forEach(([c, cl]) => h("th", { text: c, cls: cl }, hr));
   const tb = h("tbody", {}, t);
-  const nm = { even: "Even split", margin: "Highest margin first", contract: "Contract priority" };
+  const nm = { even: "Even split", margin: "Highest value first", contract: "Fixed priority" };
   D.allocation.forEach((a) => {
     const r = h("tr", {}, tb);
     h("td", { text: nm[a.policy] || a.policy }, r);
-    prods.forEach((p) => h("td", { cls: "n", text: fmt(a.per[p], 0) + "%" }, r));
+    h("td", { cls: "n", text: fmt(a.worst, 0) + "%" }, r);
+    h("td", { cls: "n", text: fmt(a.median, 0) + "%" }, r);
+    h("td", { cls: "n", text: `${a.under50} of ${D.base.n_products}` }, r);
     h("td", { cls: "n", text: fmt(a.total) }, r);
   });
 })();
@@ -487,13 +533,14 @@ drawFan();
 // ---- 5. decisions -----------------------------------------------------------
 (function () {
   const K = D.kpis;
+  const st = D.load.sens.find((s) => s.stock_scale === D.load.stress);
   [
-    ["Plan with a range, not a single number", `The median says ${pct(K.fill_p50)} of the plan is buildable, but the range is wide. Buying cover is set by the bad case, so the plan is shown as P10 / P50 / P90.`],
-    ["Order to the P95 lead time", `Order-by dates use the bad-case lead time. On that basis ${K.late_drivers} of the top ${K.n_drivers} shortage parts are already late and need an expedite decision now.`],
-    ["Score suppliers on the original promise", "Against reschedules, habitual reschedulers score 100%. The scorecard uses the first promise and reports the gap as its own metric."],
-    ["Keep the P95 trigger, drop the variance trigger", "Measured, not assumed: the bad-case trigger carries the detection; the variance trigger adds only false alarms."],
-    ["Group alerts by supplier, then work a top-10 list", `One late supplier is one phone call. Grouping cut the queue; the top 10 incidents still hold ${pct(D.load.top10_share)} of the value at risk.`],
-    ["Don't pick an allocation policy for the business", "Who gets a short part is a business call. The policies are compared side by side; the worst-off product barely changes across them."],
+    ["Order more, not faster", `Only ${pct(K.fill_p50)} of the plan is buildable, yet ${K.late_drivers} of the top ${K.n_drivers} shortage parts are past their order-by date and ${D.expedite.needed} expedites are needed. Real lead times are short; the gap is quantity.`],
+    ["Still order to the P95 lead time", "Order-by dates use the bad-case lead time from each part's real distribution. Ordering to the average means arriving late about half the time on any part whose lead time varies."],
+    ["Don't trust on-time scores against the scheduled date", `${pct(K.exact_date_pct / 100)} of real deliveries land exactly on the scheduled date. Keep the first promise and score against it.`],
+    ["Judge vendors over a year, not 120 days", `Real vendors order about ten times a year. A 120-day window could judge only ${D.window120} of ${D.base.suppliers}; a one-year window judges ${D.judged}.`],
+    ["Group alerts by supplier", `Nothing is urgent at the simulated stock level. When stock is cut to ×${st.stock_scale}, grouping turns ${st.p1_alerts} urgent alerts into ${st.p1_incidents} supplier calls.`],
+    ["Leave allocation to the business", "Who gets a short shared part is a business call. The three policies are shown side by side."],
   ].forEach(([t, p], i) => {
     const d = h("div", { cls: "dec" }, $("decisions"));
     h("div", { cls: "n", text: String(i + 1).padStart(2, "0") }, d); h("h3", { text: t }, d); h("p", { text: p }, d);

@@ -3,123 +3,173 @@
 **Live dashboard: https://riya0920.github.io/bom-shortage-risk-analytics/**
 
 Can a factory build its 13-week production plan with the parts it has and the
-parts on order? And if not, which parts will stop the line, which suppliers are
-to blame, and who needs to act first?
+parts on order? If not, which parts will stop the line, which suppliers can we
+trust, and who needs to act first?
+
+A bill of materials (BOM) is the recipe for a product: which parts and which
+sub-assemblies go into it, level by level.
 
 ## What we did
 
-A factory makes 4 products. Each product is built from a multi-level bill of
-materials (BOM): 32 sub-assemblies and **260 purchased parts** from **50
-suppliers**, 68 of them from a single source. We built a tool that answers the
-questions a materials manager asks every week:
+We took a **real published supply chain** for power hand tools and **real
+supplier delivery records**, and built the tool a materials manager uses every
+week:
 
-1. **How much of the plan can we build?** Week by week, per product.
+1. **How much of the plan can we build?** Week by week, per product, as a range.
 2. **What is stopping it?** Which parts gate production, and the last day to
    order them.
 3. **Which suppliers can we trust?** On-time scores that can't be gamed, and an
    early warning when a supplier starts slipping.
-4. **Who acts first?** Turn hundreds of part alerts into a short list for the
-   right person.
+4. **Who acts first?** Turn part alerts into a short list for the right person.
 
-The data is simulated so every answer can be checked against a known truth: we
-know each supplier's real lead-time distribution, and we planted 6 supplier
-disruptions for the detector to find.
+### What is real, what is assumed, what is simulated
+
+| | What | Source |
+|---|---|---|
+| **Real** | BOM structure, part costs, product demand (mean and spread), each part's lead-time distribution | Willems (2008), chain 24, power-driven hand tools: 17 products, 31 sub-assemblies, 209 purchased parts, 1,168 BOM lines |
+| **Real** | Supplier lead times, on-time rate against the scheduled date, order history, the factories behind each vendor | USAID SCMS Delivery History (US-government open data): 4,126 delivery lines from 27 vendors, 2006-2015 |
+| **Assumed** | 1 of each part per parent | Willems has no quantities |
+| **Assumed** | Which vendor supplies which part | The two datasets are unrelated. Parts and vendors are both ranked by lead time and matched band by band (fast parts to fast vendors, 7-8 parts each) |
+| **Simulated** | Stock on hand, open orders, minimum order sizes | No public dataset has them. Seeded rule: 12% of parts are short (45-95% of their 13-week need covered), the rest have 105-190%, 35-75% of it on hand |
+| **Simulated** | The *original* promise date | SCMS keeps one scheduled date per line; nothing public keeps the original next to the reschedule |
+| **Simulated** | 6 planted supplier disruptions | Used only to score the early-warning detector, planted into order histories resampled from each real vendor's own lead times |
+
+**Why chain 24.** Of the 38 Willems chains, it has the most finished products
+that share parts (17 products; 143 of 209 parts feed two or more, 44 feed all
+17) and real demand for each product. 114 of its parts have a discrete
+lead-time distribution; the other 95 have one fixed lead time, which we keep
+fixed. Chain 26 (aircraft engines) has a distribution on every part but only
+two demand points; chain 20 has 74 parts and 25 distributions.
 
 ## How we did it
 
-- **BOM explosion.** Walk the multi-level BOM so a sub-assembly shared by two
-  products counts its parts twice. Getting this wrong understates exactly the
-  shared parts, which are the ones that go short.
-- **Monte Carlo buildability.** 300 simulations, each drawing a new lead time for
-  every open order. Result: buildable units per week as a range (P10 / P50 / P90),
-  not one number. A product needs *every* one of its parts, so a small shortage in
-  one cheap part stops the whole product.
-- **Shortage drivers with order-by dates.** Rank parts by how often they were the
-  one that stopped production. The order-by date uses the supplier's **P95** lead
-  time (a bad-case delivery), not the average.
-- **Supplier analytics.** On-time-in-full (OTIF) scored against the *original*
-  promise and against the latest reschedule. A deterioration detector with three
-  triggers (average up, P95 up, variance up), scored against the planted
-  disruptions.
-- **Planning extras.** Safety stock that includes lead-time variation, expedite
-  options with costs, hidden tier-2 suppliers, and three policies for splitting a
-  short part between products.
-- **Alerts.** Severity tiers with response times, grouping by supplier, and a
-  delivery layer (outbox, retries, rate limits) tested against a real local HTTP
-  server.
+- **BOM explosion.** Walk the multi-level BOM so a sub-assembly used along two
+  paths counts its parts twice. Getting this wrong understates exactly the shared
+  parts.
+- **Monte Carlo buildability.** 300 simulations. Each open order lands at its
+  promise date moved by a draw from the part's real lead-time distribution plus
+  its vendor's real lateness. Result: buildable units per week as P10 / P50 / P90.
+- **Shortage drivers with order-by dates.** Rank parts by how often they stopped
+  a product. Order-by date = first short week minus the part's **P95** lead time.
+- **Supplier analytics on real SCMS history.** On-time against the scheduled
+  date, the share of deliveries landing exactly on it, a composite risk score
+  with visible weights, and a deterioration detector (mean, P95 and variance
+  triggers). The detector is scored in a sandbox with planted disruptions, then
+  run on the real history.
+- **Planning extras.** Safety stock with both demand and lead-time variation,
+  expedite options, tier-2 factories (real SCMS manufacturing sites), and three
+  policies for splitting a short part between products.
+- **Alerts.** Severity tiers, grouping by supplier, and a delivery layer
+  (outbox, retries, rate limits) tested against a real local HTTP server.
 
-Python, NumPy, SciPy, scikit-learn. 58 tests, run in CI.
+Python, NumPy, SciPy, scikit-learn, xlrd. 84 tests, run in CI (the 6 real-data
+tests skip there, because the data is downloaded, not committed).
 
 ## What we found
 
 | Question | Finding |
 |---|---|
-| Can we build the plan? | **No.** In the median case only **25%** of planned units can be built (613 of 2,417). Shortfalls start in week 3, once today's stock runs out. |
-| What is stopping it? | **6 of the top 10** shortage parts are already past their order-by date. 54 of 260 parts have zero or negative slack today. $848K of output value is at risk. |
-| Are on-time scores honest? | **No.** Suppliers who reschedule early score **100%** against the rescheduled date but only **36-46%** against what they first promised. |
-| Does the early warning work? | Partly. It catches **3 of 6** planted disruptions. At the best threshold precision is 60%. Most of the catches come from the **P95 trigger**: without it, recall drops from 50% to 33%. The variance trigger adds only false alarms. |
-| Is safety stock right? | The common textbook formula (demand variation only) understates it **6.9x**, because 97% of the variation here comes from suppliers, not demand. |
-| Does expediting help? | Only sometimes: **11 of 24** expedite options still arrive after the part was needed. |
-| Is the risk hidden deeper? | Yes. One tier-2 supplier sits behind **63 parts and all 4 products**, which a tier-1 view cannot see. |
-| Can people act on the alerts? | Grouping 260 part alerts into **108 supplier incidents** cut the queue by 58%. It is still too long: one owner has 26 urgent items against a limit of 10. The queue isn't long because of bad ranking; the parts really are short. The top 10 incidents hold **91%** of the value at risk. |
+| Can we build the plan? | **No.** In the median case **41%** of planned units can be built (65,841 of 159,731). P10 39%, P90 43%. Shortfalls start in week 4. |
+| What is stopping it? | Quantity, not timing. **0 of the top 10** shortage parts are past their order-by date: real part lead times are 3-55 days (median 9), so there is still time to order. 82 of 209 parts run out inside 13 weeks. |
+| Are on-time scores honest? | The real data points to no. **89% of 4,126 SCMS deliveries land exactly on the scheduled date** (94% on or before), and 17 of 27 vendors hit the exact date over 90% of the time. That is what a date updated to match the delivery looks like. With a simulated original promise the gap reaches **+75 points**. |
+| Does the early warning work? | Partly. At the default setting precision is **0.40**, recall **0.33**; best F1 at 1.10x gives precision 0.40, recall 0.67. Real vendors order about ten times a year: a 120-day window could judge only 11 of 27 of them, a one-year window judges 23. On the real history **37 of 96 vendor-years** get flagged (no ground truth to check). |
+| Is safety stock right? | Only **25%** of the variance comes from lead times; real demand swings more. Leaving lead-time spread out understates safety stock just **1.29x**. |
+| Does expediting help? | **0 of 24** expedite options are needed. Every top shortage part can still be ordered at its normal lead time. |
+| Is the risk hidden deeper? | Yes, in real data: **27 of 59** manufacturing sites ship through more than one vendor. GSK Mississauga sits behind 4 vendors a buyer would treat as separate. |
+| Can people act on the alerts? | At the simulated stock level nothing is urgent (0 P1). Grouping 209 part alerts gives 30 supplier incidents. With stock cut to x0.25, 44 urgent alerts become 16 incidents and the worst urgent queue falls from 41 to 15, still above the limit of 10. |
 
-Two problems we found and fixed along the way:
+### What changed when the simulated data was replaced with real data
 
-- **Results changed between runs.** A loop over a Python `set` of strings used
-  random numbers, and string hashing changes per process, so two runs of the same
-  script gave value-at-risk figures 61% apart. Fixed, with a test that runs the
-  script in three separate processes.
-- **The risk band is too wide.** Checked against fresh simulated futures, 97% of
-  outcomes land inside the P10-P90 band (should be 80%). We report this instead of
-  tuning it away.
+| Finding | Simulated version | Real data |
+|---|---|---|
+| Plan buildable (median) | 25% | 41% |
+| Top shortage parts already too late | 6 of 10 | 0 of 10 |
+| Share of safety-stock variance from suppliers | 97% (textbook formula 6.9x too low) | 25% (1.29x) |
+| Expedites that arrive too late | 11 of 24 | 0 of 24 needed |
+| Urgent items on the busiest owner | 26 | 0 (15 only when stock is cut to x0.25) |
+| Detector: the P95 trigger carries detection | yes | no single trigger does; only the variance trigger adds false alarms |
+| P10-P90 band holds the outcome (target 80%) | 97% | 99% |
+
+The simulator had lead times of 14-75 days. The real chain's are 3-55, so the
+problem moves from *timing* to *quantity*.
+
+Three problems found along the way:
+
+- **The BOM was read upside down at first.** Willems arcs run from a part to the
+  stage that uses it. Read the other way, every product had an empty BOM and the
+  plan came out 100% buildable. A test now checks the direction.
+- **A safety-stock bug the simulated data hid.** The empirical version multiplied
+  one day's demand by the lead time, so demand spread grew with L instead of
+  sqrt(L). At the simulated demand spread (CV 0.25) it barely showed; at the real
+  one (CV about 0.95) it doubled the answer. Fixed, with a test.
+- **The detector's window was too short for real vendors.** 120 days worked on
+  simulated data with frequent orders. Real vendors order too rarely, so the
+  window is now one year.
 
 ## What we decided, and why
 
-1. **Plan with a range, not a single number.** How much safety cover to buy
-   depends on the bad case, and a single number hides it.
-2. **Order to the P95 lead time.** Ordering to the average means arriving late
-   half the time, and for a part that stops the line that is not a plan.
-3. **Score suppliers on the original promise.** It is the only version they
-   cannot improve by rescheduling. The gap between the two scores is tracked as its
-   own warning sign.
-4. **Keep the P95 trigger, drop the variance trigger.** Measured, not assumed: P95
-   does most of the detecting; variance only adds false alarms.
-5. **Group alerts by supplier, then work a top-10 list.** One late supplier is one
-   phone call, not twelve alerts. The top 10 incidents cover 91% of the exposure.
-6. **Leave allocation to the business.** Who gets a short part (even split,
-   highest margin, contract priority) is a business call. We show the trade-off;
-   the worst-off product gets about 20% under all three.
+1. **Order more, not faster.** 59% of the plan is short, yet no top part is past
+   its order-by date. The fix is order quantity; paying for speed buys nothing.
+2. **Keep ordering to the P95 lead time.** It comes from each part's real
+   distribution; ordering to the average means arriving late about half the time
+   on any part whose lead time varies.
+3. **Don't trust on-time scores against the scheduled date.** 89% exact-date hits
+   is a moved date, not a punctual vendor. Keep the first promise and score
+   against it.
+4. **Judge vendors over a year, not 120 days.** Otherwise most real vendors
+   can't be judged at all.
+5. **Group alerts by supplier.** When stock is tight it cuts the worst urgent
+   queue from 41 to 15. It is still over the limit, so it needs a top-N rule too.
+6. **Leave allocation to the business.** Even split, highest value first and
+   fixed priority leave the worst product at 23-25%; the trade-off is shown, not
+   chosen.
 
-**Limits:** the data is simulated, so what carries over is the method and the
-size of the effects, not the exact numbers. Supplier capacity is assumed, and the
-alert delivery has no scheduler or real email/ticket system.
+**Limits:** stock, open orders, minimum orders and the original promise dates are
+simulated, and the vendor-to-part match is an assumption, so the buildability,
+alert and incident numbers show the method, not a real plant's position.
+Supplier capacity is assumed. The real-history detector flags have no ground
+truth. SCMS vendors ship medicines and test kits, not tool parts.
 
 ## How to run it
 
 ```bash
 pip install -r requirements.txt
+python download_data.py     # fetches both datasets into data/raw/ (no login; gitignored)
 
-python run_supply.py        # ~40s  buildability, shortage drivers, suppliers -> docs/RESULTS.md
-python extend.py            # ~25s  expedites, tier-2 risk, calibration     -> docs/EXTENSIONS.md
-python complete.py          # ~30s  safety stock, detector sweep, alerts     -> docs/COMPLETION.md
+python run_supply.py        # ~20s  buildability, shortage drivers, suppliers -> docs/RESULTS.md
+python extend.py            # ~10s  expedites, tier-2 sites, calibration     -> docs/EXTENSIONS.md
+python complete.py          # ~10s  safety stock, detector sweep, alerts     -> docs/COMPLETION.md
 python run_pass4.py         # ~20s  supplier incidents and alert delivery    -> docs/INCIDENTS_AND_TRANSPORT.md
 python build_dashboard.py   #       rebuilds docs/index.html from out/*.json
 
-python -m pytest tests -q   # 58 tests
+python -m pytest tests -q   # 84 tests (6 need data/raw and skip without it)
 ```
+
+`download_data.py` gets:
+
+- Willems workbook: https://seanwillems.com/wp-content/uploads/2020/11/MSOM_Data_Set_Willems_InExcel.zip
+- SCMS delivery history: https://raw.githubusercontent.com/ColbyRobinson/Supply-Chain-Shipment-Delay-Prediction/HEAD/data/SCMS_Delivery_History_Dataset_20150929.csv
 
 Every number above comes from the files in `out/`. The full write-ups are in
 [`docs/`](docs/), and a weekly materials-review pack is generated at
 [`out/materials_review_pack.md`](out/materials_review_pack.md).
 
+**Data credits.** Sean P. Willems, "Real-world multiechelon supply chains used
+for inventory optimization", *Manufacturing & Service Operations Management*
+10(1):19-23, 2008 (open to researchers who cite the paper). USAID Supply Chain
+Management System (SCMS) Delivery History Dataset, US-government open data.
+
 ## Code layout
 
 ```
-src/supply.py              simulated supply base: BOMs, suppliers, lead times, orders, planted disruptions
+download_data.py           downloads the two public datasets into data/raw/
+src/data_loaders.py        Willems and SCMS loaders, cleaning rules, the vendor-to-part mapping
+src/supply.py              builds the supply base: real BOM + real vendors + simulated stock and orders
 src/buildability.py        BOM explosion, weekly buildability, Monte Carlo, allocation, order-by dates
-src/supplier_analytics.py  OTIF both ways, deterioration detector, supplier risk score
+src/supplier_analytics.py  on-time both ways, deterioration detector, real-history scan, risk score, per-part rows
 src/inventory.py           safety stock, lot sizing, supplier capacity
 src/routing.py             severity tiers, response times, routing
 src/incidents.py           grouping alerts by supplier, the load check
 src/transport.py           alert delivery: outbox, retries, dead letters, rate limits
+tests/mini_fixture.py      a tiny hand-made chain in the real file formats, so tests run without data
 ```

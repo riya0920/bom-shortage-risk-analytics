@@ -321,7 +321,9 @@ def value_triage(incidents: list, *, top_n: int = 10) -> dict:
         "parts_in_p1": sum(i.n_parts for i in p1),
         "incidents_for_80pct_of_p1_value": k80,
         "p1_value": total_p1, "all_value": total_all,
-        "verdict": ("workable: a top-N queue carries most of the exposure"
+        "verdict": ("workable: there are no P1 incidents to triage"
+                    if not p1 else
+                    "workable: a top-N queue carries most of the exposure"
                     if head_value / total_p1 >= 0.6 else
                     "not workable by triage: the exposure is spread across more "
                     "incidents than one owner can work, and the answer is "

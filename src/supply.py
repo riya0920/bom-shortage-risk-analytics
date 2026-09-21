@@ -1,69 +1,112 @@
-"""A simulated manufacturing supply base with multi-level BOMs and ground truth.
+"""The supply base, built from real public data plus a few clearly simulated layers.
 
-What makes this manufacturing supply chain rather than generic supply chain: the
-BOM. A $2 fastener at 100% availability-criticality stops a $2M machine, and the
-only way to see that is to propagate component risk through a bill of materials to
-END-ITEM BUILDABILITY. Supplier on-time-delivery percentages cannot answer the one
-question that matters, which is CAN WE BUILD THE PLAN.
+REAL (from data/raw, see data_loaders.py):
+  * BOM structure, part costs, product demand and every purchased part's
+    lead-time distribution: Willems (2008) chain 24, power-driven hand tools.
+    17 finished products, 31 in-house sub-assemblies, 209 purchased parts.
+  * Supplier behaviour: USAID SCMS delivery history. Each supplier is a real
+    SCMS vendor with its real lead times, real on-time rate against the
+    scheduled date, real manufacturing sites and real order history.
 
-Generated with ground truth throughout:
-  * 4 end products with multi-level BOMs (~200 components, shared across products --
-    shared components are where the shortage maths gets interesting)
-  * ~50 suppliers, some single-sourced and flagged as such
-  * per supplier-part lead-time distributions with a mean AND a variance, some
-    with fat tails, because the variance is what actually bites
-  * open purchase orders with promise dates and (for history) actual receipts
-  * quality rejection rates that reduce effective supply
-  * planted disruptions: specific suppliers whose lead time doubles at a known
-    week, so early-warning precision and recall are scoreable
+ASSUMED (stated, not data):
+  * Quantity per parent is 1 on every BOM line (Willems has no quantities).
+  * Which SCMS vendor supplies which Willems part: matched by lead-time band,
+    see `data_loaders.map_vendors_to_parts`. The two datasets are unrelated.
+
+SIMULATED (seeded, documented rule, labelled as simulated everywhere):
+  * On-hand stock and open orders. No public dataset has them.
+  * Minimum order quantities.
+  * The ORIGINAL promise date for the OTIF trap. SCMS keeps one scheduled date
+    per line; nothing public keeps the original next to the reschedule.
+  * Planted disruptions, used only to score the deterioration detector. They
+    are planted into a "scoring sandbox": order histories resampled from each
+    real vendor's own lead times, so the baseline is real and the disruption is
+    the only thing we added.
 """
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass, field
 
 import numpy as np
 
-WEEKS = 13  # the materials-planning standard horizon; see README for why
+import data_loaders as DL
+
+WEEKS = 13          # the materials-planning standard horizon; see README
+SEED = 20260819
+SANDBOX_YEARS = 3
+RECENT_DAYS = 365      # detector: recent window
+BASELINE_DAYS = 1095   # detector: baseline starts this many days back
 
 
 @dataclass
 class Supplier:
+    """A real SCMS vendor. Every number here is measured from its history."""
     supplier_id: str
     name: str
+    n_lines: int
     lead_mean_days: float
     lead_sd_days: float
-    fat_tail: bool
-    quality_reject_rate: float
-    financial_score: float          # 0-1, higher = healthier; a proxy, not a rating
+    lead_p50_days: float
+    lead_p95_days: float
+    on_time_vs_scheduled: float
+    exact_on_scheduled_date: float
+    late_rate: float
+    sole_source_share: float
+    sites: list
+    lines_per_year: float
+    fat_tail: bool                      # P95 / P50 lead time >= 2.5
+    rel_late: np.ndarray = field(default_factory=lambda: np.zeros(1))
+    habitual_rescheduler: bool = False  # SIMULATED trait, for the OTIF trap only
 
 
 @dataclass
 class Component:
     part: str
-    level: int
-    supplier_id: str | None         # None = manufactured in-house (sub-assembly)
+    level: int                  # 0 product, 1 in-house sub-assembly, 2 purchased
+    supplier_id: str | None
     single_sourced: bool
     unit_cost: float
-    on_hand: float
-    moq: float
+    on_hand: float              # SIMULATED for purchased parts
+    moq: float                  # SIMULATED
+    depth: int = 0              # Willems relDepth
+    lead_values: tuple = (0.0,)
+    lead_probs: tuple = (1.0,)
+    lead_mean: float = 0.0
+    lead_sd: float = 0.0
+    lead_p95: float = 0.0
+    has_distribution: bool = False
 
 
 @dataclass
 class BomLine:
     parent: str
     child: str
-    qty_per: float
+    qty_per: float              # always 1.0: Willems has no quantities
 
 
 @dataclass
 class PurchaseOrder:
+    """An OPEN order (simulated). Receipt history lives in `Delivery`."""
     po_id: str
     part: str
     supplier_id: str
     qty: float
     promise_day: float
-    original_promise_day: float     # kept separately: see the OTIF trap in README
-    received_day: float | None
+    original_promise_day: float
+    received_day: float | None = None
+
+
+@dataclass
+class Delivery:
+    """One vendor delivery line. Days are relative to day 0 = latest PO date."""
+    supplier_id: str
+    order_day: float
+    promise_day: float          # latest promise: the SCMS scheduled date (real)
+    original_promise_day: float  # SIMULATED for habitual reschedulers
+    received_day: float
+    source: str                 # "real" or "sandbox"
+    site: str = ""
 
 
 @dataclass
@@ -73,269 +116,270 @@ class SupplyBase:
     bom: list[BomLine]
     pos: list[PurchaseOrder]
     products: list[str]
-    demand: dict[str, np.ndarray]   # product -> units required per week
+    demand: dict[str, np.ndarray]           # product -> units per week (plan)
+    demand_sd_day: dict[str, float]         # product -> std dev of daily demand
+    history: list[Delivery] = field(default_factory=list)   # real SCMS lines
+    sandbox: list[Delivery] = field(default_factory=list)   # scoring sandbox
     planted_disruptions: list[dict] = field(default_factory=list)
+    meta: dict = field(default_factory=dict)
+    _kids: dict = field(default_factory=dict, repr=False)
+    _parents: dict = field(default_factory=dict, repr=False)
+    _req: dict | None = field(default=None, repr=False)
+
+    def index(self) -> None:
+        self._kids = defaultdict(list)
+        self._parents = defaultdict(list)
+        for b in self.bom:
+            self._kids[b.parent].append(b)
+            self._parents[b.child].append(b)
+        self._req = None
 
     def children(self, parent: str) -> list[BomLine]:
-        return [b for b in self.bom if b.parent == parent]
+        return self._kids.get(parent, [])
 
     def parents_of(self, child: str) -> list[BomLine]:
-        return [b for b in self.bom if b.child == child]
+        return self._parents.get(child, [])
 
 
-def build(seed: int = 20260819, n_suppliers: int = 50) -> SupplyBase:
+def discrete_quantile(values, probs, q: float) -> float:
+    order = np.argsort(values)
+    v = np.asarray(values, float)[order]
+    c = np.cumsum(np.asarray(probs, float)[order])
+    return float(v[min(int(np.searchsorted(c, q - 1e-12)), len(v) - 1)])
+
+
+# ---------------------------------------------------------------------------
+# build
+# ---------------------------------------------------------------------------
+
+def build(seed: int = SEED, chain: int = DL.CHAIN) -> SupplyBase:
+    """Load the real data from data/raw and build the supply base."""
+    if not DL.raw_data_present():
+        raise FileNotFoundError(
+            "data/raw is missing. Run `python download_data.py` first.")
+    rows, arcs = DL.read_willems_xls(DL.WILLEMS_XLS, chain)
+    lines, log = DL.clean_scms(DL.read_scms_csv(DL.SCMS_CSV))
+    return build_from(DL.chain_structure(rows, arcs), lines, seed=seed,
+                      meta={"chain": chain, "scms_cleaning": log})
+
+
+def build_from(chain: dict, scms_lines: list[dict], seed: int = SEED,
+               min_vendor_lines: int = DL.MIN_VENDOR_LINES,
+               meta: dict | None = None) -> SupplyBase:
+    """Pure constructor: a parsed Willems chain + cleaned SCMS lines."""
     rng = np.random.default_rng(seed)
 
+    # ---- suppliers: real SCMS vendors ------------------------------------
+    vt = DL.vendor_table(scms_lines, min_vendor_lines)
+    names = sorted(vt, key=lambda v: (vt[v]["lead_p50"], v))
     suppliers: dict[str, Supplier] = {}
-    for i in range(n_suppliers):
-        sid = f"SUP-{i+1:03d}"
-        fat = rng.random() < 0.25
-        mean = float(rng.uniform(14, 75))
+    name_to_id = {}
+    for i, v in enumerate(names):
+        s = vt[v]
+        sid = f"V{i + 1:02d}"
+        name_to_id[v] = sid
+        mine = [x for x in scms_lines if x["vendor"] == v]
+        rel = np.array([max(x["late_days"], 0.0) / x["sched_lead_days"]
+                        if x["sched_lead_days"] > 0 else 0.0 for x in mine])
         suppliers[sid] = Supplier(
-            supplier_id=sid, name=f"Supplier {i+1:03d}",
-            lead_mean_days=mean,
-            # Variance scaled to the mean, plus a heavier tail for a quarter of
-            # them. A supplier with a 30-day mean and a 25-day sd is a completely
-            # different planning problem from one with a 30-day mean and a 3-day
-            # sd, and an OTD percentage cannot tell them apart.
-            lead_sd_days=float(mean * rng.uniform(0.08, 0.45)),
-            fat_tail=fat,
-            quality_reject_rate=float(rng.beta(1.4, 90)),
-            financial_score=float(np.clip(rng.beta(6, 2), 0, 1)),
-        )
+            supplier_id=sid, name=v, n_lines=s["n_lines"],
+            lead_mean_days=s["lead_mean"], lead_sd_days=s["lead_sd"],
+            lead_p50_days=s["lead_p50"], lead_p95_days=s["lead_p95"],
+            on_time_vs_scheduled=s["on_time_vs_scheduled"],
+            exact_on_scheduled_date=s["exact_on_scheduled_date"],
+            late_rate=s["late_rate"], sole_source_share=s["sole_source_share"],
+            sites=s["sites"], lines_per_year=s["lines_per_year"],
+            fat_tail=bool(s["lead_p95"] / max(s["lead_p50"], 1e-9) >= 2.5),
+            rel_late=rel,
+            # SIMULATED: a third of vendors habitually move the promise date.
+            habitual_rescheduler=(i % 3 == 0))
 
-    products = ["PRD-A", "PRD-B", "PRD-C", "PRD-D"]
+    # ---- components: real Willems parts, sub-assemblies, products ---------
+    pi = chain["part_info"]
+    mapping = DL.map_vendors_to_parts(
+        {p: pi[p]["lead_mean"] for p in chain["parts"]},
+        {name_to_id[v]: vt[v]["lead_p50"] for v in names})
     components: dict[str, Component] = {}
-    bom: list[BomLine] = []
+    for p in chain["products"]:
+        components[p] = Component(p, 0, None, False,
+                                  chain["product_cost"].get(p, 0.0), 0.0, 0.0)
+    for s in chain["subs"]:
+        components[s] = Component(s, 1, None, False, 0.0, 0.0, 0.0,
+                                  depth=chain["sub_depth"].get(s, 0))
+    for p in chain["parts"]:
+        info = pi[p]
+        sid = mapping.get(p)
+        sup = suppliers.get(sid)
+        components[p] = Component(
+            p, 2, sid,
+            single_sourced=bool(sup and sup.sole_source_share >= 0.5),
+            unit_cost=info["unit_cost"], on_hand=0.0,
+            moq=float(rng.choice([1, 25, 50, 100, 250])),      # SIMULATED
+            depth=info["depth"], lead_values=info["lead_values"],
+            lead_probs=info["lead_probs"], lead_mean=info["lead_mean"],
+            lead_sd=info["lead_sd"],
+            lead_p95=discrete_quantile(info["lead_values"], info["lead_probs"], 0.95),
+            has_distribution=info["has_distribution"])
 
-    # Level 0 = end products, level 1 = sub-assemblies (made in house),
-    # level 2 = purchased parts. Shared components are created on purpose.
-    shared_subs = [f"SUB-S{i+1:02d}" for i in range(8)]
-    shared_parts = [f"PRT-S{i+1:03d}" for i in range(30)]
-
-    for p in products:
-        components[p] = Component(p, 0, None, False, 0.0, 0.0, 0.0)
-
-    def make_part(part: str, level: int) -> Component:
-        sid = str(rng.choice(list(suppliers)))
-        single = rng.random() < 0.3
-        cost = float(np.exp(rng.normal(2.0, 1.4)))
-        return Component(part, level, sid, single, cost,
-                         on_hand=float(rng.integers(0, 900)),
-                         moq=float(rng.choice([1, 25, 50, 100, 250])))
-
-    for s in shared_subs:
-        components[s] = Component(s, 1, None, False, 0.0, float(rng.integers(0, 60)), 0.0)
-    for p in shared_parts:
-        components[p] = make_part(p, 2)
-
-    idx = 0
-    for pi, prod in enumerate(products):
-        # 3-5 sub-assemblies per product, some shared
-        n_sub = int(rng.integers(5, 9))
-        subs = []
-        for k in range(n_sub):
-            if k < 2 and rng.random() < 0.7:
-                sub = str(rng.choice(shared_subs))
-            else:
-                sub = f"SUB-{pi+1}{k+1:02d}"
-                components[sub] = Component(sub, 1, None, False, 0.0,
-                                            float(rng.integers(0, 60)), 0.0)
-            subs.append(sub)
-            bom.append(BomLine(prod, sub, float(rng.integers(1, 4))))
-
-        # dict.fromkeys, NOT set(). `set` iteration order over strings varies
-        # between PROCESSES, because Python salts string hashing (PEP 456) --
-        # and every rng call inside this loop then consumes randomness in a
-        # different order, so the whole supply base differs on every run. It is
-        # deterministic within one process, which is exactly why it survived:
-        # three builds in one interpreter agree, and three runs of the same
-        # script do not. dict.fromkeys deduplicates in insertion order, which is
-        # the order `subs` was built in and is itself deterministic.
-        for sub in dict.fromkeys(subs):
-            if any(b.parent == sub for b in bom):
-                continue  # already exploded (shared sub-assembly)
-            n_parts = int(rng.integers(10, 22))
-            for _ in range(n_parts):
-                if rng.random() < 0.45:
-                    part = str(rng.choice(shared_parts))
-                else:
-                    idx += 1
-                    part = f"PRT-{idx:04d}"
-                    components[part] = make_part(part, 2)
-                if not any(b.parent == sub and b.child == part for b in bom):
-                    bom.append(BomLine(sub, part, float(rng.integers(1, 7))))
-
-    # Open purchase orders + receipt history for lead-time analytics.
-    pos: list[PurchaseOrder] = []
-    n = 0
-    for part, c in components.items():
-        if c.level != 2 or c.supplier_id is None:
-            continue
-        s = suppliers[c.supplier_id]
-        # history: 8-20 received POs
-        for _ in range(int(rng.integers(8, 21))):
-            n += 1
-            # Spread order history from ~2 years ago to ~2 weeks ago. The first
-            # version drew from -120 to -700 days, which left the "recent" window
-            # used by the deterioration detector completely EMPTY -- so every
-            # supplier was skipped for insufficient data and the detector scored
-            # precision 0 / recall 0 while looking like it ran.
-            order_day = float(-rng.uniform(15, 700))
-            lead = _draw_lead(rng, s)
-            received = order_day + lead
-            original_promise = order_day + s.lead_mean_days
-
-            # RESCHEDULING. Some suppliers, when they are going to be late, call
-            # ahead and move the promise date -- and in most ERP configurations
-            # that overwrites the promise field in place, so the original is gone.
-            # Scored against the reschedule they look perfect; scored against what
-            # they first committed to they look like what they are.
-            #
-            # `reschedules` is a supplier trait here: roughly a third of them do it
-            # habitually. Without this the OTIF gap is identically zero for
-            # everyone and the definitional trap cannot be demonstrated, which is
-            # what the first version of this generator produced.
-            habitual_rescheduler = (int(s.supplier_id.split("-")[1]) % 3) == 0
-            latest_promise = original_promise
-            if habitual_rescheduler and received > original_promise:
-                # Move the promise to the date they now intend to hit -- which
-                # they then hit. Scored against it, the delivery is on time.
-                latest_promise = received + float(rng.uniform(0.0, 1.0))
-            pos.append(PurchaseOrder(
-                f"PO-{n:05d}", part, s.supplier_id, float(rng.integers(50, 600)),
-                promise_day=latest_promise,
-                original_promise_day=original_promise,
-                received_day=received))
-        # open orders arriving inside the horizon
-        for _ in range(int(rng.integers(0, 4))):
-            n += 1
-            arrive = float(rng.uniform(2, WEEKS * 7))
-            pos.append(PurchaseOrder(
-                f"PO-{n:05d}", part, s.supplier_id, float(rng.integers(50, 900)),
-                promise_day=arrive,
-                original_promise_day=arrive - float(rng.choice([0, 0, 0, 7, 14])),
-                received_day=None))
-
-    demand = {p: np.array([float(rng.integers(20, 70)) for _ in range(WEEKS)])
+    # Willems arcs run component -> the stage that consumes it, so the
+    # destination is the parent.
+    bom = [BomLine(parent=b, child=a, qty_per=1.0) for a, b in chain["bom"]]
+    products = list(chain["products"])
+    demand = {p: np.full(WEEKS, float(round(chain["demand_avg"][p] * 7)))
               for p in products}
+    base = SupplyBase(suppliers, components, bom, [], products, demand,
+                      dict(chain["demand_sd"]), meta=dict(meta or {}))
+    base.index()
 
-    base = SupplyBase(suppliers, components, bom, pos, products, demand)
+    # ---- real delivery history -------------------------------------------
+    kept = [x for x in scms_lines if x["vendor"] in name_to_id]
+    day0 = max(x["po_date"] for x in kept) if kept else None
+    for x in sorted(kept, key=lambda x: (x["po_date"], x["vendor"], x["lead_days"])):
+        sid = name_to_id[x["vendor"]]
+        od = float((x["po_date"] - day0).days)
+        base.history.append(Delivery(
+            sid, od, od + x["sched_lead_days"], od + x["sched_lead_days"],
+            od + x["lead_days"], "real", x["site"]))
+    _simulate_original_promises(base, rng)
 
-    # ------------------------------------------------------------------
-    # Calibrate supply to the plan, instead of drawing it out of the air.
-    #
-    # The first version set on-hand from U(0, 900) and PO quantities from
-    # U(50, 900) with no reference to what the BOM actually needs. A product
-    # needing 15 of a part per unit, at 45 units/week for 13 weeks, needs ~8,800
-    # of that part -- so every part was short, buildability came out at 4 units
-    # across the whole horizon, all three allocation policies tied at 0% fill, and
-    # the percentile fan was a flat line at zero. A model in which nothing can be
-    # built cannot demonstrate anything about shortages.
-    #
-    # Supply is now set as a COVERAGE FRACTION of the 13-week requirement, drawn so
-    # that most parts are comfortable and a minority genuinely gate the plan --
-    # which is what a real materials position looks like and what makes the
-    # shortage attribution in buildability.py have something to attribute.
-    # ------------------------------------------------------------------
-    total_req: dict[str, float] = {}
-    for prod in products:
-        per_unit = explode(base, prod, 1.0)
-        units = float(demand[prod].sum())
-        for part, qty in per_unit.items():
-            total_req[part] = total_req.get(part, 0.0) + qty * units
-
-    open_by_part: dict[str, list[PurchaseOrder]] = {}
-    for po in pos:
-        if po.received_day is None:
-            open_by_part.setdefault(po.part, []).append(po)
-
-    for part, req in total_req.items():
-        c = components.get(part)
-        if c is None or c.level != 2:
-            continue
-        # Coverage: an explicit mixture rather than a single skewed draw.
-        #
-        # Tuning note worth keeping, because it IS the BOM-propagation lesson.
-        # The first attempt drew coverage ~ Beta(5,2)*1.35, i.e. a median of about
-        # 0.98 of the 13-week requirement per part. That sounds close to adequate.
-        # End-item buildability came out at 11-33% fill, because a product needs
-        # EVERY one of its ~60-100 parts: if each part independently has a ~50%
-        # chance of being under-covered, the chance that all of them are adequate
-        # is indistinguishable from zero. Part-level coverage does not translate
-        # into end-item coverage, and that non-linearity is the entire reason this
-        # analysis has to run through the BOM instead of over a supplier scorecard.
-        #
-        # So the generator now plants a MINORITY of genuinely short parts against a
-        # comfortable majority, which is what a real materials position looks like
-        # and what leaves the shortage attribution something specific to attribute.
-        if rng.random() < 0.12:
-            coverage = float(rng.uniform(0.45, 0.95))   # planted short part
-        else:
-            coverage = float(rng.uniform(1.05, 1.9))
-        on_hand_share = float(rng.uniform(0.35, 0.75))
-        c.on_hand = float(np.floor(req * coverage * on_hand_share))
-        remaining = max(0.0, req * coverage - c.on_hand)
-        orders = open_by_part.get(part, [])
-        if orders:
-            each = remaining / len(orders)
-            for po in orders:
-                po.qty = float(np.ceil(each))
-        elif remaining > 0:
-            # No open order and not enough on hand: this part is a shortage driver
-            # by construction, which is exactly the case worth surfacing.
-            pass
-
+    _seed_inventory_and_orders(base, rng)
+    _build_sandbox(base, rng)
     _plant_disruptions(base, rng)
+
+    base.meta.update({
+        "day0": day0.isoformat() if day0 else None,
+        "vendor_mapping_rule": "lead-time band (rank quantile), an assumption",
+        "parts_with_lead_distribution": sum(
+            1 for c in components.values() if c.level == 2 and c.has_distribution),
+        "chain_classes": chain.get("classes"),
+        "demand_stages_split": chain.get("demand_stages_split", 0),
+        "part_arcs_not_into_manufacturing": chain.get(
+            "part_arcs_not_into_manufacturing", 0),
+        "scms_vendors_kept": len(suppliers),
+        "scms_lines_kept": len(base.history),
+    })
     return base
 
 
-def _draw_lead(rng: np.random.Generator, s: Supplier) -> float:
-    """Lead time realisation. Fat-tailed suppliers get an occasional long one."""
-    v = rng.normal(s.lead_mean_days, s.lead_sd_days)
-    if s.fat_tail and rng.random() < 0.12:
-        v += abs(rng.normal(0, s.lead_mean_days * 0.9))
-    return float(max(1.0, v))
-
-
-def _plant_disruptions(base: SupplyBase, rng: np.random.Generator) -> None:
-    """Plant known deteriorations so alerting can be scored.
-
-    Two flavours, because they are detected by different statistics:
-      lead_time_doubling -- the mean moves. Any monitor catches this eventually.
-      tail_blowout       -- the MEAN barely moves and the P95 explodes. Only a
-                            monitor watching the distribution sees it, which is
-                            the whole argument for not tracking averages.
+def _simulate_original_promises(base: SupplyBase, rng) -> None:
+    """SIMULATED. SCMS stores one scheduled date; we treat it as the LATEST
+    promise. For the third of vendors marked as habitual reschedulers, half of
+    their lines are given an original promise that was earlier by 10-50% of
+    the quoted lead time. Everyone else's original promise equals the latest.
     """
-    ids = list(base.suppliers)
-    chosen = rng.choice(ids, size=6, replace=False)
+    for d in base.history:
+        s = base.suppliers[d.supplier_id]
+        if s.habitual_rescheduler and rng.random() < 0.5:
+            quoted = d.promise_day - d.order_day
+            d.original_promise_day = d.promise_day - quoted * float(rng.uniform(0.1, 0.5))
+
+
+def _seed_inventory_and_orders(base: SupplyBase, rng) -> None:
+    """SIMULATED on-hand stock and open orders, set against the real plan.
+
+    Rule (unchanged from the first version of this project so results are
+    comparable): each purchased part gets a COVERAGE of its 13-week requirement.
+    12% of parts are drawn short (coverage 0.45-0.95), the rest comfortable
+    (1.05-1.9). 35-75% of the covered quantity is on hand today; the rest is
+    split over 0-3 open orders arriving on days 2-91. A part with no open order
+    and not enough stock is short by construction.
+    """
+    total_req = defaultdict(float)
+    req = unit_requirements(base)
+    for prod in base.products:
+        units = float(base.demand[prod].sum())
+        for part, q in req[prod].items():
+            total_req[part] += q * units
+
+    n = 0
+    for part, c in base.components.items():
+        if c.level != 2:
+            continue
+        orders = []
+        for _ in range(int(rng.integers(0, 4))):
+            n += 1
+            arrive = float(rng.uniform(2, WEEKS * 7))
+            orders.append(PurchaseOrder(f"PO-{n:05d}", part, c.supplier_id, 0.0,
+                                        promise_day=arrive,
+                                        original_promise_day=arrive))
+        r = total_req.get(part, 0.0)
+        coverage = (float(rng.uniform(0.45, 0.95)) if rng.random() < 0.12
+                    else float(rng.uniform(1.05, 1.9)))
+        share = float(rng.uniform(0.35, 0.75))
+        c.on_hand = float(np.floor(r * coverage * share))
+        remaining = max(0.0, r * coverage - c.on_hand)
+        for po in orders:
+            po.qty = float(np.ceil(remaining / len(orders)))
+        base.pos.extend(orders)
+
+
+def _build_sandbox(base: SupplyBase, rng) -> None:
+    """Three years of order history per vendor, resampled from its REAL lines.
+
+    Order count = the vendor's real orders per year x 3. Order dates are
+    uniform over the last 1,095 days; each order takes a real (lead, scheduled
+    lead) pair drawn from that vendor's history. No drift exists here unless we
+    plant it, which is what makes precision and recall scoreable.
+
+    Three years, not two, because real SCMS vendors order rarely (median about
+    ten lines a year): a 120-day recent window, which the simulated version
+    used, leaves most vendors with too few orders to judge at all.
+    """
+    by = defaultdict(list)
+    for d in base.history:
+        by[d.supplier_id].append(d)
+    for sid in sorted(base.suppliers):
+        s = base.suppliers[sid]
+        real = by.get(sid, [])
+        if not real:
+            continue
+        n = max(1, int(round(SANDBOX_YEARS * s.lines_per_year)))
+        idx = rng.integers(0, len(real), size=n)
+        days = np.sort(-rng.uniform(1, SANDBOX_YEARS * 365, size=n))
+        for od, i in zip(days, idx):
+            r = real[int(i)]
+            lead = r.received_day - r.order_day
+            quoted = r.promise_day - r.order_day
+            base.sandbox.append(Delivery(sid, float(od), float(od + quoted),
+                                         float(od + quoted), float(od + lead),
+                                         "sandbox", r.site))
+
+
+def _plant_disruptions(base: SupplyBase, rng) -> None:
+    """SIMULATED disruptions, planted into the sandbox only.
+
+      lead_time_doubling -- every order after onset takes one extra median lead
+      tail_blowout       -- 35% of orders after onset take 1.2-2.4 extra median
+                            leads; the median barely moves, the P95 explodes
+    Onset falls 200-300 days before day 0, inside the detector's one-year
+    recent window, so most of that window's orders are affected.
+    """
+    ids = sorted(base.suppliers)
+    chosen = rng.choice(ids, size=min(6, len(ids)), replace=False)
     for i, sid in enumerate(chosen):
         kind = "lead_time_doubling" if i % 2 == 0 else "tail_blowout"
-        s = base.suppliers[sid]
-        # Onset must fall INSIDE the detector's recent window (last 120 days),
-        # otherwise the disruption contaminates the baseline it is being compared
-        # against and the ratio collapses toward 1.0 -- a planted signal that
-        # cannot be detected by construction, which tests nothing.
-        onset = float(rng.uniform(-100, -55))
-        for po in base.pos:
-            if po.supplier_id != sid or po.received_day is None:
-                continue
-            if po.promise_day - s.lead_mean_days < onset:
+        s = base.suppliers[str(sid)]
+        onset = float(rng.uniform(-300, -200))
+        for d in base.sandbox:
+            if d.supplier_id != sid or d.order_day < onset:
                 continue
             if kind == "lead_time_doubling":
-                po.received_day += s.lead_mean_days
+                d.received_day += s.lead_p50_days
             elif rng.random() < 0.35:
-                po.received_day += s.lead_mean_days * rng.uniform(1.2, 2.4)
+                d.received_day += s.lead_p50_days * float(rng.uniform(1.2, 2.4))
         base.planted_disruptions.append(
-            {"supplier_id": sid, "kind": kind, "onset_day": onset})
+            {"supplier_id": str(sid), "kind": kind, "onset_day": onset})
 
+
+# ---------------------------------------------------------------------------
+# BOM
+# ---------------------------------------------------------------------------
 
 def explode(base: SupplyBase, product: str, qty: float) -> dict[str, float]:
     """Total quantity of every component needed to build `qty` of `product`.
 
-    Multi-level: a shared sub-assembly used by two products contributes its
-    children twice. Getting this wrong understates requirements on exactly the
-    components that are shared, which are the ones that go short.
+    Multi-level: a sub-assembly reached along two paths contributes its
+    children twice. Getting this wrong understates exactly the shared parts.
     """
     need: dict[str, float] = {}
 
@@ -350,4 +394,29 @@ def explode(base: SupplyBase, product: str, qty: float) -> dict[str, float]:
 
 def unit_requirements(base: SupplyBase) -> dict[str, dict[str, float]]:
     """Per-unit component requirement for each product. Computed once."""
-    return {p: explode(base, p, 1.0) for p in base.products}
+    if base._req is None:
+        base._req = {p: explode(base, p, 1.0) for p in base.products}
+    return base._req
+
+
+def part_daily_demand(base: SupplyBase) -> dict[str, float]:
+    """Units per day of each component, from the plan through the BOM."""
+    out = defaultdict(float)
+    req = unit_requirements(base)
+    for p in base.products:
+        per_day = float(np.mean(base.demand[p])) / 7.0
+        for part, q in req[p].items():
+            out[part] += q * per_day
+    return dict(out)
+
+
+def part_daily_demand_sd(base: SupplyBase) -> dict[str, float]:
+    """Std dev of daily component demand, from the real product demand sd.
+    Products are treated as independent (Willems gives no correlations)."""
+    var = defaultdict(float)
+    req = unit_requirements(base)
+    for p in base.products:
+        sd = base.demand_sd_day.get(p, 0.0)
+        for part, q in req[p].items():
+            var[part] += (q * sd) ** 2
+    return {k: v ** 0.5 for k, v in var.items()}

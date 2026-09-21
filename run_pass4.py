@@ -1,6 +1,11 @@
-"""Pass 4: severity per supplier, and an alert transport.
+"""Incidents per supplier, and an alert transport.
 
-README items 2 and 3. Writes docs/INCIDENTS_AND_TRANSPORT.md and out/pass4.json.
+Writes docs/INCIDENTS_AND_TRANSPORT.md and out/pass4.json.
+
+The per-part rows come from `supplier_analytics.part_risk_rows`: real plan,
+real lead times, real unit costs, SIMULATED stock and open orders. Because the
+stock is simulated, the load check is also run with stock scaled down (x0.5,
+x0.25) to show how the queue behaves when the position is tighter.
 """
 from __future__ import annotations
 
@@ -8,8 +13,6 @@ import json
 import pathlib
 import sys
 import time
-
-import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "src"))
 
@@ -22,51 +25,61 @@ import transport as TP            # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT / "out"
 DOCS = ROOT / "docs"
+STOCK_SCALES = (1.0, 0.5, 0.25)
+STRESS_SCALE = 0.25     # the case the transport is exercised on
 
 
-def risk_rows(base) -> list:
-    risk = {r["supplier_id"]: r for r in SA.risk_score(base)}
-    rows = []
-    for part, c in sorted(base.components.items()):
-        if c.supplier_id is None:
-            continue
-        s = base.suppliers[c.supplier_id]
-        weekly = sum(supply.explode(base, p, 1.0).get(part, 0.0)
-                     * float(np.mean(base.demand[p])) for p in base.products)
-        d_day = weekly / 7.0
-        if d_day <= 0:
-            continue
-        slack = c.on_hand / d_day - s.lead_mean_days
-        rows.append({"part": part, "supplier_id": c.supplier_id,
-                     "days_of_slack": slack, "lead_days": s.lead_mean_days,
-                     "units_at_risk": max(-slack, 0.0) * d_day,
-                     "value_at_risk": max(-slack, 0.0) * d_day * c.unit_cost,
-                     "single_sourced": c.single_sourced,
-                     "risk_score": risk.get(c.supplier_id, {}).get(
-                         "risk_score", 0.0)})
-    return rows
+def risk_rows(base, stock_scale: float = 1.0) -> list:
+    return SA.part_risk_rows(base, stock_scale)
 
 
-def stage_incidents() -> dict:
-    base = supply.build()
-    rows = risk_rows(base)
+def incidents_for(base, stock_scale: float) -> dict:
+    rows = risk_rows(base, stock_scale)
     alerts, _ = RT.dedupe(RT.build_alerts(rows))
     inc = IN.group_by_supplier(alerts)
     lc = IN.load_check(alerts, inc)
-    lc.pop("load_before", None)
-    lc.pop("load_after", None)
+    load_before, load_after = lc.pop("load_before"), lc.pop("load_after")
     return {
+        "stock_scale": stock_scale,
         "load_check": lc,
         "concentration": IN.concentration(alerts),
         "calibration": IN.calibrate(rows),
         "value_triage": IN.value_triage(inc),
         "already_short": sum(1 for r in rows if r["days_of_slack"] <= 0),
+        "runs_out_in_horizon": sum(1 for r in rows
+                                   if r["runout_day"] < supply.WEEKS * 7),
         "n_rows": len(rows),
-        "load_before": RT.load_by_role(alerts),
-        "load_after": IN.load_by_role(inc),
+        "load_before": load_before,
+        "load_after": load_after,
         "sample_incident": max(inc, key=lambda i: i.n_parts).as_dict(),
         "_incidents": inc,
     }
+
+
+def stage_incidents() -> dict:
+    base = supply.build()
+    runs = {s: incidents_for(base, s) for s in STOCK_SCALES}
+    out = {k: v for k, v in runs[1.0].items()}
+    out["sensitivity"] = [{
+        "stock_scale": s,
+        "p1_alerts": r["load_check"]["p1_alerts"],
+        "p1_incidents": r["load_check"]["p1_incidents"],
+        "alerts": r["load_check"]["alerts"],
+        "incidents": r["load_check"]["incidents"],
+        "worst_p1_before": r["load_check"]["worst_p1_before"]["items"],
+        "worst_p1_after": r["load_check"]["worst_p1_after"]["items"],
+        "busiest_after": r["load_check"]["busiest_after"]["items"],
+        "passes_after": r["load_check"]["passes_after"],
+        "already_short": r["already_short"],
+        "value_at_risk": r["load_check"]["value_before"],
+        "top10_share_of_p1_value": r["value_triage"]["top_n_share_of_p1_value"],
+        "incidents_for_80pct": r["value_triage"]["incidents_for_80pct_of_p1_value"],
+        "top_supplier_share": r["concentration"]["top_share"],
+    } for s, r in runs.items()]
+    stress = runs[STRESS_SCALE]
+    out["stress"] = {k: v for k, v in stress.items() if k != "_incidents"}
+    out["_stress_incidents"] = stress["_incidents"]
+    return out
 
 
 def stage_transport(inc: list) -> dict:
@@ -204,170 +217,110 @@ def report(d: dict) -> str:
     L: list[str] = []
     A = L.append
     ic, tr = d["incidents"], d["transport"]
-    lc, con, cal, vt = (ic["load_check"], ic["concentration"],
-                        ic["calibration"], ic["value_triage"])
+    lc = ic["load_check"]
+    st = ic["stress"]
+    slc, scon, scal, svt = (st["load_check"], st["concentration"],
+                            st["calibration"], st["value_triage"])
 
-    A("# Incidents, a transport, and a diagnosis that was half right\n")
-    A(f"The last two buildable items on this project's list. Generated by "
-      f"`run_pass4.py` in {d['elapsed_s']:.0f} s.\n")
+    A("# Incidents and a transport\n")
+    A(f"Generated by `run_pass4.py` in {d['elapsed_s']:.0f} s. Per-part rows use the "
+      "real plan, real lead times and real unit costs, with **simulated** stock and "
+      "open orders.\n")
 
-    A("## 0. First: every number in this project was irreproducible\n")
-    A("`supply.build()` contained `for sub in set(subs):`, and the loop body "
-      "makes `rng` calls. **Python salts string hashing per process** (PEP 456), "
-      "so a set of strings iterates in a different order in every interpreter - "
-      "and the random draws are then consumed in a different order, producing a "
-      "different supply base on every run. Two runs of the same script gave a "
-      "value at risk of 656,531 and 1,059,890: a 61% swing with no input "
-      "changed.\n")
-    A("It survived three passes because **it is deterministic within one "
-      "process**. Three builds in one interpreter agree exactly; three runs of "
-      "the same script do not, and nothing in a normal test session looks at "
-      "the second case. Fixed with `dict.fromkeys`, which deduplicates in "
-      "insertion order. This is the fourth instance of the same family of bug "
-      "across these nine projects - the other three were `hash()` used as a "
-      "seed.\n")
-    A("Every figure below comes from the fixed generator and is identical "
-      "across runs; the figures in the earlier passes did not and were not.\n")
-
-    A("\n## 1. Severity per supplier - the fix the README named\n")
-    A("An incident is not a summary of alerts. It is one **decision** with one "
-      "owner: a supplier that has slipped puts every part it ships at risk at "
-      "once, and the response to all of them is the same phone call. The parts "
-      "become the incident's contents, which is where they were always useful. "
-      "One incident per *(supplier, severity)* rather than per supplier, "
-      "because a supplier with two P1 parts and nine P4s is two conversations "
-      "on two clocks.\n")
+    A("## 1. Severity per supplier\n")
+    A("An incident is one decision with one owner: a supplier that has slipped "
+      "puts every part it ships at risk at once, and the response is one phone "
+      "call. One incident per *(supplier, severity)*, because a supplier with two "
+      "P1 parts and nine P4s is two conversations on two clocks.\n")
+    A("### At the simulated stock level\n")
     A("| | alerts | incidents |")
     A("|---|---:|---:|")
     A(f"| items | {lc['alerts']} | **{lc['incidents']}** ({lc['reduction_pct']:.0f}% fewer) |")
-    A(f"| P1 items | {lc['p1_alerts']} | **{lc['p1_incidents']}** |")
+    A(f"| P1 items | {lc['p1_alerts']} | {lc['p1_incidents']} |")
     A(f"| busiest owner | {lc['busiest_before']['role']} {lc['busiest_before']['items']} | "
       f"{lc['busiest_after']['role']} **{lc['busiest_after']['items']}** |")
-    A(f"| worst P1 queue | {lc['worst_p1_before']['role']} {lc['worst_p1_before']['items']} | "
-      f"{lc['worst_p1_after']['role']} **{lc['worst_p1_after']['items']}** |")
     A(f"| parts covered | {lc['parts_covered_before']} | {lc['parts_covered_after']} |")
     A(f"| value at risk | {lc['value_before']:,.0f} | {lc['value_after']:,.0f} |")
-    A("\nThe last two rows are the ones that keep this honest: grouping changes "
-      "the **count** an owner sees and not the work, so the parts and the value "
-      "are carried through unchanged and the comparison is visibly like for "
-      "like.\n")
+    A(f"\n{ic['runs_out_in_horizon']} of {ic['n_rows']} parts run out inside 13 weeks "
+      f"and {ic['already_short']} are already past the point where a normal order "
+      "could arrive in time. **Nothing is P1.** Real lead times are 3-55 days, so "
+      "every part that will run out can still be ordered in time. The simulated "
+      "version had 14-75 day lead times and put 26 urgent items on one owner; "
+      "that finding does not survive real lead times. The grouped queue still "
+      f"fails the load check on total size ({lc['busiest_after']['items']} items for "
+      f"one owner against a limit of {lc['per_owner_limit']}), but those are routine "
+      "P3/P4 items that go out as a weekly digest.\n")
 
-    A(f"\n### And it still fails the load check\n")
-    A(f"Against a limit of {lc['per_owner_limit']} open items per owner and "
-      f"{lc['p1_limit']} P1s - judgements, stated as such - the queue passes "
-      f"**neither** before nor after: `passes_before={lc['passes_before']}`, "
-      f"`passes_after={lc['passes_after']}`. The busiest owner still has "
-      f"{lc['busiest_after']['items']} items and the worst P1 queue still has "
-      f"{lc['worst_p1_after']['items']}.\n")
-    A("**The stated diagnosis was half right.** It said *one late supplier puts "
-      "every part it ships into P1 at once*. That happens, and grouping is worth "
-      f"{lc['reduction_pct']:.0f}%. But the alerts are not concentrated: the top "
-      f"five suppliers are **{con['top_share'] * 100:.0f}%** of them across "
-      f"{con['n_suppliers']} suppliers.\n")
-    A("| supplier | alerts | of which P1 | parts | share |")
+    A("### When stock is tighter (sensitivity)\n")
+    A("The stock level is simulated, so the same check is run with on-hand stock "
+      "scaled down. Open orders and everything real stay the same.\n")
+    A("| on-hand stock | P1 alerts | P1 incidents | worst P1 queue (per part) | "
+      "worst P1 queue (per supplier) | busiest owner | passes? | top-10 share of P1 value |")
+    A("|---:|---:|---:|---:|---:|---:|:--:|---:|")
+    for r in ic["sensitivity"]:
+        A(f"| x{r['stock_scale']:.2f} | {r['p1_alerts']} | {r['p1_incidents']} | "
+          f"{r['worst_p1_before']} | {r['worst_p1_after']} | {r['busiest_after']} | "
+          f"{'yes' if r['passes_after'] else 'no'} | "
+          f"{100 * r['top10_share_of_p1_value']:.0f}% |")
+    A(f"\nAt x{STRESS_SCALE:.2f} stock the grouping does real work: "
+      f"{slc['p1_alerts']} P1 part alerts become {slc['p1_incidents']} P1 "
+      f"incidents, and the worst urgent queue goes from "
+      f"{slc['worst_p1_before']['items']} to {slc['worst_p1_after']['items']} "
+      f"against a limit of {slc['p1_limit']}. Grouping helps by as much as alerts "
+      f"are concentrated: the top five vendors carry "
+      f"{scon['top_share'] * 100:.0f}% of alerts across {scon['n_suppliers']} vendors.\n")
+    A("| vendor | alerts | of which P1 | parts | share |")
     A("|---|---:|---:|---:|---:|")
-    for r in con["top"]:
+    for r in scon["top"]:
         A(f"| {r['supplier_id']} | {r['alerts']} | {r['P1']} | {r['n_parts']} | "
           f"{r['share_of_alerts'] * 100:.1f}% |")
-
-    A("\n### So the threshold was swept, and it does not save it either\n")
-    A("Tightening the slack ratio that fires P1, everything demoted landing in "
-      "P2 (which has an SLA rather than none):\n")
+    A("\nTightening the slack ratio that fires P1 (stress case):\n")
     A("| P1 slack ratio | P1 alerts | P1 incidents | worst P1 queue | within limit? |")
     A("|---:|---:|---:|---:|:--:|")
-    for r in cal["sweep"]:
+    for r in scal["sweep"]:
         A(f"| {r['p1_ratio']:.2f} | {r['p1_alerts']} | {r['p1_incidents']} | "
           f"{r['worst_p1_owner']} {r['worst_p1_items']} | "
           f"{'yes' if r['p1_passes'] else 'no'} |")
-    floor = cal["sweep"][-1]
-    A(f"\nEven at a ratio of {floor['p1_ratio']:.2f} the worst queue is "
-      f"{floor['worst_p1_items']}, still above {cal['p1_limit']}. There is a "
-      f"floor, and it is correct: **{ic['already_short']} of {ic['n_rows']} "
-      "parts have zero or negative slack** - they are already below their lead "
-      "time, ordering now does not recover them, and no ratio threshold can or "
-      "should argue that away.\n")
-    A("**The queue is not too long because the policy mis-ranks. It is too long "
-      "because the situation is bad.** That is a different finding from the one "
-      "this project expected to make, and tuning the threshold until the table "
-      "looked acceptable would have buried it.\n")
-
-    A("\n### The only honest lever left\n")
-    A(f"Stop pretending everything urgent can be worked, and say what a top-N "
-      f"queue covers. The top {vt['top_n']} P1 incidents by value carry "
-      f"**{vt['top_n_share_of_p1_value'] * 100:.0f}% of the P1 value at risk** "
-      f"({vt['top_n_value']:,.0f} of {vt['p1_value']:,.0f}) across "
-      f"{vt['top_n_parts']} of {vt['parts_in_p1']} parts; "
-      f"{vt['incidents_for_80pct_of_p1_value']} incidents carry 80% of it.\n")
-    A(f"> {vt['verdict']}\n")
+    A(f"\nTop-{svt['top_n']} triage in the stress case: the top {svt['top_n']} P1 "
+      f"incidents carry **{svt['top_n_share_of_p1_value'] * 100:.0f}%** of the P1 "
+      f"value at risk; {svt['incidents_for_80pct_of_p1_value']} incidents carry 80%.\n")
+    A(f"> {svt['verdict']}\n")
 
     A("\n## 2. A transport\n")
-    A("Alerts were objects, and the README said a deployment attaches a "
-      "transport. Attaching one is where the problems are, and none of them are "
-      "about the protocol. The receiver is a real HTTP server on a real socket - "
-      "mocking it would test the code that calls the transport, which is not the "
-      "part that goes wrong.\n")
-
-    A(f"\n### Urgent is sent, routine is digested\n")
-    A(f"{tr['incidents']} incidents become **{tr['messages_prepared']} "
-      f"messages**: {tr['urgent_messages']} individual P1/P2 items and "
-      f"{tr['digest_messages']} digests. The response to a P4 is *look at it on "
-      "Friday*, and forty separate messages saying that is how a channel gets "
-      "filtered to a folder - after which the P1s go there too.\n")
-
-    A("\n### At-least-once, and the receiver deduplicates\n")
+    A(f"Exercised on the stress-case incidents (stock x{STRESS_SCALE:.2f}), because "
+      "at the base stock level there is nothing urgent to send. The receiver is a "
+      "real HTTP server on a local socket.\n")
+    A(f"{tr['incidents']} incidents become **{tr['messages_prepared']} messages**: "
+      f"{tr['urgent_messages']} individual P1/P2 items and {tr['digest_messages']} "
+      "digests. Routine items go out as one digest per owner and severity.\n")
     rt = tr["retry"]
-    A("A sender that marks a message sent *before* the POST loses it when the "
-      "POST fails; one that marks *after* will re-send when it crashes in "
-      "between. There is no third option, so this marks after and every message "
-      "carries an idempotency key the receiver deduplicates on.\n")
-    A(f"- Receiver rejects its first {rt['receiver_failed_first']} requests with "
-      f"a 503. First pass: **{rt['first_pass_failed']} failures**, nothing "
-      "marked sent.")
+    A("**At-least-once, and the receiver deduplicates.** The sender marks a "
+      "message sent only after the POST succeeds, and every message carries an "
+      "idempotency key.\n")
+    A(f"- Receiver rejects its first {rt['receiver_failed_first']} requests with a "
+      f"503. First pass: {rt['first_pass_failed']} failures, nothing marked sent.")
     A(f"- Retried on a backoff clock: all {rt['messages']} messages delivered, "
-      f"receiver saw **{rt['receiver_saw_requests']} requests** for "
-      f"{rt['delivered']} distinct deliveries and "
-      f"**{rt['receiver_duplicates']} duplicates**, final states "
-      f"`{rt['counts']}`.")
-    A(f"- Re-running the entire job re-enqueues nothing: "
-      f"**{tr['rerun']['duplicate_enqueues']} duplicate enqueues rejected** by "
-      f"the UNIQUE key, {tr['rerun']['sent']} additional sends, and the receiver "
-      f"has seen {tr['receiver_duplicates_after_rerun']} duplicates.\n")
+      f"receiver saw {rt['receiver_saw_requests']} requests for {rt['delivered']} "
+      f"deliveries and {rt['receiver_duplicates']} duplicates.")
+    A(f"- Re-running the whole job: {tr['rerun']['duplicate_enqueues']} duplicate "
+      f"enqueues rejected, {tr['rerun']['sent']} extra sends, "
+      f"{tr['receiver_duplicates_after_rerun']} duplicates at the receiver.")
     cw = tr["crash_window"]
-    A(f"\n**And the ordinary retry never produces a duplicate**, because a "
-      f"failed send was never delivered - so receiver-side dedupe is untested "
-      f"by it. The case it exists for is the crash window: deliver the message, "
-      f"then die before marking the outbox. State after the crash: "
-      f"`{cw['state_after_crash']}` - still pending. On restart it is sent again "
-      f"({cw['resent_on_restart']} send), the receiver sees "
-      f"**{cw['receiver_requests']} requests** and records "
-      f"**{cw['receiver_distinct_deliveries']} delivery**, suppressing "
-      f"**{cw['receiver_duplicates_suppressed']}** on the idempotency key. "
-      "That is the whole contract, and it only works because both halves are "
-      "there.\n")
-    A("The key is a SHA-256 of recipient plus canonical payload - deliberately "
-      "not `hash()`, which is the bug found at the top of this document and "
-      "which here would mean every restart re-sending everything.\n")
-
-    A("\n### A dead letter is not a failure to hide\n")
+    A(f"- Crash window (delivered, then died before marking): state after crash "
+      f"`{cw['state_after_crash']}`, re-sent on restart ({cw['resent_on_restart']}), "
+      f"receiver saw {cw['receiver_requests']} requests, recorded "
+      f"{cw['receiver_distinct_deliveries']} delivery and suppressed "
+      f"{cw['receiver_duplicates_suppressed']} duplicate.")
     dl = tr["dead_letter"]
-    A(f"Against an endpoint that never answers, the messages exhaust their "
-      f"retries and land in `DEAD`: `{dl['counts']}`, "
-      f"**{dl['still_in_outbox']} still in the outbox**. Dropping them would "
-      "make the transport look reliable and make a P1 disappear; retrying "
-      "forever turns one broken endpoint into an outage of the whole queue.\n")
-
-    A("\n### Rate limiting is part of the alert policy, not the plumbing\n")
+    A(f"- Endpoint that never answers: messages land in `DEAD` "
+      f"(`{dl['counts']}`), {dl['still_in_outbox']} kept in the outbox, none dropped.")
     rl = tr["rate_limit"]
-    A(f"The load check says how many items an owner can absorb. A transport that "
-      f"ignores it delivers all of them at 06:00, and the queue that was too "
-      f"long on paper is now too long in somebody's inbox. With a budget of "
-      f"{rl['limit_per_recipient']} per recipient: **{rl['sent']} sent, "
-      f"{rl['deferred']} deferred**, nothing dropped "
-      f"(`{rl['nothing_dropped']}`), and no recipient received more than "
-      f"**{rl['max_to_one_recipient']}**.\n")
-    A("The queue is drained in severity order, so the budget is spent on P1s "
-      "rather than on whatever was enqueued first, and what exceeds it is "
-      "deferred visibly - a silently held P1 is worse than a noisy one.\n")
+    A(f"- Rate limit of {rl['limit_per_recipient']} per recipient: {rl['sent']} sent, "
+      f"{rl['deferred']} deferred, nothing dropped ({rl['nothing_dropped']}), max "
+      f"{rl['max_to_one_recipient']} to one recipient, urgent first.\n")
+    A("The generator and the idempotency key are both checked for being identical "
+      "across separate processes (Python salts string hashing per process, which "
+      "once made every number in this project differ run to run).\n")
     return "\n".join(L) + "\n"
 
 
@@ -377,8 +330,9 @@ def main() -> None:
     DOCS.mkdir(exist_ok=True)
     ic = stage_incidents()
     print("  incidents done")
-    inc = ic.pop("_incidents")
-    d = {"incidents": ic, "transport": stage_transport(inc)}
+    ic.pop("_incidents")
+    stress_inc = ic.pop("_stress_incidents")
+    d = {"incidents": ic, "transport": stage_transport(stress_inc)}
     print("  transport done")
     d["elapsed_s"] = time.time() - t0
     (OUT / "pass4.json").write_text(json.dumps(d, indent=2, default=str),

@@ -1,167 +1,584 @@
 {
   "base": {
+    "source": {
+      "bom": "Willems (2008) chain 24, power-driven hand tools (real)",
+      "suppliers": "USAID SCMS delivery history, Direct Drop vendors (real)",
+      "vendor_to_part_mapping": "lead-time band matching (assumption)",
+      "stock_and_open_orders": "simulated",
+      "original_promise_dates": "simulated",
+      "planted_disruptions": "simulated, in a sandbox built from real vendor lead times"
+    },
     "products": [
-      "PRD-A",
-      "PRD-B",
-      "PRD-C",
-      "PRD-D"
+      "Manuf_0032",
+      "Manuf_0033",
+      "Manuf_0034",
+      "Manuf_0035",
+      "Manuf_0036",
+      "Manuf_0037",
+      "Manuf_0038",
+      "Manuf_0039",
+      "Manuf_0040",
+      "Manuf_0041",
+      "Manuf_0042",
+      "Manuf_0043",
+      "Manuf_0044",
+      "Manuf_0045",
+      "Manuf_0046",
+      "Manuf_0047",
+      "Manuf_0048"
     ],
-    "purchased_parts": 260,
-    "sub_assemblies": 32,
-    "bom_lines": 442,
-    "suppliers": 50,
-    "single_sourced_parts": 68,
-    "open_pos": 390,
-    "received_pos": 3624,
+    "n_products": 17,
+    "purchased_parts": 209,
+    "sub_assemblies": 31,
+    "bom_lines": 1168,
+    "suppliers": 27,
+    "single_sourced_parts": 31,
+    "parts_shared_by_2plus_products": 143,
+    "parts_in_every_product": 44,
+    "parts_with_lead_distribution": 114,
+    "part_lead_days": {
+      "min": 3.0,
+      "median": 9.0,
+      "max": 55.0
+    },
+    "weekly_demand_total": 12287.0,
+    "open_pos": 341,
+    "real_delivery_lines": 4126,
+    "sandbox_delivery_lines": 1923,
     "horizon_weeks": 13,
     "planted_disruptions": [
       {
-        "supplier_id": "SUP-011",
+        "supplier_id": "V02",
         "kind": "lead_time_doubling",
-        "onset_day": -91.77282668801274
+        "onset_day": -281.24287507982706
       },
       {
-        "supplier_id": "SUP-044",
+        "supplier_id": "V10",
         "kind": "tail_blowout",
-        "onset_day": -87.71255233994776
+        "onset_day": -200.94861151101753
       },
       {
-        "supplier_id": "SUP-041",
+        "supplier_id": "V14",
         "kind": "lead_time_doubling",
-        "onset_day": -92.24267357471923
+        "onset_day": -288.09272756379204
       },
       {
-        "supplier_id": "SUP-009",
+        "supplier_id": "V08",
         "kind": "tail_blowout",
-        "onset_day": -97.81131966126647
+        "onset_day": -258.99429582858204
       },
       {
-        "supplier_id": "SUP-002",
+        "supplier_id": "V23",
         "kind": "lead_time_doubling",
-        "onset_day": -94.72963404412116
+        "onset_day": -278.2749220950384
       },
       {
-        "supplier_id": "SUP-014",
+        "supplier_id": "V06",
         "kind": "tail_blowout",
-        "onset_day": -59.661567882233754
+        "onset_day": -265.0015159282044
+      }
+    ],
+    "scms_cleaning": {
+      "rows": 10324,
+      "direct_drop": 4920,
+      "dropped_missing_date": 328,
+      "dropped_lead_not_positive": 357,
+      "dropped_scheduled_before_po": 0,
+      "kept": 4235,
+      "vendors": 68
+    },
+    "day0": "2015-08-04",
+    "suppliers_table": [
+      {
+        "supplier_id": "V01",
+        "name": "REINBOLD EXPORT IMPORT",
+        "n_lines": 10,
+        "lead_p50": 30.5,
+        "lead_p95": 87.55,
+        "on_time_vs_scheduled": 0.9,
+        "sole_source_share": 0.0,
+        "lines_per_year": 3.7006079027355625,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          3.0,
+          4.0
+        ]
+      },
+      {
+        "supplier_id": "V02",
+        "name": "Premier Medical Corporation Ltd.",
+        "n_lines": 11,
+        "lead_p50": 32.0,
+        "lead_p95": 80.5,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 1.0,
+        "lines_per_year": 1.7243562231759655,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          4.0,
+          5.0
+        ]
+      },
+      {
+        "supplier_id": "V03",
+        "name": "S. BUYS WHOLESALER",
+        "n_lines": 331,
+        "lead_p50": 40.0,
+        "lead_p95": 178.0,
+        "on_time_vs_scheduled": 0.9758308157099698,
+        "sole_source_share": 0.0,
+        "lines_per_year": 57.243252840909086,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          5.0,
+          5.0
+        ]
+      },
+      {
+        "supplier_id": "V04",
+        "name": "Orasure Technologies Inc.",
+        "n_lines": 50,
+        "lead_p50": 58.0,
+        "lead_p95": 301.2499999999999,
+        "on_time_vs_scheduled": 0.98,
+        "sole_source_share": 0.26,
+        "lines_per_year": 6.134531407457171,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          5.0,
+          5.5
+        ]
+      },
+      {
+        "supplier_id": "V05",
+        "name": "ASPEN PHARMACARE",
+        "n_lines": 40,
+        "lead_p50": 68.0,
+        "lead_p95": 168.49999999999991,
+        "on_time_vs_scheduled": 0.975,
+        "sole_source_share": 0.0,
+        "lines_per_year": 6.009872480460715,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          5.6705000000000005,
+          6.0
+        ]
+      },
+      {
+        "supplier_id": "V06",
+        "name": "SHANGHAI KEHUA BIOENGINEERING CO.,LTD.  (KHB)",
+        "n_lines": 70,
+        "lead_p50": 69.0,
+        "lead_p95": 227.0,
+        "on_time_vs_scheduled": 0.9714285714285714,
+        "sole_source_share": 1.0,
+        "lines_per_year": 9.936844150796736,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          6.0,
+          6.0
+        ]
+      },
+      {
+        "supplier_id": "V07",
+        "name": "IDA FOUNDATION",
+        "n_lines": 16,
+        "lead_p50": 71.0,
+        "lead_p95": 142.0,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.3125,
+        "lines_per_year": 4.0895731280615815,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          6.0,
+          6.494999999999999
+        ]
+      },
+      {
+        "supplier_id": "V08",
+        "name": "BIO-RAD LABORATORIES (FRANCE)",
+        "n_lines": 25,
+        "lead_p50": 73.0,
+        "lead_p95": 173.79999999999993,
+        "on_time_vs_scheduled": 0.88,
+        "sole_source_share": 1.0,
+        "lines_per_year": 2.894215530903328,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          6.506,
+          6.75
+        ]
+      },
+      {
+        "supplier_id": "V09",
+        "name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
+        "n_lines": 107,
+        "lead_p50": 76.0,
+        "lead_p95": 248.09999999999985,
+        "on_time_vs_scheduled": 0.9906542056074766,
+        "sole_source_share": 0.1588785046728972,
+        "lines_per_year": 12.992603058510637,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          6.75,
+          6.75
+        ]
+      },
+      {
+        "supplier_id": "V10",
+        "name": "Standard Diagnostics, Inc.",
+        "n_lines": 88,
+        "lead_p50": 77.0,
+        "lead_p95": 267.7499999999999,
+        "on_time_vs_scheduled": 0.9545454545454546,
+        "sole_source_share": 0.8863636363636364,
+        "lines_per_year": 11.458823529411765,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          6.75,
+          7.0
+        ]
+      },
+      {
+        "supplier_id": "V11",
+        "name": "JSI R&T INSTITUTE, INC.",
+        "n_lines": 19,
+        "lead_p50": 78.0,
+        "lead_p95": 115.39999999999992,
+        "on_time_vs_scheduled": 0.9473684210526315,
+        "sole_source_share": 0.0,
+        "lines_per_year": 10.205514705882353,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          7.0,
+          7.0
+        ]
+      },
+      {
+        "supplier_id": "V12",
+        "name": "Trinity Biotech, Plc",
+        "n_lines": 347,
+        "lead_p50": 78.0,
+        "lead_p95": 234.39999999999998,
+        "on_time_vs_scheduled": 0.9971181556195965,
+        "sole_source_share": 0.011527377521613832,
+        "lines_per_year": 40.59633247918001,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          7.388999999999999,
+          8.0
+        ]
+      },
+      {
+        "supplier_id": "V13",
+        "name": "BRISTOL-MYERS SQUIBB",
+        "n_lines": 65,
+        "lead_p50": 81.0,
+        "lead_p95": 179.8,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.0,
+        "lines_per_year": 10.675022482014388,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          8.0,
+          9.0
+        ]
+      },
+      {
+        "supplier_id": "V14",
+        "name": "Orgenics, Ltd",
+        "n_lines": 747,
+        "lead_p50": 91.0,
+        "lead_p95": 218.0,
+        "on_time_vs_scheduled": 0.8688085676037484,
+        "sole_source_share": 0.10843373493975904,
+        "lines_per_year": 93.6313486616335,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          9.0,
+          10.0
+        ]
+      },
+      {
+        "supplier_id": "V15",
+        "name": "Hoffmann-La Roche ltd Basel",
+        "n_lines": 22,
+        "lead_p50": 104.0,
+        "lead_p95": 241.19999999999993,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.18181818181818182,
+        "lines_per_year": 4.427272727272728,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          10.0,
+          10.1505
+        ]
+      },
+      {
+        "supplier_id": "V16",
+        "name": "LAWRENCE LABORATORIES (SUBSIDIARY OF BRISTOL MYERS SQUIBB)",
+        "n_lines": 18,
+        "lead_p50": 104.0,
+        "lead_p95": 250.59999999999988,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.0,
+        "lines_per_year": 5.6048593350383635,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          10.223500000000001,
+          10.374
+        ]
+      },
+      {
+        "supplier_id": "V17",
+        "name": "STRIDES ARCOLAB LIMITED",
+        "n_lines": 92,
+        "lead_p50": 116.0,
+        "lead_p95": 229.00000000000006,
+        "on_time_vs_scheduled": 0.9565217391304348,
+        "sole_source_share": 0.0,
+        "lines_per_year": 10.57695939565628,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          10.38,
+          10.53
+        ]
+      },
+      {
+        "supplier_id": "V18",
+        "name": "ABBVIE LOGISTICS (FORMERLY ABBOTT LOGISTICS BV)",
+        "n_lines": 346,
+        "lead_p50": 117.0,
+        "lead_p95": 258.75,
+        "on_time_vs_scheduled": 0.9884393063583815,
+        "sole_source_share": 0.0,
+        "lines_per_year": 39.97991142043657,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          10.5335,
+          10.6445
+        ]
+      },
+      {
+        "supplier_id": "V19",
+        "name": "Aurobindo Pharma Limited",
+        "n_lines": 642,
+        "lead_p50": 123.0,
+        "lead_p95": 270.94999999999993,
+        "on_time_vs_scheduled": 0.8535825545171339,
+        "sole_source_share": 0.003115264797507788,
+        "lines_per_year": 75.10906470211403,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          10.6535,
+          10.748999999999999
+        ]
+      },
+      {
+        "supplier_id": "V20",
+        "name": "MYLAN LABORATORIES LTD (FORMERLY MATRIX LABORATORIES)",
+        "n_lines": 317,
+        "lead_p50": 127.0,
+        "lead_p95": 225.39999999999998,
+        "on_time_vs_scheduled": 0.9936908517350158,
+        "sole_source_share": 0.0,
+        "lines_per_year": 42.28789262235208,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          10.825,
+          10.917499999999999
+        ]
+      },
+      {
+        "supplier_id": "V21",
+        "name": "HETERO LABS LIMITED",
+        "n_lines": 277,
+        "lead_p50": 128.0,
+        "lead_p95": 195.0,
+        "on_time_vs_scheduled": 0.9927797833935018,
+        "sole_source_share": 0.0,
+        "lines_per_year": 39.72290930506478,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          11.0,
+          11.158
+        ]
+      },
+      {
+        "supplier_id": "V22",
+        "name": "MERCK SHARP & DOHME IDEA GMBH (FORMALLY MERCK SHARP & DOHME B.V.)",
+        "n_lines": 66,
+        "lead_p50": 132.0,
+        "lead_p95": 292.75,
+        "on_time_vs_scheduled": 0.9848484848484849,
+        "sole_source_share": 0.16666666666666666,
+        "lines_per_year": 9.973727761688043,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          11.1765,
+          11.658999999999999
+        ]
+      },
+      {
+        "supplier_id": "V23",
+        "name": "CIPLA LIMITED",
+        "n_lines": 174,
+        "lead_p50": 133.5,
+        "lead_p95": 305.0,
+        "on_time_vs_scheduled": 0.867816091954023,
+        "sole_source_share": 0.0,
+        "lines_per_year": 19.960270100502512,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          11.827,
+          12.0
+        ]
+      },
+      {
+        "supplier_id": "V24",
+        "name": "MICRO LABS LIMITED",
+        "n_lines": 35,
+        "lead_p50": 145.0,
+        "lead_p95": 221.0,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.0,
+        "lines_per_year": 17.205585464333783,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          12.0,
+          14.0
+        ]
+      },
+      {
+        "supplier_id": "V25",
+        "name": "GLAXOSMITHKLINE EXPORT LIMITED",
+        "n_lines": 20,
+        "lead_p50": 205.0,
+        "lead_p95": 285.0,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.0,
+        "lines_per_year": 6.291989664082688,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          15.0,
+          16.0
+        ]
+      },
+      {
+        "supplier_id": "V26",
+        "name": "EMCURE PHARMACEUTICALS LTD",
+        "n_lines": 41,
+        "lead_p50": 224.0,
+        "lead_p95": 328.0,
+        "on_time_vs_scheduled": 0.9512195121951219,
+        "sole_source_share": 0.0,
+        "lines_per_year": 7.057139491046183,
+        "parts_mapped": 8,
+        "part_lead_band": [
+          16.0,
+          17.0
+        ]
+      },
+      {
+        "supplier_id": "V27",
+        "name": "PHARMACY DIRECT",
+        "n_lines": 150,
+        "lead_p50": 287.0,
+        "lead_p95": 319.0,
+        "on_time_vs_scheduled": 1.0,
+        "sole_source_share": 0.0,
+        "lines_per_year": 91.46494156928215,
+        "parts_mapped": 7,
+        "part_lead_band": [
+          17.124499999999998,
+          55.0
+        ]
       }
     ]
   },
   "deterioration": {
     "flags": [
       {
-        "supplier_id": "SUP-044",
-        "n_recent": 21,
-        "n_baseline": 53,
-        "mean_baseline": 18.292362729576546,
-        "mean_recent": 22.387581999395866,
-        "mean_ratio": 1.2238759055000503,
-        "p95_baseline": 25.60476934450069,
-        "p95_recent": 53.50725692790448,
-        "p95_ratio": 2.0897379003102245,
-        "sd_ratio": 3.1949004389342925,
-        "triggers": [
-          "p95",
-          "variance"
-        ],
-        "flagged": true
-      },
-      {
-        "supplier_id": "SUP-027",
-        "n_recent": 10,
-        "n_baseline": 15,
-        "mean_baseline": 69.52944182662264,
-        "mean_recent": 97.7777035464138,
-        "mean_ratio": 1.40627770017528,
-        "p95_baseline": 85.84673062882047,
-        "p95_recent": 159.47156771664612,
-        "p95_ratio": 1.857631228918441,
-        "sd_ratio": 2.4143220212802783,
-        "triggers": [
-          "mean",
-          "p95",
-          "variance"
-        ],
-        "flagged": true
-      },
-      {
-        "supplier_id": "SUP-011",
-        "n_recent": 17,
-        "n_baseline": 38,
-        "mean_baseline": 29.281873625123982,
-        "mean_recent": 51.7178798385429,
-        "mean_ratio": 1.7662080132115836,
-        "p95_baseline": 37.49056420427867,
-        "p95_recent": 65.16983661777984,
-        "p95_ratio": 1.7382997028981022,
-        "sd_ratio": 2.110830447130548,
-        "triggers": [
-          "mean",
-          "p95",
-          "variance"
-        ],
-        "flagged": true
-      },
-      {
-        "supplier_id": "SUP-014",
-        "n_recent": 11,
-        "n_baseline": 14,
-        "mean_baseline": 32.15497430708822,
-        "mean_recent": 39.343539150113365,
-        "mean_ratio": 1.2235599622743443,
-        "p95_baseline": 49.664558305097756,
-        "p95_recent": 80.69862359719447,
-        "p95_ratio": 1.6248734782145693,
-        "sd_ratio": 1.415235082043594,
-        "triggers": [
-          "p95"
-        ],
-        "flagged": true
-      },
-      {
-        "supplier_id": "SUP-003",
+        "supplier_id": "V15",
         "n_recent": 6,
-        "n_baseline": 27,
-        "mean_baseline": 75.7774818608834,
-        "mean_recent": 92.76505329085357,
-        "mean_ratio": 1.224177037990744,
-        "p95_baseline": 109.73639973809556,
-        "p95_recent": 156.34526304060896,
-        "p95_ratio": 1.4247347590567334,
-        "sd_ratio": 2.039152420860044,
+        "n_baseline": 7,
+        "mean_baseline": 100.28571428571429,
+        "mean_recent": 154.83333333333334,
+        "mean_ratio": 1.5439221272554606,
+        "p95_baseline": 144.89999999999998,
+        "p95_recent": 267.0,
+        "p95_ratio": 1.842650103519669,
+        "sd_ratio": 2.6449961178284846,
         "triggers": [
+          "mean",
           "p95",
           "variance"
         ],
         "flagged": true
       },
       {
-        "supplier_id": "SUP-043",
-        "n_recent": 20,
-        "n_baseline": 37,
-        "mean_baseline": 65.93564523835309,
-        "mean_recent": 70.1358439853494,
-        "mean_ratio": 1.0637014885015967,
-        "p95_baseline": 96.21147414230191,
-        "p95_recent": 131.15729686078777,
-        "p95_ratio": 1.3632188679158903,
-        "sd_ratio": 1.38606766680554,
+        "supplier_id": "V23",
+        "n_recent": 24,
+        "n_baseline": 36,
+        "mean_baseline": 154.47222222222223,
+        "mean_recent": 250.91666666666666,
+        "mean_ratio": 1.6243481388239525,
+        "p95_baseline": 266.75,
+        "p95_recent": 433.39999999999986,
+        "p95_ratio": 1.6247422680412367,
+        "sd_ratio": 1.880642212086393,
         "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V14",
+        "n_recent": 84,
+        "n_baseline": 197,
+        "mean_baseline": 99.81218274111676,
+        "mean_recent": 169.98809523809524,
+        "mean_ratio": 1.7030796298583513,
+        "p95_baseline": 184.7999999999999,
+        "p95_recent": 264.79999999999995,
+        "p95_ratio": 1.4329004329004333,
+        "sd_ratio": 1.273238004125401,
+        "triggers": [
+          "mean",
           "p95"
         ],
         "flagged": true
       },
       {
-        "supplier_id": "SUP-036",
-        "n_recent": 5,
-        "n_baseline": 13,
-        "mean_baseline": 45.93779252159108,
-        "mean_recent": 34.11144834285987,
-        "mean_ratio": 0.742557412327274,
-        "p95_baseline": 70.52396350647003,
-        "p95_recent": 57.51867867424126,
-        "p95_ratio": 0.8155905569454327,
-        "sd_ratio": 1.6267155685222867,
+        "supplier_id": "V04",
+        "n_recent": 8,
+        "n_baseline": 10,
+        "mean_baseline": 69.0,
+        "mean_recent": 166.625,
+        "mean_ratio": 2.414855072463768,
+        "p95_baseline": 223.49999999999986,
+        "p95_recent": 313.29999999999995,
+        "p95_ratio": 1.4017897091722602,
+        "sd_ratio": 1.3351718038230642,
+        "triggers": [
+          "mean",
+          "p95"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V03",
+        "n_recent": 70,
+        "n_baseline": 102,
+        "mean_baseline": 49.166666666666664,
+        "mean_recent": 52.614285714285714,
+        "mean_ratio": 1.0701210653753026,
+        "p95_baseline": 175.44999999999942,
+        "p95_recent": 127.0,
+        "p95_ratio": 0.7238529495582811,
+        "sd_ratio": 1.5412042592030102,
         "triggers": [
           "variance"
         ],
@@ -170,569 +587,1570 @@
     ],
     "score": {
       "planted": [
-        "SUP-002",
-        "SUP-009",
-        "SUP-011",
-        "SUP-014",
-        "SUP-041",
-        "SUP-044"
+        "V02",
+        "V06",
+        "V08",
+        "V10",
+        "V14",
+        "V23"
       ],
       "flagged": [
-        "SUP-003",
-        "SUP-011",
-        "SUP-014",
-        "SUP-027",
-        "SUP-036",
-        "SUP-043",
-        "SUP-044"
+        "V03",
+        "V04",
+        "V14",
+        "V15",
+        "V23"
       ],
+      "evaluated": 23,
       "true_positives": [
-        "SUP-011",
-        "SUP-014",
-        "SUP-044"
+        "V14",
+        "V23"
       ],
       "false_positives": [
-        "SUP-003",
-        "SUP-027",
-        "SUP-036",
-        "SUP-043"
+        "V03",
+        "V04",
+        "V15"
       ],
       "missed": [
-        "SUP-002",
-        "SUP-009",
-        "SUP-041"
+        "V02",
+        "V06",
+        "V08",
+        "V10"
       ],
-      "precision": 0.42857142857142855,
-      "recall": 0.5,
+      "missed_not_evaluable": [
+        "V02",
+        "V08"
+      ],
+      "precision": 0.4,
+      "recall": 0.3333333333333333,
       "by_kind": {
         "lead_time_doubling": {
           "planted": 3,
-          "caught": 1,
-          "by_p95_only": 0
+          "caught": 2,
+          "by_p95_only": 0,
+          "not_evaluable": 1
         },
         "tail_blowout": {
           "planted": 3,
-          "caught": 2,
-          "by_p95_only": 1
+          "caught": 0,
+          "by_p95_only": 0,
+          "not_evaluable": 1
+        }
+      }
+    },
+    "window_120d": {
+      "evaluable": 11,
+      "score": {
+        "planted": [
+          "V02",
+          "V06",
+          "V08",
+          "V10",
+          "V14",
+          "V23"
+        ],
+        "flagged": [
+          "V03",
+          "V17"
+        ],
+        "evaluated": 11,
+        "true_positives": [],
+        "false_positives": [
+          "V03",
+          "V17"
+        ],
+        "missed": [
+          "V02",
+          "V06",
+          "V08",
+          "V10",
+          "V14",
+          "V23"
+        ],
+        "missed_not_evaluable": [
+          "V02",
+          "V06",
+          "V08",
+          "V10"
+        ],
+        "precision": 0.0,
+        "recall": 0.0,
+        "by_kind": {
+          "lead_time_doubling": {
+            "planted": 3,
+            "caught": 0,
+            "by_p95_only": 0,
+            "not_evaluable": 1
+          },
+          "tail_blowout": {
+            "planted": 3,
+            "caught": 0,
+            "by_p95_only": 0,
+            "not_evaluable": 3
+          }
         }
       }
     }
   },
+  "real_scan": {
+    "vendor_years_evaluated": 96,
+    "vendor_years_flagged": 37,
+    "flag_rate": 0.3854166666666667,
+    "by_trigger": {
+      "mean": 31,
+      "p95": 24,
+      "variance": 25
+    },
+    "vendors_flagged_at_least_once": 19,
+    "top": [
+      {
+        "supplier_id": "V09",
+        "name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
+        "year": 2008,
+        "n_recent": 20,
+        "n_baseline": 11,
+        "mean_baseline": 38.90909090909091,
+        "mean_recent": 127.65,
+        "mean_ratio": 3.280724299065421,
+        "p95_baseline": 64.0,
+        "p95_recent": 357.7,
+        "p95_ratio": 5.5890625,
+        "sd_ratio": 6.065940969852266,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V14",
+        "name": "Orgenics, Ltd",
+        "year": 2008,
+        "n_recent": 84,
+        "n_baseline": 10,
+        "mean_baseline": 29.3,
+        "mean_recent": 89.14285714285714,
+        "mean_ratio": 3.0424183325207212,
+        "p95_baseline": 50.65,
+        "p95_recent": 223.09999999999997,
+        "p95_ratio": 4.404738400789733,
+        "sd_ratio": 4.5341775515480816,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V12",
+        "name": "Trinity Biotech, Plc",
+        "year": 2008,
+        "n_recent": 42,
+        "n_baseline": 11,
+        "mean_baseline": 52.27272727272727,
+        "mean_recent": 105.83333333333333,
+        "mean_ratio": 2.02463768115942,
+        "p95_baseline": 83.5,
+        "p95_recent": 251.49999999999977,
+        "p95_ratio": 3.011976047904189,
+        "sd_ratio": 4.44477766602863,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V10",
+        "name": "Standard Diagnostics, Inc.",
+        "year": 2013,
+        "n_recent": 16,
+        "n_baseline": 31,
+        "mean_baseline": 66.80645161290323,
+        "mean_recent": 128.6875,
+        "mean_ratio": 1.9262735393529695,
+        "p95_baseline": 103.0,
+        "p95_recent": 275.25,
+        "p95_ratio": 2.6723300970873787,
+        "sd_ratio": 3.179000814734525,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V04",
+        "name": "Orasure Technologies Inc.",
+        "year": 2008,
+        "n_recent": 7,
+        "n_baseline": 8,
+        "mean_baseline": 47.0,
+        "mean_recent": 99.0,
+        "mean_ratio": 2.106382978723404,
+        "p95_baseline": 87.89999999999998,
+        "p95_recent": 206.59999999999994,
+        "p95_ratio": 2.3503981797497153,
+        "sd_ratio": 2.9898645947597466,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V20",
+        "name": "MYLAN LABORATORIES LTD (FORMERLY MATRIX LABORATORIES)",
+        "year": 2009,
+        "n_recent": 28,
+        "n_baseline": 19,
+        "mean_baseline": 101.94736842105263,
+        "mean_recent": 131.17857142857142,
+        "mean_ratio": 1.286728372298842,
+        "p95_baseline": 130.0,
+        "p95_recent": 287.0,
+        "p95_ratio": 2.207692307692308,
+        "sd_ratio": 2.092276825534901,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V06",
+        "name": "SHANGHAI KEHUA BIOENGINEERING CO.,LTD.  (KHB)",
+        "year": 2012,
+        "n_recent": 16,
+        "n_baseline": 6,
+        "mean_baseline": 57.5,
+        "mean_recent": 88.4375,
+        "mean_ratio": 1.5380434782608696,
+        "p95_baseline": 89.75,
+        "p95_recent": 190.0,
+        "p95_ratio": 2.116991643454039,
+        "sd_ratio": 2.1047897647670686,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V18",
+        "name": "ABBVIE LOGISTICS (FORMERLY ABBOTT LOGISTICS BV)",
+        "year": 2010,
+        "n_recent": 39,
+        "n_baseline": 60,
+        "mean_baseline": 98.61666666666666,
+        "mean_recent": 154.69230769230768,
+        "mean_ratio": 1.5686223528035257,
+        "p95_baseline": 217.05,
+        "p95_recent": 457.7000000000001,
+        "p95_ratio": 2.1087307072103205,
+        "sd_ratio": 1.7475159734445114,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V09",
+        "name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
+        "year": 2012,
+        "n_recent": 19,
+        "n_baseline": 19,
+        "mean_baseline": 65.05263157894737,
+        "mean_recent": 121.84210526315789,
+        "mean_ratio": 1.872977346278317,
+        "p95_baseline": 126.29999999999995,
+        "p95_recent": 253.69999999999996,
+        "p95_ratio": 2.0087094220110853,
+        "sd_ratio": 2.124421113300876,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V04",
+        "name": "Orasure Technologies Inc.",
+        "year": 2009,
+        "n_recent": 19,
+        "n_baseline": 15,
+        "mean_baseline": 71.26666666666667,
+        "mean_recent": 140.57894736842104,
+        "mean_ratio": 1.972576436413766,
+        "p95_baseline": 167.3999999999999,
+        "p95_recent": 335.59999999999997,
+        "p95_ratio": 2.004778972520909,
+        "sd_ratio": 1.8639513798231184,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V19",
+        "name": "Aurobindo Pharma Limited",
+        "year": 2009,
+        "n_recent": 60,
+        "n_baseline": 55,
+        "mean_baseline": 93.98181818181818,
+        "mean_recent": 131.51666666666668,
+        "mean_ratio": 1.3993841490939576,
+        "p95_baseline": 143.2,
+        "p95_recent": 285.0,
+        "p95_ratio": 1.990223463687151,
+        "sd_ratio": 2.8460491377483774,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      },
+      {
+        "supplier_id": "V05",
+        "name": "ASPEN PHARMACARE",
+        "year": 2013,
+        "n_recent": 7,
+        "n_baseline": 18,
+        "mean_baseline": 62.166666666666664,
+        "mean_recent": 148.42857142857142,
+        "mean_ratio": 2.387590961317503,
+        "p95_baseline": 111.0,
+        "p95_recent": 217.29999999999998,
+        "p95_ratio": 1.9576576576576574,
+        "sd_ratio": 2.176838104425485,
+        "triggers": [
+          "mean",
+          "p95",
+          "variance"
+        ],
+        "flagged": true
+      }
+    ]
+  },
   "otif_gap": [
     {
-      "supplier_id": "SUP-036",
-      "n_receipts": 28,
-      "otif_vs_original_pct": 35.714285714285715,
+      "supplier_id": "V25",
+      "name": "GLAXOSMITHKLINE EXPORT LIMITED",
+      "n_receipts": 20,
+      "otif_vs_original_pct": 25.0,
       "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 64.28571428571428
+      "gaming_gap_pts": 75.0,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": true
     },
     {
-      "supplier_id": "SUP-009",
-      "n_receipts": 26,
-      "otif_vs_original_pct": 38.46153846153846,
+      "supplier_id": "V13",
+      "name": "BRISTOL-MYERS SQUIBB",
+      "n_receipts": 65,
+      "otif_vs_original_pct": 36.92307692307692,
       "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 61.53846153846154
+      "gaming_gap_pts": 63.07692307692308,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": true
     },
     {
-      "supplier_id": "SUP-003",
+      "supplier_id": "V16",
+      "name": "LAWRENCE LABORATORIES (SUBSIDIARY OF BRISTOL MYERS SQUIBB)",
+      "n_receipts": 18,
+      "otif_vs_original_pct": 50.0,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 50.0,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V10",
+      "name": "Standard Diagnostics, Inc.",
+      "n_receipts": 88,
+      "otif_vs_original_pct": 47.72727272727273,
+      "otif_vs_latest_promise_pct": 95.45454545454545,
+      "gaming_gap_pts": 47.72727272727273,
+      "exact_on_scheduled_date_pct": 88.63636363636364,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V07",
+      "name": "IDA FOUNDATION",
+      "n_receipts": 16,
+      "otif_vs_original_pct": 56.25,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 43.75,
+      "exact_on_scheduled_date_pct": 93.75,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V04",
+      "name": "Orasure Technologies Inc.",
+      "n_receipts": 50,
+      "otif_vs_original_pct": 56.0,
+      "otif_vs_latest_promise_pct": 98.0,
+      "gaming_gap_pts": 42.0,
+      "exact_on_scheduled_date_pct": 98.0,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V19",
+      "name": "Aurobindo Pharma Limited",
+      "n_receipts": 642,
+      "otif_vs_original_pct": 44.70404984423676,
+      "otif_vs_latest_promise_pct": 85.35825545171339,
+      "gaming_gap_pts": 40.65420560747663,
+      "exact_on_scheduled_date_pct": 81.93146417445483,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V01",
+      "name": "REINBOLD EXPORT IMPORT",
+      "n_receipts": 10,
+      "otif_vs_original_pct": 50.0,
+      "otif_vs_latest_promise_pct": 90.0,
+      "gaming_gap_pts": 40.0,
+      "exact_on_scheduled_date_pct": 90.0,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V22",
+      "name": "MERCK SHARP & DOHME IDEA GMBH (FORMALLY MERCK SHARP & DOHME B.V.)",
+      "n_receipts": 66,
+      "otif_vs_original_pct": 59.09090909090909,
+      "otif_vs_latest_promise_pct": 98.48484848484848,
+      "gaming_gap_pts": 39.39393939393939,
+      "exact_on_scheduled_date_pct": 96.96969696969697,
+      "habitual_rescheduler_simulated": true
+    },
+    {
+      "supplier_id": "V02",
+      "name": "Premier Medical Corporation Ltd.",
+      "n_receipts": 11,
+      "otif_vs_original_pct": 100.0,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 90.9090909090909,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V03",
+      "name": "S. BUYS WHOLESALER",
+      "n_receipts": 331,
+      "otif_vs_original_pct": 97.58308157099698,
+      "otif_vs_latest_promise_pct": 97.58308157099698,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 73.1117824773414,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V05",
+      "name": "ASPEN PHARMACARE",
+      "n_receipts": 40,
+      "otif_vs_original_pct": 97.5,
+      "otif_vs_latest_promise_pct": 97.5,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 97.5,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V06",
+      "name": "SHANGHAI KEHUA BIOENGINEERING CO.,LTD.  (KHB)",
       "n_receipts": 70,
-      "otif_vs_original_pct": 42.857142857142854,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 57.142857142857146
+      "otif_vs_original_pct": 97.14285714285714,
+      "otif_vs_latest_promise_pct": 97.14285714285714,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 85.71428571428571,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-006",
-      "n_receipts": 42,
-      "otif_vs_original_pct": 42.857142857142854,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 57.142857142857146
+      "supplier_id": "V08",
+      "name": "BIO-RAD LABORATORIES (FRANCE)",
+      "n_receipts": 25,
+      "otif_vs_original_pct": 88.0,
+      "otif_vs_latest_promise_pct": 88.0,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 84.0,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-021",
-      "n_receipts": 72,
-      "otif_vs_original_pct": 43.05555555555556,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 56.94444444444444
+      "supplier_id": "V09",
+      "name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
+      "n_receipts": 107,
+      "otif_vs_original_pct": 99.06542056074767,
+      "otif_vs_latest_promise_pct": 99.06542056074767,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 88.78504672897196,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-048",
-      "n_receipts": 112,
-      "otif_vs_original_pct": 43.75,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 56.25
+      "supplier_id": "V11",
+      "name": "JSI R&T INSTITUTE, INC.",
+      "n_receipts": 19,
+      "otif_vs_original_pct": 94.73684210526316,
+      "otif_vs_latest_promise_pct": 94.73684210526316,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 89.47368421052632,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-018",
-      "n_receipts": 102,
-      "otif_vs_original_pct": 44.11764705882353,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 55.88235294117647
+      "supplier_id": "V12",
+      "name": "Trinity Biotech, Plc",
+      "n_receipts": 347,
+      "otif_vs_original_pct": 99.71181556195965,
+      "otif_vs_latest_promise_pct": 99.71181556195965,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 99.13544668587896,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-045",
-      "n_receipts": 68,
-      "otif_vs_original_pct": 44.11764705882353,
-      "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 55.88235294117647
+      "supplier_id": "V14",
+      "name": "Orgenics, Ltd",
+      "n_receipts": 747,
+      "otif_vs_original_pct": 86.88085676037483,
+      "otif_vs_latest_promise_pct": 86.88085676037483,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 78.44712182061579,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-024",
-      "n_receipts": 49,
-      "otif_vs_original_pct": 44.89795918367347,
+      "supplier_id": "V15",
+      "name": "Hoffmann-La Roche ltd Basel",
+      "n_receipts": 22,
+      "otif_vs_original_pct": 100.0,
       "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 55.10204081632653
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": false
     },
     {
-      "supplier_id": "SUP-042",
-      "n_receipts": 109,
-      "otif_vs_original_pct": 45.87155963302752,
+      "supplier_id": "V17",
+      "name": "STRIDES ARCOLAB LIMITED",
+      "n_receipts": 92,
+      "otif_vs_original_pct": 95.65217391304348,
+      "otif_vs_latest_promise_pct": 95.65217391304348,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 94.56521739130434,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V18",
+      "name": "ABBVIE LOGISTICS (FORMERLY ABBOTT LOGISTICS BV)",
+      "n_receipts": 346,
+      "otif_vs_original_pct": 98.84393063583815,
+      "otif_vs_latest_promise_pct": 98.84393063583815,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 98.26589595375722,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V20",
+      "name": "MYLAN LABORATORIES LTD (FORMERLY MATRIX LABORATORIES)",
+      "n_receipts": 317,
+      "otif_vs_original_pct": 99.36908517350157,
+      "otif_vs_latest_promise_pct": 99.36908517350157,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 97.79179810725552,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V21",
+      "name": "HETERO LABS LIMITED",
+      "n_receipts": 277,
+      "otif_vs_original_pct": 99.27797833935018,
+      "otif_vs_latest_promise_pct": 99.27797833935018,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 96.028880866426,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V23",
+      "name": "CIPLA LIMITED",
+      "n_receipts": 174,
+      "otif_vs_original_pct": 86.7816091954023,
+      "otif_vs_latest_promise_pct": 86.7816091954023,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 83.33333333333334,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V24",
+      "name": "MICRO LABS LIMITED",
+      "n_receipts": 35,
+      "otif_vs_original_pct": 100.0,
       "otif_vs_latest_promise_pct": 100.0,
-      "gaming_gap_pts": 54.12844036697248
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V26",
+      "name": "EMCURE PHARMACEUTICALS LTD",
+      "n_receipts": 41,
+      "otif_vs_original_pct": 95.1219512195122,
+      "otif_vs_latest_promise_pct": 95.1219512195122,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 95.1219512195122,
+      "habitual_rescheduler_simulated": false
+    },
+    {
+      "supplier_id": "V27",
+      "name": "PHARMACY DIRECT",
+      "n_receipts": 150,
+      "otif_vs_original_pct": 100.0,
+      "otif_vs_latest_promise_pct": 100.0,
+      "gaming_gap_pts": 0.0,
+      "exact_on_scheduled_date_pct": 100.0,
+      "habitual_rescheduler_simulated": false
     }
   ],
+  "scheduled_evidence": {
+    "n_lines": 4126,
+    "exact_on_scheduled_pct": 88.51187590887058,
+    "on_or_before_scheduled_pct": 93.86815317498788,
+    "late_pct": 6.1318468250121185,
+    "late_by_more_than_7d_pct": 3.6597188560349005,
+    "vendors_exact_over_90pct": 17,
+    "n_vendors": 27
+  },
   "risk": {
     "weights": {
       "single_source": 0.3,
-      "lead_variability": 0.25,
-      "quality": 0.25,
-      "financial": 0.2
+      "lead_variability": 0.3,
+      "late_vs_scheduled": 0.2,
+      "recent_drift": 0.2
     },
     "top": [
       {
-        "supplier_id": "SUP-016",
-        "risk_score": 0.643758796566027,
+        "supplier_id": "V08",
+        "name": "BIO-RAD LABORATORIES (FRANCE)",
+        "risk_score": 0.8631825377451575,
         "contributions": {
-          "single_source": 0.18,
-          "lead_variability": 0.17107067643462645,
-          "quality": 0.178568201176004,
-          "financial": 0.11411991895539647
+          "single_source": 0.3,
+          "lead_variability": 0.2031825377451575,
+          "late_vs_scheduled": 0.16000000000000003,
+          "recent_drift": 0.2
         },
-        "single_sourced_parts": 3,
-        "lead_cv": 0.4105696234431035,
-        "quality_reject_rate": 0.0357136402352008,
-        "financial_score": 0.4294004052230177
+        "parts_mapped": 7,
+        "sole_source_share": 1.0,
+        "lead_cv": 0.6772751258171916,
+        "late_rate": 0.12,
+        "recent_drift": 1.8180192264699306,
+        "n_lines": 25
       },
       {
-        "supplier_id": "SUP-032",
-        "risk_score": 0.5242532543658296,
+        "supplier_id": "V06",
+        "name": "SHANGHAI KEHUA BIOENGINEERING CO.,LTD.  (KHB)",
+        "risk_score": 0.5650174943639925,
         "contributions": {
-          "single_source": 0.12,
-          "lead_variability": 0.24683855766337914,
-          "quality": 0.1248151284884767,
-          "financial": 0.032599568213973695
+          "single_source": 0.3,
+          "lead_variability": 0.2269222562687544,
+          "late_vs_scheduled": 0.0380952380952381,
+          "recent_drift": 0.0
         },
-        "single_sourced_parts": 2,
-        "lead_cv": 0.5924125383921099,
-        "quality_reject_rate": 0.024963025697695342,
-        "financial_score": 0.8370021589301315
+        "parts_mapped": 8,
+        "sole_source_share": 1.0,
+        "lead_cv": 0.7564075208958481,
+        "late_rate": 0.02857142857142857,
+        "recent_drift": 0.5475227502527805,
+        "n_lines": 70
       },
       {
-        "supplier_id": "SUP-046",
-        "risk_score": 0.5193775893965219,
+        "supplier_id": "V10",
+        "name": "Standard Diagnostics, Inc.",
+        "risk_score": 0.543390651036545,
         "contributions": {
-          "single_source": 0.24,
-          "lead_variability": 0.15320361770490729,
-          "quality": 0.08872643309243355,
-          "financial": 0.03744753859918102
+          "single_source": 0.2659090909090909,
+          "lead_variability": 0.21687549952139357,
+          "late_vs_scheduled": 0.06060606060606061,
+          "recent_drift": 0.0
         },
-        "single_sourced_parts": 4,
-        "lead_cv": 0.3676886824917775,
-        "quality_reject_rate": 0.017745286618486712,
-        "financial_score": 0.8127623070040949
+        "parts_mapped": 8,
+        "sole_source_share": 0.8863636363636364,
+        "lead_cv": 0.7229183317379786,
+        "late_rate": 0.045454545454545456,
+        "recent_drift": 1.0,
+        "n_lines": 88
       },
       {
-        "supplier_id": "SUP-033",
-        "risk_score": 0.4979227951632377,
+        "supplier_id": "V03",
+        "name": "S. BUYS WHOLESALER",
+        "risk_score": 0.5322255790533736,
         "contributions": {
-          "single_source": 0.06,
-          "lead_variability": 0.11350911014565794,
-          "quality": 0.25,
-          "financial": 0.07441368501757976
+          "single_source": 0.0,
+          "lead_variability": 0.3,
+          "late_vs_scheduled": 0.032225579053373615,
+          "recent_drift": 0.2
         },
-        "single_sourced_parts": 1,
-        "lead_cv": 0.27242186434957905,
-        "quality_reject_rate": 0.05471401061530286,
-        "financial_score": 0.6279315749121012
+        "parts_mapped": 8,
+        "sole_source_share": 0.0,
+        "lead_cv": 1.1840844728063815,
+        "late_rate": 0.02416918429003021,
+        "recent_drift": 2.698190920468768,
+        "n_lines": 331
       },
       {
-        "supplier_id": "SUP-019",
-        "risk_score": 0.48588827137789686,
+        "supplier_id": "V02",
+        "name": "Premier Medical Corporation Ltd.",
+        "risk_score": 0.4511201561251893,
         "contributions": {
-          "single_source": 0.06,
-          "lead_variability": 0.12298588351103958,
-          "quality": 0.25,
-          "financial": 0.05290238786685728
+          "single_source": 0.3,
+          "lead_variability": 0.15112015612518928,
+          "late_vs_scheduled": 0.0,
+          "recent_drift": 0.0
         },
-        "single_sourced_parts": 1,
-        "lead_cv": 0.295166120426495,
-        "quality_reject_rate": 0.07357875253311981,
-        "financial_score": 0.7354880606657136
+        "parts_mapped": 8,
+        "sole_source_share": 1.0,
+        "lead_cv": 0.503733853750631,
+        "late_rate": 0.0,
+        "recent_drift": 1.0,
+        "n_lines": 11
       },
       {
-        "supplier_id": "SUP-014",
-        "risk_score": 0.4834956958431067,
+        "supplier_id": "V14",
+        "name": "Orgenics, Ltd",
+        "risk_score": 0.4202610542599393,
         "contributions": {
-          "single_source": 0.12,
-          "lead_variability": 0.16063083168283634,
-          "quality": 0.1581810447999904,
-          "financial": 0.044683819360279965
+          "single_source": 0.03253012048192771,
+          "lead_variability": 0.16808838732144296,
+          "late_vs_scheduled": 0.1749219098616689,
+          "recent_drift": 0.044720636594899776
         },
-        "single_sourced_parts": 2,
-        "lead_cv": 0.3855139960388072,
-        "quality_reject_rate": 0.03163620895999808,
-        "financial_score": 0.7765809031986002
+        "parts_mapped": 8,
+        "sole_source_share": 0.10843373493975904,
+        "lead_cv": 0.5602946244048099,
+        "late_rate": 0.13119143239625167,
+        "recent_drift": 1.1118015914872494,
+        "n_lines": 747
       },
       {
-        "supplier_id": "SUP-011",
-        "risk_score": 0.46667536978863383,
+        "supplier_id": "V04",
+        "name": "Orasure Technologies Inc.",
+        "risk_score": 0.3918578845389385,
         "contributions": {
-          "single_source": 0.24,
-          "lead_variability": 0.15677666197578083,
-          "quality": 0.03453747698215186,
-          "financial": 0.03536123083070113
+          "single_source": 0.078,
+          "lead_variability": 0.2728492852093947,
+          "late_vs_scheduled": 0.02666666666666667,
+          "recent_drift": 0.014341932662877088
         },
-        "single_sourced_parts": 4,
-        "lead_cv": 0.37626398874187394,
-        "quality_reject_rate": 0.006907495396430372,
-        "financial_score": 0.8231938458464944
+        "parts_mapped": 7,
+        "sole_source_share": 0.26,
+        "lead_cv": 0.9094976173646491,
+        "late_rate": 0.02,
+        "recent_drift": 1.0358548316571927,
+        "n_lines": 50
       },
       {
-        "supplier_id": "SUP-035",
-        "risk_score": 0.4665538307163574,
+        "supplier_id": "V19",
+        "name": "Aurobindo Pharma Limited",
+        "risk_score": 0.3614138054842714,
         "contributions": {
-          "single_source": 0.24,
-          "lead_variability": 0.11813108353123783,
-          "quality": 0.027973180885365448,
-          "financial": 0.08044956629975414
+          "single_source": 0.0009345794392523364,
+          "lead_variability": 0.16525596540119764,
+          "late_vs_scheduled": 0.1952232606438214,
+          "recent_drift": 0.0
         },
-        "single_sourced_parts": 4,
-        "lead_cv": 0.2835146004749708,
-        "quality_reject_rate": 0.00559463617707309,
-        "financial_score": 0.5977521685012294
+        "parts_mapped": 8,
+        "sole_source_share": 0.003115264797507788,
+        "lead_cv": 0.5508532180039921,
+        "late_rate": 0.14641744548286603,
+        "recent_drift": 0.7818885275069861,
+        "n_lines": 642
       },
       {
-        "supplier_id": "SUP-004",
-        "risk_score": 0.46527631261336755,
+        "supplier_id": "V23",
+        "name": "CIPLA LIMITED",
+        "risk_score": 0.329484296635847,
         "contributions": {
-          "single_source": 0.18,
-          "lead_variability": 0.16128645118460144,
-          "quality": 0.020207158376857926,
-          "financial": 0.1037827030519082
+          "single_source": 0.0,
+          "lead_variability": 0.15323908590787758,
+          "late_vs_scheduled": 0.1762452107279694,
+          "recent_drift": 0.0
         },
-        "single_sourced_parts": 3,
-        "lead_cv": 0.38708748284304345,
-        "quality_reject_rate": 0.004041431675371586,
-        "financial_score": 0.48108648474045906
+        "parts_mapped": 8,
+        "sole_source_share": 0.0,
+        "lead_cv": 0.5107969530262586,
+        "late_rate": 0.13218390804597702,
+        "recent_drift": 0.7099991824053634,
+        "n_lines": 174
       },
       {
-        "supplier_id": "SUP-045",
-        "risk_score": 0.4483770675986964,
+        "supplier_id": "V09",
+        "name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
+        "risk_score": 0.3225525350222341,
         "contributions": {
-          "single_source": 0.12,
-          "lead_variability": 0.06319142937715852,
-          "quality": 0.201089104915062,
-          "financial": 0.0640965333064759
+          "single_source": 0.047663551401869154,
+          "lead_variability": 0.22231248431489362,
+          "late_vs_scheduled": 0.012461059190031154,
+          "recent_drift": 0.04011544011544013
         },
-        "single_sourced_parts": 2,
-        "lead_cv": 0.15165943050518044,
-        "quality_reject_rate": 0.0402178209830124,
-        "financial_score": 0.6795173334676206
+        "parts_mapped": 8,
+        "sole_source_share": 0.1588785046728972,
+        "lead_cv": 0.7410416143829788,
+        "late_rate": 0.009345794392523364,
+        "recent_drift": 1.1002886002886003,
+        "n_lines": 107
       }
     ]
   },
   "deterministic": {
     "built": {
-      "PRD-A": [
-        69.0,
-        56.0,
-        43.0,
+      "Manuf_0032": [
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        59.0,
         0.0,
-        2.0,
-        61.0,
-        48.0,
-        10.0,
+        450.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0033": [
+        2268.0,
+        2268.0,
+        2268.0,
+        1579.0,
+        50.0,
+        724.0,
+        1916.0,
+        396.0,
+        1770.0,
+        1333.0,
+        1067.0,
+        855.0,
+        684.0
+      ],
+      "Manuf_0034": [
+        1960.0,
+        1960.0,
+        1960.0,
+        1365.0,
+        43.0,
+        625.0,
+        1205.0,
+        27.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0035": [
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        136.0,
+        130.0,
+        84.0,
+        1.0,
         0.0,
         0.0,
         0.0,
         0.0,
         0.0
       ],
-      "PRD-B": [
+      "Manuf_0036": [
+        98.0,
+        98.0,
+        98.0,
+        68.0,
+        2.0,
+        92.0,
+        60.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0037": [
+        147.0,
+        147.0,
+        147.0,
+        39.0,
+        3.0,
+        139.0,
+        90.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0038": [
+        1053.0,
+        1053.0,
+        1053.0,
+        733.0,
+        23.0,
+        336.0,
+        647.0,
+        14.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0039": [
+        95.0,
+        95.0,
+        95.0,
+        29.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0040": [
+        4144.0,
+        4144.0,
+        4144.0,
+        2886.0,
+        92.0,
+        1323.0,
+        2549.0,
+        58.0,
+        4.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0041": [
+        210.0,
+        210.0,
+        210.0,
+        112.0,
+        0.0,
+        0.0,
+        129.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0042": [
+        385.0,
+        385.0,
+        385.0,
+        206.0,
+        0.0,
+        0.0,
+        236.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0043": [
+        189.0,
+        189.0,
+        189.0,
+        131.0,
+        4.0,
+        178.0,
+        53.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0044": [
+        159.0,
+        159.0,
+        159.0,
+        110.0,
+        3.0,
+        150.0,
+        97.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0045": [
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        81.0,
+        77.0,
+        50.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Manuf_0046": [
+        85.0,
+        85.0,
+        85.0,
+        45.0,
+        0.0,
+        0.0,
         52.0,
-        57.0,
-        10.0,
+        1.0,
         0.0,
         0.0,
         0.0,
         0.0,
-        36.0,
+        0.0
+      ],
+      "Manuf_0047": [
+        182.0,
+        182.0,
+        182.0,
+        97.0,
+        0.0,
+        0.0,
+        182.0,
+        152.0,
+        142.0,
+        107.0,
+        85.0,
+        68.0,
+        54.0
+      ],
+      "Manuf_0048": [
+        448.0,
+        448.0,
+        448.0,
+        239.0,
+        0.0,
+        0.0,
+        275.0,
         6.0,
         0.0,
         0.0,
-        0.0,
-        0.0
-      ],
-      "PRD-C": [
-        65.0,
-        26.0,
-        33.0,
-        1.0,
-        1.0,
-        20.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "PRD-D": [
-        37.0,
-        40.0,
-        23.0,
-        2.0,
-        1.0,
-        26.0,
-        22.0,
-        30.0,
-        0.0,
-        5.0,
         0.0,
         0.0,
         0.0
       ]
     },
     "demand": {
-      "PRD-A": [
-        69.0,
-        56.0,
-        56.0,
-        59.0,
-        61.0,
-        61.0,
-        48.0,
-        54.0,
-        52.0,
-        45.0,
-        61.0,
-        62.0,
-        51.0
+      "Manuf_0032": [
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0,
+        644.0
       ],
-      "PRD-B": [
-        52.0,
-        57.0,
-        40.0,
-        33.0,
-        64.0,
-        64.0,
-        21.0,
-        36.0,
-        69.0,
-        49.0,
-        37.0,
-        25.0,
-        61.0
+      "Manuf_0033": [
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0,
+        2268.0
       ],
-      "PRD-C": [
-        65.0,
-        26.0,
-        40.0,
-        21.0,
-        38.0,
-        58.0,
-        45.0,
-        39.0,
-        69.0,
-        22.0,
-        61.0,
-        66.0,
-        41.0
+      "Manuf_0034": [
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0,
+        1960.0
       ],
-      "PRD-D": [
-        37.0,
-        40.0,
-        28.0,
-        34.0,
-        40.0,
-        26.0,
-        22.0,
-        50.0,
-        32.0,
-        52.0,
-        26.0,
-        41.0,
-        55.0
+      "Manuf_0035": [
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0,
+        138.0
+      ],
+      "Manuf_0036": [
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0,
+        98.0
+      ],
+      "Manuf_0037": [
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0,
+        147.0
+      ],
+      "Manuf_0038": [
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0,
+        1053.0
+      ],
+      "Manuf_0039": [
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0,
+        95.0
+      ],
+      "Manuf_0040": [
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0,
+        4144.0
+      ],
+      "Manuf_0041": [
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0,
+        210.0
+      ],
+      "Manuf_0042": [
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0,
+        385.0
+      ],
+      "Manuf_0043": [
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0,
+        189.0
+      ],
+      "Manuf_0044": [
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0,
+        159.0
+      ],
+      "Manuf_0045": [
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0,
+        82.0
+      ],
+      "Manuf_0046": [
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0,
+        85.0
+      ],
+      "Manuf_0047": [
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0,
+        182.0
+      ],
+      "Manuf_0048": [
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0,
+        448.0
       ]
     },
-    "gating_events": 39
+    "gating_events": 164
   },
   "monte_carlo": {
     "fan": {
-      "PRD-A": {
+      "Manuf_0032": {
         "p10": [
-          69.0,
-          56.0,
-          41.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        ],
-        "p50": [
-          69.0,
-          56.0,
-          43.0,
-          0.0,
-          0.0,
-          16.0,
-          21.0,
-          12.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
-        ],
-        "p90": [
-          69.0,
-          56.0,
-          43.0,
-          3.2000000000000455,
-          61.0,
-          61.0,
-          48.0,
-          54.0,
-          52.0,
-          17.0,
-          1.0,
-          0.0,
-          0.0
-        ],
-        "demand": [
-          69.0,
-          56.0,
-          56.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
           59.0,
-          61.0,
-          61.0,
-          48.0,
-          54.0,
-          52.0,
-          45.0,
-          61.0,
-          62.0,
-          51.0
-        ]
-      },
-      "PRD-B": {
-        "p10": [
-          52.0,
-          57.0,
-          10.0,
           0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
+          450.0,
           0.0,
           0.0,
           0.0,
           0.0
         ],
         "p50": [
-          52.0,
-          57.0,
-          10.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          59.0,
           0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
+          450.0,
           0.0,
           0.0,
           0.0,
           0.0
         ],
         "p90": [
-          52.0,
-          57.0,
-          10.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          59.0,
           0.0,
-          42.0,
-          42.0,
-          21.0,
-          36.0,
-          32.30000000000007,
+          450.0,
           0.0,
           0.0,
           0.0,
           0.0
         ],
         "demand": [
-          52.0,
-          57.0,
-          40.0,
-          33.0,
-          64.0,
-          64.0,
-          21.0,
-          36.0,
-          69.0,
-          49.0,
-          37.0,
-          25.0,
-          61.0
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0,
+          644.0
         ]
       },
-      "PRD-C": {
+      "Manuf_0033": {
         "p10": [
-          65.0,
-          26.0,
-          33.0,
-          1.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
+          2268.0,
+          2268.0,
+          2268.0,
+          1579.0,
+          50.0,
+          4.0,
+          1916.0,
+          395.0,
+          1770.0,
+          1333.0,
+          1067.0,
+          855.0,
+          684.0
         ],
         "p50": [
-          65.0,
-          26.0,
-          33.0,
-          1.0,
-          1.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0,
-          0.0
+          2268.0,
+          2268.0,
+          2268.0,
+          1579.0,
+          50.0,
+          724.0,
+          1916.0,
+          396.0,
+          1771.0,
+          1333.0,
+          1067.0,
+          855.0,
+          684.0
         ],
         "p90": [
-          65.0,
-          26.0,
-          40.0,
-          21.0,
-          21.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          1579.0,
+          50.0,
+          724.0,
+          2268.0,
+          501.0,
+          1818.0,
+          1372.0,
+          1098.0,
+          879.0,
+          704.0
+        ],
+        "demand": [
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0,
+          2268.0
+        ]
+      },
+      "Manuf_0034": {
+        "p10": [
+          1960.0,
+          1960.0,
+          1960.0,
+          1365.0,
+          43.0,
+          4.0,
+          1205.0,
           20.0,
+          1.0,
           0.0,
           0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          1960.0,
+          1960.0,
+          1960.0,
+          1365.0,
+          43.0,
+          625.0,
+          1206.0,
+          27.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          1960.0,
+          1960.0,
+          1960.0,
+          1365.0,
+          43.0,
+          625.0,
+          1808.0,
+          27.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0,
+          1960.0
+        ]
+      },
+      "Manuf_0035": {
+        "p10": [
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          136.0,
+          130.0,
+          84.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          136.0,
+          130.0,
+          84.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          136.0,
+          130.0,
+          127.0,
+          1.0,
           0.0,
           0.0,
           0.0,
@@ -740,28 +2158,214 @@
           0.0
         ],
         "demand": [
-          65.0,
-          26.0,
-          40.0,
-          21.0,
-          38.0,
-          58.0,
-          45.0,
-          39.0,
-          69.0,
-          22.0,
-          61.0,
-          66.0,
-          41.0
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0,
+          138.0
         ]
       },
-      "PRD-D": {
+      "Manuf_0036": {
         "p10": [
-          37.0,
-          40.0,
+          98.0,
+          98.0,
+          98.0,
+          68.0,
+          2.0,
+          0.0,
+          60.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          98.0,
+          98.0,
+          98.0,
+          68.0,
+          2.0,
+          92.0,
+          60.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          98.0,
+          98.0,
+          98.0,
+          68.0,
+          2.0,
+          92.0,
+          90.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0,
+          98.0
+        ]
+      },
+      "Manuf_0037": {
+        "p10": [
+          147.0,
+          147.0,
+          147.0,
+          39.0,
+          0.0,
+          0.0,
+          90.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          147.0,
+          147.0,
+          147.0,
+          39.0,
+          3.0,
+          139.0,
+          90.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          147.0,
+          147.0,
+          147.0,
+          39.0,
+          3.0,
+          139.0,
+          135.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0,
+          147.0
+        ]
+      },
+      "Manuf_0038": {
+        "p10": [
+          1053.0,
+          1053.0,
+          1053.0,
+          733.0,
           23.0,
           2.0,
+          647.0,
+          10.0,
           1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          1053.0,
+          1053.0,
+          1053.0,
+          733.0,
+          23.0,
+          336.0,
+          648.0,
+          14.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          1053.0,
+          1053.0,
+          1053.0,
+          733.0,
+          23.0,
+          336.0,
+          971.0,
+          14.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0,
+          1053.0
+        ]
+      },
+      "Manuf_0039": {
+        "p10": [
+          95.0,
+          95.0,
+          95.0,
+          29.0,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -772,13 +2376,571 @@
           0.0
         ],
         "p50": [
-          37.0,
-          40.0,
-          23.0,
+          95.0,
+          95.0,
+          95.0,
+          29.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          95.0,
+          95.0,
+          95.0,
+          29.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0,
+          95.0
+        ]
+      },
+      "Manuf_0040": {
+        "p10": [
+          4144.0,
+          4144.0,
+          4144.0,
+          2886.0,
+          92.0,
+          9.0,
+          2549.0,
+          42.0,
+          4.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          4144.0,
+          4144.0,
+          4144.0,
+          2886.0,
+          92.0,
+          1323.0,
+          2550.0,
+          58.0,
+          4.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          4144.0,
+          4144.0,
+          4144.0,
+          2886.0,
+          92.0,
+          1323.0,
+          3824.0,
+          58.0,
+          4.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0,
+          4144.0
+        ]
+      },
+      "Manuf_0041": {
+        "p10": [
+          210.0,
+          210.0,
+          210.0,
+          112.0,
+          0.0,
+          0.0,
+          129.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          210.0,
+          210.0,
+          210.0,
+          112.0,
+          0.0,
+          0.0,
+          129.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          210.0,
+          210.0,
+          210.0,
+          112.0,
+          0.0,
+          0.0,
+          193.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0,
+          210.0
+        ]
+      },
+      "Manuf_0042": {
+        "p10": [
+          385.0,
+          385.0,
+          385.0,
+          206.0,
+          0.0,
+          0.0,
+          236.0,
           3.0,
-          21.0,
-          13.0,
-          8.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          385.0,
+          385.0,
+          385.0,
+          206.0,
+          0.0,
+          0.0,
+          236.0,
+          5.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          385.0,
+          385.0,
+          385.0,
+          206.0,
+          0.0,
+          0.0,
+          355.0,
+          5.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0,
+          385.0
+        ]
+      },
+      "Manuf_0043": {
+        "p10": [
+          189.0,
+          189.0,
+          189.0,
+          131.0,
+          4.0,
+          0.0,
+          52.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          189.0,
+          189.0,
+          189.0,
+          131.0,
+          4.0,
+          178.0,
+          53.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          189.0,
+          189.0,
+          189.0,
+          131.0,
+          4.0,
+          179.0,
+          174.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0,
+          189.0
+        ]
+      },
+      "Manuf_0044": {
+        "p10": [
+          159.0,
+          159.0,
+          159.0,
+          110.0,
+          3.0,
+          0.0,
+          97.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          159.0,
+          159.0,
+          159.0,
+          110.0,
+          3.0,
+          150.0,
+          97.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          159.0,
+          159.0,
+          159.0,
+          110.0,
+          3.0,
+          150.0,
+          146.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0,
+          159.0
+        ]
+      },
+      "Manuf_0045": {
+        "p10": [
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          81.0,
+          77.0,
+          50.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          81.0,
+          77.0,
+          50.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          81.0,
+          77.0,
+          75.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0,
+          82.0
+        ]
+      },
+      "Manuf_0046": {
+        "p10": [
+          85.0,
+          85.0,
+          85.0,
+          45.0,
+          0.0,
+          0.0,
+          52.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          85.0,
+          85.0,
+          85.0,
+          45.0,
+          0.0,
+          0.0,
+          52.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p90": [
+          85.0,
+          85.0,
+          85.0,
+          45.0,
+          0.0,
+          0.0,
+          78.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "demand": [
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0,
+          85.0
+        ]
+      },
+      "Manuf_0047": {
+        "p10": [
+          182.0,
+          182.0,
+          182.0,
+          97.0,
+          0.0,
+          0.0,
+          182.0,
+          152.0,
+          142.0,
+          107.0,
+          85.0,
+          68.0,
+          54.0
+        ],
+        "p50": [
+          182.0,
+          182.0,
+          182.0,
+          97.0,
+          0.0,
+          0.0,
+          182.0,
+          152.0,
+          142.0,
+          107.0,
+          85.0,
+          68.0,
+          54.0
+        ],
+        "p90": [
+          182.0,
+          182.0,
+          182.0,
+          97.0,
+          0.0,
+          0.0,
+          182.0,
+          156.0,
+          145.0,
+          110.0,
+          88.0,
+          70.0,
+          56.0
+        ],
+        "demand": [
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0,
+          182.0
+        ]
+      },
+      "Manuf_0048": {
+        "p10": [
+          448.0,
+          448.0,
+          448.0,
+          239.0,
+          0.0,
+          0.0,
+          275.0,
+          4.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "p50": [
+          448.0,
+          448.0,
+          448.0,
+          239.0,
+          0.0,
+          0.0,
+          275.0,
           6.0,
           0.0,
           0.0,
@@ -787,34 +2949,34 @@
           0.0
         ],
         "p90": [
-          37.0,
-          40.0,
-          28.0,
-          34.0,
-          40.0,
-          26.0,
-          22.0,
-          34.10000000000002,
-          25.0,
+          448.0,
+          448.0,
+          448.0,
+          239.0,
+          0.0,
+          0.0,
+          413.0,
           6.0,
-          5.0,
-          5.0,
-          4.0
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
         ],
         "demand": [
-          37.0,
-          40.0,
-          28.0,
-          34.0,
-          40.0,
-          26.0,
-          22.0,
-          50.0,
-          32.0,
-          52.0,
-          26.0,
-          41.0,
-          55.0
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0,
+          448.0
         ]
       }
     },
@@ -822,309 +2984,572 @@
     "allocation": "even",
     "top_gating_parts": [
       {
-        "part": "PRT-0146",
-        "times_gating": 2654
+        "part": "Part_0038",
+        "times_gating": 21100
       },
       {
-        "part": "PRT-0100",
-        "times_gating": 1895
+        "part": "Part_0172",
+        "times_gating": 3125
       },
       {
-        "part": "PRT-0008",
-        "times_gating": 1676
+        "part": "Part_0027",
+        "times_gating": 3000
       },
       {
-        "part": "PRT-0109",
-        "times_gating": 1227
+        "part": "Part_0152",
+        "times_gating": 1640
       },
       {
-        "part": "PRT-0177",
-        "times_gating": 1056
+        "part": "Part_0029",
+        "times_gating": 1493
       },
       {
-        "part": "PRT-0200",
-        "times_gating": 978
+        "part": "Part_0121",
+        "times_gating": 1358
       },
       {
-        "part": "PRT-0062",
-        "times_gating": 642
+        "part": "Part_0098",
+        "times_gating": 920
       },
       {
-        "part": "PRT-S021",
-        "times_gating": 573
+        "part": "Part_0077",
+        "times_gating": 607
       },
       {
-        "part": "PRT-0027",
-        "times_gating": 174
+        "part": "Part_0198",
+        "times_gating": 545
       },
       {
-        "part": "PRT-0192",
-        "times_gating": 159
-      },
-      {
-        "part": "PRT-0061",
-        "times_gating": 134
-      },
-      {
-        "part": "PRT-S025",
-        "times_gating": 82
-      },
-      {
-        "part": "PRT-0227",
-        "times_gating": 21
-      },
-      {
-        "part": "PRT-0190",
-        "times_gating": 10
-      },
-      {
-        "part": "PRT-0187",
-        "times_gating": 4
+        "part": "Part_0092",
+        "times_gating": 300
       }
     ]
   },
   "drivers": [
     {
-      "part": "PRT-0146",
-      "supplier": "SUP-038",
+      "part": "Part_0038",
+      "supplier": "V09",
+      "supplier_name": "CHEMBIO DIAGNOSTIC SYSTEMS, INC.",
       "single_sourced": false,
-      "times_gating_in_sim": 2654,
-      "first_impact_week": 6,
-      "lead_mean_days": 42.9292184131546,
-      "lead_p95_days": 52.445255263913005,
-      "order_by_day": -10.445255263913005,
-      "runway_days": -10.445255263913005,
-      "already_too_late": true,
-      "on_hand": 2634.0,
-      "unit_cost": 17.542554550132113
-    },
-    {
-      "part": "PRT-0100",
-      "supplier": "SUP-038",
-      "single_sourced": false,
-      "times_gating_in_sim": 1895,
-      "first_impact_week": 9,
-      "lead_mean_days": 42.9292184131546,
-      "lead_p95_days": 52.445255263913005,
-      "order_by_day": 10.554744736086995,
-      "runway_days": 10.554744736086995,
-      "already_too_late": false,
-      "on_hand": 2416.0,
-      "unit_cost": 1.7133777479417467
-    },
-    {
-      "part": "PRT-0008",
-      "supplier": "SUP-034",
-      "single_sourced": false,
-      "times_gating_in_sim": 1676,
+      "times_gating_in_sim": 21100,
       "first_impact_week": 8,
-      "lead_mean_days": 36.88797395489122,
-      "lead_p95_days": 50.718402817621765,
-      "order_by_day": 5.281597182378235,
-      "runway_days": 5.281597182378235,
+      "lead_mean_days": 6.75,
+      "lead_p95_days": 10.0,
+      "lead_has_distribution": true,
+      "order_by_day": 39.0,
+      "runway_days": 39.0,
       "already_too_late": false,
-      "on_hand": 1445.0,
-      "unit_cost": 2.86672494261427
+      "on_hand": 42855.0,
+      "unit_cost": 1.0,
+      "n_products_using": 14
     },
     {
-      "part": "PRT-0109",
-      "supplier": "SUP-043",
+      "part": "Part_0172",
+      "supplier": "V16",
+      "supplier_name": "LAWRENCE LABORATORIES (SUBSIDIARY OF BRISTOL MYERS SQUIBB)",
       "single_sourced": false,
-      "times_gating_in_sim": 1227,
-      "first_impact_week": 3,
-      "lead_mean_days": 60.55642964974743,
-      "lead_p95_days": 83.66560610908455,
-      "order_by_day": -62.66560610908455,
-      "runway_days": -62.66560610908455,
-      "already_too_late": true,
-      "on_hand": 358.0,
-      "unit_cost": 18.597411848540506
-    },
-    {
-      "part": "PRT-0177",
-      "supplier": "SUP-016",
-      "single_sourced": true,
-      "times_gating_in_sim": 1056,
-      "first_impact_week": 8,
-      "lead_mean_days": 45.95880046648969,
-      "lead_p95_days": 67.26786866526709,
-      "order_by_day": -11.267868665267088,
-      "runway_days": -11.267868665267088,
-      "already_too_late": true,
-      "on_hand": 1868.0,
-      "unit_cost": 34.200584143771906
-    },
-    {
-      "part": "PRT-0200",
-      "supplier": "SUP-032",
-      "single_sourced": false,
-      "times_gating_in_sim": 978,
-      "first_impact_week": 10,
-      "lead_mean_days": 26.52104756902098,
-      "lead_p95_days": 45.93438624148837,
-      "order_by_day": 24.06561375851163,
-      "runway_days": 24.06561375851163,
+      "times_gating_in_sim": 3125,
+      "first_impact_week": 5,
+      "lead_mean_days": 10.374,
+      "lead_p95_days": 15.0,
+      "lead_has_distribution": true,
+      "order_by_day": 13.0,
+      "runway_days": 13.0,
       "already_too_late": false,
-      "on_hand": 372.0,
-      "unit_cost": 1.3781962827751462
+      "on_hand": 4631.0,
+      "unit_cost": 0.17,
+      "n_products_using": 5
     },
     {
-      "part": "PRT-0062",
-      "supplier": "SUP-031",
+      "part": "Part_0027",
+      "supplier": "V01",
+      "supplier_name": "REINBOLD EXPORT IMPORT",
       "single_sourced": false,
-      "times_gating_in_sim": 642,
-      "first_impact_week": 3,
-      "lead_mean_days": 68.88843193117695,
-      "lead_p95_days": 89.0008605597262,
-      "order_by_day": -68.0008605597262,
-      "runway_days": -68.0008605597262,
-      "already_too_late": true,
-      "on_hand": 337.0,
-      "unit_cost": 2.1510172555110834
-    },
-    {
-      "part": "PRT-S021",
-      "supplier": "SUP-049",
-      "single_sourced": false,
-      "times_gating_in_sim": 573,
+      "times_gating_in_sim": 3000,
       "first_impact_week": 4,
-      "lead_mean_days": 45.19096321854669,
-      "lead_p95_days": 64.28370366378402,
-      "order_by_day": -36.283703663784024,
-      "runway_days": -36.283703663784024,
-      "already_too_late": true,
-      "on_hand": 5004.0,
-      "unit_cost": 1.4018498291048038
-    },
-    {
-      "part": "PRT-0027",
-      "supplier": "SUP-030",
-      "single_sourced": false,
-      "times_gating_in_sim": 174,
-      "first_impact_week": null,
-      "lead_mean_days": 59.88335763494412,
-      "lead_p95_days": 92.65124907972427,
-      "order_by_day": -1.6512490797242663,
-      "runway_days": -1.6512490797242663,
-      "already_too_late": true,
-      "on_hand": 667.0,
-      "unit_cost": 7.042214262457291
-    },
-    {
-      "part": "PRT-0192",
-      "supplier": "SUP-050",
-      "single_sourced": false,
-      "times_gating_in_sim": 159,
-      "first_impact_week": null,
-      "lead_mean_days": 23.002333655130368,
-      "lead_p95_days": 36.906596799825074,
-      "order_by_day": 54.093403200174926,
-      "runway_days": 54.093403200174926,
+      "lead_mean_days": 4.0,
+      "lead_p95_days": 4.0,
+      "lead_has_distribution": false,
+      "order_by_day": 17.0,
+      "runway_days": 17.0,
       "already_too_late": false,
-      "on_hand": 344.0,
-      "unit_cost": 0.7188039338516776
+      "on_hand": 314.0,
+      "unit_cost": 0.56,
+      "n_products_using": 1
+    },
+    {
+      "part": "Part_0152",
+      "supplier": "V07",
+      "supplier_name": "IDA FOUNDATION",
+      "single_sourced": false,
+      "times_gating_in_sim": 1640,
+      "first_impact_week": 5,
+      "lead_mean_days": 6.1225000000000005,
+      "lead_p95_days": 10.0,
+      "lead_has_distribution": true,
+      "order_by_day": 18.0,
+      "runway_days": 18.0,
+      "already_too_late": false,
+      "on_hand": 40569.0,
+      "unit_cost": 0.25,
+      "n_products_using": 13
+    },
+    {
+      "part": "Part_0029",
+      "supplier": "V25",
+      "supplier_name": "GLAXOSMITHKLINE EXPORT LIMITED",
+      "single_sourced": false,
+      "times_gating_in_sim": 1493,
+      "first_impact_week": 9,
+      "lead_mean_days": 15.416666666666664,
+      "lead_p95_days": 20.0,
+      "lead_has_distribution": true,
+      "order_by_day": 36.0,
+      "runway_days": 36.0,
+      "already_too_late": false,
+      "on_hand": 8747.0,
+      "unit_cost": 0.01,
+      "n_products_using": 1
+    },
+    {
+      "part": "Part_0121",
+      "supplier": "V14",
+      "supplier_name": "Orgenics, Ltd",
+      "single_sourced": false,
+      "times_gating_in_sim": 1358,
+      "first_impact_week": 4,
+      "lead_mean_days": 9.0,
+      "lead_p95_days": 9.0,
+      "lead_has_distribution": false,
+      "order_by_day": 12.0,
+      "runway_days": 12.0,
+      "already_too_late": false,
+      "on_hand": 717.0,
+      "unit_cost": 0.08,
+      "n_products_using": 1
+    },
+    {
+      "part": "Part_0098",
+      "supplier": "V23",
+      "supplier_name": "CIPLA LIMITED",
+      "single_sourced": false,
+      "times_gating_in_sim": 920,
+      "first_impact_week": 4,
+      "lead_mean_days": 11.92,
+      "lead_p95_days": 15.0,
+      "lead_has_distribution": true,
+      "order_by_day": 6.0,
+      "runway_days": 6.0,
+      "already_too_late": false,
+      "on_hand": 480.0,
+      "unit_cost": 0.56,
+      "n_products_using": 1
+    },
+    {
+      "part": "Part_0077",
+      "supplier": "V14",
+      "supplier_name": "Orgenics, Ltd",
+      "single_sourced": false,
+      "times_gating_in_sim": 607,
+      "first_impact_week": 7,
+      "lead_mean_days": 9.0,
+      "lead_p95_days": 9.0,
+      "lead_has_distribution": false,
+      "order_by_day": 33.0,
+      "runway_days": 33.0,
+      "already_too_late": false,
+      "on_hand": 3923.0,
+      "unit_cost": 0.01,
+      "n_products_using": 1
+    },
+    {
+      "part": "Part_0198",
+      "supplier": "V13",
+      "supplier_name": "BRISTOL-MYERS SQUIBB",
+      "single_sourced": false,
+      "times_gating_in_sim": 545,
+      "first_impact_week": 6,
+      "lead_mean_days": 8.0,
+      "lead_p95_days": 8.0,
+      "lead_has_distribution": false,
+      "order_by_day": 27.0,
+      "runway_days": 27.0,
+      "already_too_late": false,
+      "on_hand": 38056.0,
+      "unit_cost": 0.04,
+      "n_products_using": 4
+    },
+    {
+      "part": "Part_0092",
+      "supplier": "V15",
+      "supplier_name": "Hoffmann-La Roche ltd Basel",
+      "single_sourced": false,
+      "times_gating_in_sim": 300,
+      "first_impact_week": 8,
+      "lead_mean_days": 10.0,
+      "lead_p95_days": 10.0,
+      "lead_has_distribution": false,
+      "order_by_day": 39.0,
+      "runway_days": 39.0,
+      "already_too_late": false,
+      "on_hand": 883.0,
+      "unit_cost": 0.12,
+      "n_products_using": 1
     }
   ],
   "allocation": [
     {
       "policy": "even",
       "per_product": {
-        "PRD-A": {
-          "p50_total": 225.0,
-          "demand_total": 735.0,
-          "fill_rate_pct": 30.612244897959183
+        "Manuf_0032": {
+          "p50_total": 4373.0,
+          "demand_total": 8372.0,
+          "fill_rate_pct": 52.233635929288106
         },
-        "PRD-B": {
-          "p50_total": 119.0,
-          "demand_total": 608.0,
-          "fill_rate_pct": 19.57236842105263
+        "Manuf_0033": {
+          "p50_total": 17179.0,
+          "demand_total": 29484.0,
+          "fill_rate_pct": 58.2654999321666
         },
-        "PRD-C": {
-          "p50_total": 126.0,
-          "demand_total": 591.0,
-          "fill_rate_pct": 21.31979695431472
+        "Manuf_0034": {
+          "p50_total": 9147.0,
+          "demand_total": 25480.0,
+          "fill_rate_pct": 35.89874411302983
         },
-        "PRD-D": {
-          "p50_total": 150.0,
-          "demand_total": 483.0,
-          "fill_rate_pct": 31.055900621118013
+        "Manuf_0035": {
+          "p50_total": 903.0,
+          "demand_total": 1794.0,
+          "fill_rate_pct": 50.33444816053512
+        },
+        "Manuf_0036": {
+          "p50_total": 517.0,
+          "demand_total": 1274.0,
+          "fill_rate_pct": 40.58084772370486
+        },
+        "Manuf_0037": {
+          "p50_total": 714.0,
+          "demand_total": 1911.0,
+          "fill_rate_pct": 37.362637362637365
+        },
+        "Manuf_0038": {
+          "p50_total": 4914.0,
+          "demand_total": 13689.0,
+          "fill_rate_pct": 35.8974358974359
+        },
+        "Manuf_0039": {
+          "p50_total": 314.0,
+          "demand_total": 1235.0,
+          "fill_rate_pct": 25.425101214574898
+        },
+        "Manuf_0040": {
+          "p50_total": 19346.0,
+          "demand_total": 53872.0,
+          "fill_rate_pct": 35.91104841104841
+        },
+        "Manuf_0041": {
+          "p50_total": 873.0,
+          "demand_total": 2730.0,
+          "fill_rate_pct": 31.978021978021978
+        },
+        "Manuf_0042": {
+          "p50_total": 1602.0,
+          "demand_total": 5005.0,
+          "fill_rate_pct": 32.00799200799201
+        },
+        "Manuf_0043": {
+          "p50_total": 933.0,
+          "demand_total": 2457.0,
+          "fill_rate_pct": 37.97313797313797
+        },
+        "Manuf_0044": {
+          "p50_total": 839.0,
+          "demand_total": 2067.0,
+          "fill_rate_pct": 40.59022738268021
+        },
+        "Manuf_0045": {
+          "p50_total": 537.0,
+          "demand_total": 1066.0,
+          "fill_rate_pct": 50.37523452157598
+        },
+        "Manuf_0046": {
+          "p50_total": 353.0,
+          "demand_total": 1105.0,
+          "fill_rate_pct": 31.945701357466064
+        },
+        "Manuf_0047": {
+          "p50_total": 1433.0,
+          "demand_total": 2366.0,
+          "fill_rate_pct": 60.566356720202876
+        },
+        "Manuf_0048": {
+          "p50_total": 1864.0,
+          "demand_total": 5824.0,
+          "fill_rate_pct": 32.005494505494504
         }
       },
-      "total_p50": 620.0,
-      "worst_product_fill_pct": 19.57236842105263
+      "total_p50": 65841.0,
+      "worst_product_fill_pct": 25.425101214574898,
+      "median_product_fill_pct": 37.362637362637365,
+      "products_below_50pct": 12
     },
     {
       "policy": "margin",
       "per_product": {
-        "PRD-A": {
-          "p50_total": 222.0,
-          "demand_total": 735.0,
-          "fill_rate_pct": 30.20408163265306
+        "Manuf_0032": {
+          "p50_total": 4373.0,
+          "demand_total": 8372.0,
+          "fill_rate_pct": 52.233635929288106
         },
-        "PRD-B": {
-          "p50_total": 119.0,
-          "demand_total": 608.0,
-          "fill_rate_pct": 19.57236842105263
+        "Manuf_0033": {
+          "p50_total": 20125.0,
+          "demand_total": 29484.0,
+          "fill_rate_pct": 68.25735992402659
         },
-        "PRD-C": {
-          "p50_total": 145.0,
-          "demand_total": 591.0,
-          "fill_rate_pct": 24.534686971235196
+        "Manuf_0034": {
+          "p50_total": 11760.0,
+          "demand_total": 25480.0,
+          "fill_rate_pct": 46.15384615384615
         },
-        "PRD-D": {
-          "p50_total": 143.5,
-          "demand_total": 483.0,
-          "fill_rate_pct": 29.71014492753623
+        "Manuf_0035": {
+          "p50_total": 966.0,
+          "demand_total": 1794.0,
+          "fill_rate_pct": 53.84615384615385
+        },
+        "Manuf_0036": {
+          "p50_total": 588.0,
+          "demand_total": 1274.0,
+          "fill_rate_pct": 46.15384615384615
+        },
+        "Manuf_0037": {
+          "p50_total": 763.0,
+          "demand_total": 1911.0,
+          "fill_rate_pct": 39.92673992673993
+        },
+        "Manuf_0038": {
+          "p50_total": 6318.0,
+          "demand_total": 13689.0,
+          "fill_rate_pct": 46.15384615384615
+        },
+        "Manuf_0039": {
+          "p50_total": 314.0,
+          "demand_total": 1235.0,
+          "fill_rate_pct": 25.425101214574898
+        },
+        "Manuf_0040": {
+          "p50_total": 14920.0,
+          "demand_total": 53872.0,
+          "fill_rate_pct": 27.695277695277696
+        },
+        "Manuf_0041": {
+          "p50_total": 1050.0,
+          "demand_total": 2730.0,
+          "fill_rate_pct": 38.46153846153846
+        },
+        "Manuf_0042": {
+          "p50_total": 1925.0,
+          "demand_total": 5005.0,
+          "fill_rate_pct": 38.46153846153846
+        },
+        "Manuf_0043": {
+          "p50_total": 933.0,
+          "demand_total": 2457.0,
+          "fill_rate_pct": 37.97313797313797
+        },
+        "Manuf_0044": {
+          "p50_total": 954.0,
+          "demand_total": 2067.0,
+          "fill_rate_pct": 46.15384615384615
+        },
+        "Manuf_0045": {
+          "p50_total": 574.0,
+          "demand_total": 1066.0,
+          "fill_rate_pct": 53.84615384615385
+        },
+        "Manuf_0046": {
+          "p50_total": 425.0,
+          "demand_total": 1105.0,
+          "fill_rate_pct": 38.46153846153846
+        },
+        "Manuf_0047": {
+          "p50_total": 1456.0,
+          "demand_total": 2366.0,
+          "fill_rate_pct": 61.53846153846154
+        },
+        "Manuf_0048": {
+          "p50_total": 1365.0,
+          "demand_total": 5824.0,
+          "fill_rate_pct": 23.4375
         }
       },
-      "total_p50": 629.5,
-      "worst_product_fill_pct": 19.57236842105263
+      "total_p50": 68809.0,
+      "worst_product_fill_pct": 23.4375,
+      "median_product_fill_pct": 46.15384615384615,
+      "products_below_50pct": 12
     },
     {
       "policy": "contract",
       "per_product": {
-        "PRD-A": {
-          "p50_total": 221.5,
-          "demand_total": 735.0,
-          "fill_rate_pct": 30.13605442176871
+        "Manuf_0032": {
+          "p50_total": 4373.0,
+          "demand_total": 8372.0,
+          "fill_rate_pct": 52.233635929288106
         },
-        "PRD-B": {
-          "p50_total": 119.0,
-          "demand_total": 608.0,
-          "fill_rate_pct": 19.57236842105263
+        "Manuf_0033": {
+          "p50_total": 20307.0,
+          "demand_total": 29484.0,
+          "fill_rate_pct": 68.87464387464388
         },
-        "PRD-C": {
-          "p50_total": 145.0,
-          "demand_total": 591.0,
-          "fill_rate_pct": 24.534686971235196
+        "Manuf_0034": {
+          "p50_total": 9835.0,
+          "demand_total": 25480.0,
+          "fill_rate_pct": 38.5989010989011
         },
-        "PRD-D": {
-          "p50_total": 143.5,
-          "demand_total": 483.0,
-          "fill_rate_pct": 29.71014492753623
+        "Manuf_0035": {
+          "p50_total": 1013.0,
+          "demand_total": 1794.0,
+          "fill_rate_pct": 56.465997770345595
+        },
+        "Manuf_0036": {
+          "p50_total": 686.0,
+          "demand_total": 1274.0,
+          "fill_rate_pct": 53.84615384615385
+        },
+        "Manuf_0037": {
+          "p50_total": 763.0,
+          "demand_total": 1911.0,
+          "fill_rate_pct": 39.92673992673993
+        },
+        "Manuf_0038": {
+          "p50_total": 5265.0,
+          "demand_total": 13689.0,
+          "fill_rate_pct": 38.46153846153846
+        },
+        "Manuf_0039": {
+          "p50_total": 314.0,
+          "demand_total": 1235.0,
+          "fill_rate_pct": 25.425101214574898
+        },
+        "Manuf_0040": {
+          "p50_total": 17311.0,
+          "demand_total": 53872.0,
+          "fill_rate_pct": 32.13357588357589
+        },
+        "Manuf_0041": {
+          "p50_total": 993.0,
+          "demand_total": 2730.0,
+          "fill_rate_pct": 36.37362637362637
+        },
+        "Manuf_0042": {
+          "p50_total": 1540.0,
+          "demand_total": 5005.0,
+          "fill_rate_pct": 30.76923076923077
+        },
+        "Manuf_0043": {
+          "p50_total": 933.0,
+          "demand_total": 2457.0,
+          "fill_rate_pct": 37.97313797313797
+        },
+        "Manuf_0044": {
+          "p50_total": 795.0,
+          "demand_total": 2067.0,
+          "fill_rate_pct": 38.46153846153846
+        },
+        "Manuf_0045": {
+          "p50_total": 574.0,
+          "demand_total": 1066.0,
+          "fill_rate_pct": 53.84615384615385
+        },
+        "Manuf_0046": {
+          "p50_total": 340.0,
+          "demand_total": 1105.0,
+          "fill_rate_pct": 30.76923076923077
+        },
+        "Manuf_0047": {
+          "p50_total": 1274.0,
+          "demand_total": 2366.0,
+          "fill_rate_pct": 53.84615384615385
+        },
+        "Manuf_0048": {
+          "p50_total": 2493.0,
+          "demand_total": 5824.0,
+          "fill_rate_pct": 42.80563186813187
         }
       },
-      "total_p50": 629.0,
-      "worst_product_fill_pct": 19.57236842105263
+      "total_p50": 68809.0,
+      "worst_product_fill_pct": 25.425101214574898,
+      "median_product_fill_pct": 38.5989010989011,
+      "products_below_50pct": 11
     }
   ],
   "calibration": {
-    "PRD-A": {
-      "pct_below_p50": 12.846153846153847,
-      "pct_inside_p10_p90": 97.12820512820512
+    "Manuf_0032": {
+      "pct_below_p50": 0.1794871794871795,
+      "pct_inside_p10_p90": 99.46153846153845
     },
-    "PRD-B": {
+    "Manuf_0033": {
+      "pct_below_p50": 7.9743589743589745,
+      "pct_inside_p10_p90": 98.74358974358974
+    },
+    "Manuf_0034": {
+      "pct_below_p50": 6.205128205128205,
+      "pct_inside_p10_p90": 97.41025641025641
+    },
+    "Manuf_0035": {
       "pct_below_p50": 0.0,
-      "pct_inside_p10_p90": 97.46153846153847
+      "pct_inside_p10_p90": 99.35897435897436
     },
-    "PRD-C": {
-      "pct_below_p50": 2.0,
+    "Manuf_0036": {
+      "pct_below_p50": 1.4102564102564104,
+      "pct_inside_p10_p90": 99.35897435897436
+    },
+    "Manuf_0037": {
+      "pct_below_p50": 6.230769230769231,
+      "pct_inside_p10_p90": 99.35897435897436
+    },
+    "Manuf_0038": {
+      "pct_below_p50": 6.743589743589744,
+      "pct_inside_p10_p90": 97.58974358974359
+    },
+    "Manuf_0039": {
+      "pct_below_p50": 0.0,
+      "pct_inside_p10_p90": 100.0
+    },
+    "Manuf_0040": {
+      "pct_below_p50": 6.743589743589744,
+      "pct_inside_p10_p90": 96.25641025641025
+    },
+    "Manuf_0041": {
+      "pct_below_p50": 0.641025641025641,
+      "pct_inside_p10_p90": 98.61538461538461
+    },
+    "Manuf_0042": {
+      "pct_below_p50": 1.9743589743589745,
+      "pct_inside_p10_p90": 98.15384615384616
+    },
+    "Manuf_0043": {
+      "pct_below_p50": 4.230769230769231,
+      "pct_inside_p10_p90": 99.92307692307692
+    },
+    "Manuf_0044": {
+      "pct_below_p50": 2.7435897435897436,
+      "pct_inside_p10_p90": 99.35897435897436
+    },
+    "Manuf_0045": {
+      "pct_below_p50": 1.3333333333333335,
+      "pct_inside_p10_p90": 99.35897435897436
+    },
+    "Manuf_0046": {
+      "pct_below_p50": 1.9743589743589745,
       "pct_inside_p10_p90": 98.71794871794873
     },
-    "PRD-D": {
-      "pct_below_p50": 17.64102564102564,
-      "pct_inside_p10_p90": 95.53846153846153
+    "Manuf_0047": {
+      "pct_below_p50": 0.8974358974358974,
+      "pct_inside_p10_p90": 97.8974358974359
+    },
+    "Manuf_0048": {
+      "pct_below_p50": 1.9743589743589745,
+      "pct_inside_p10_p90": 98.15384615384616
     }
   },
-  "wall_seconds": 16.409155300003476
+  "wall_seconds": 11.026135399995837
 }

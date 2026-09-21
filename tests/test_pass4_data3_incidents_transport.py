@@ -1,9 +1,7 @@
-"""Pass 4: incidents, the transport, and the reproducibility bug.
+"""Incidents, the transport, and cross-process reproducibility.
 
-The most important test here is the boring one: two builds in two PROCESSES
-agree. That is the bug that made every number in this project irreproducible for
-three passes, and it survived because it is deterministic inside one process --
-so a test that builds twice in one interpreter would have passed throughout.
+The incident tests use hand-made per-part rows (mixed severities over six
+suppliers), so they test the grouping logic rather than one data set's numbers.
 """
 from __future__ import annotations
 
@@ -14,12 +12,13 @@ import sys
 
 import pytest
 
-SRC = pathlib.Path(__file__).resolve().parents[1] / "src"
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
 sys.path.insert(0, str(SRC))
+sys.path.insert(0, str(ROOT / "tests"))
 
 import incidents as IN            # noqa: E402
 import routing as RT              # noqa: E402
-import supply                     # noqa: E402
 import transport as TP            # noqa: E402
 
 
@@ -27,26 +26,26 @@ import transport as TP            # noqa: E402
 # reproducibility
 # ---------------------------------------------------------------------------
 
-def test_the_generator_is_deterministic_across_processes():
-    """`for sub in set(subs)` drove rng calls, and set iteration over strings
-    varies between processes (PEP 456). Same seed, different supply base, every
-    run. An in-process check cannot see it."""
-    prog = (f"import sys; sys.path.insert(0, {str(SRC)!r})\n"
-            "import supply\n"
-            "b = supply.build()\n"
-            "print(sum(c.on_hand for c in b.components.values()), "
-            "len(b.components), len(b.bom))\n")
+def test_the_supply_base_is_deterministic_across_processes():
+    """Python salts string hashing per process (PEP 456), so any random draw
+    driven by set iteration differs between runs while agreeing inside one
+    interpreter. Only a cross-process check can see it."""
+    prog = (f"import sys; sys.path[:0] = [{str(SRC)!r}, {str(ROOT / 'tests')!r}]\n"
+            "from mini_fixture import build_mini\n"
+            "b = build_mini()\n"
+            "print(sum(c.on_hand for c in b.components.values()), len(b.pos), "
+            "sum(d.received_day for d in b.sandbox), b.planted_disruptions)\n")
     outs = {subprocess.run([sys.executable, "-c", prog], capture_output=True,
                            text=True, check=True).stdout.strip()
             for _ in range(3)}
-    assert len(outs) == 1, f"build() differs across processes: {outs}"
+    assert len(outs) == 1, f"build differs across processes: {outs}"
 
 
 def test_no_rng_is_driven_by_set_iteration():
-    """The shape of the bug, not just this instance."""
-    src = (SRC / "supply.py").read_text(encoding="utf-8")
-    assert "for sub in set(" not in src
-    assert "dict.fromkeys(subs)" in src
+    """The shape of the bug, not just one instance."""
+    for name in ("supply.py", "data_loaders.py", "buildability.py"):
+        src = (SRC / name).read_text(encoding="utf-8")
+        assert "in set(" not in src, name
 
 
 # ---------------------------------------------------------------------------
@@ -55,27 +54,15 @@ def test_no_rng_is_driven_by_set_iteration():
 
 @pytest.fixture(scope="module")
 def rows():
-    import numpy as np
-    import supplier_analytics as SA
-    base = supply.build()
-    risk = {r["supplier_id"]: r for r in SA.risk_score(base)}
     out = []
-    for part, c in sorted(base.components.items()):
-        if c.supplier_id is None:
-            continue
-        s = base.suppliers[c.supplier_id]
-        weekly = sum(supply.explode(base, p, 1.0).get(part, 0.0)
-                     * float(np.mean(base.demand[p])) for p in base.products)
-        d = weekly / 7.0
-        if d <= 0:
-            continue
-        slack = c.on_hand / d - s.lead_mean_days
-        out.append({"part": part, "supplier_id": c.supplier_id,
-                    "days_of_slack": slack, "lead_days": s.lead_mean_days,
-                    "units_at_risk": max(-slack, 0.0) * d,
-                    "value_at_risk": max(-slack, 0.0) * d * c.unit_cost,
-                    "single_sourced": c.single_sourced,
-                    "risk_score": risk.get(c.supplier_id, {}).get("risk_score", 0.0)})
+    slacks = [-5.0, 2.0, 8.0, 14.0, 25.0, 60.0]
+    for s in range(6):
+        for k, slack in enumerate(slacks[: 3 + s % 4]):
+            out.append({"part": f"S{s}-P{k}", "supplier_id": f"SUP{s}",
+                        "days_of_slack": slack + s, "lead_days": 20.0,
+                        "units_at_risk": 10.0 * (k + 1),
+                        "value_at_risk": 100.0 * (k + 1) * (s + 1),
+                        "single_sourced": (s + k) % 5 == 0, "risk_score": 0.1 * s})
     return out
 
 
@@ -91,8 +78,8 @@ def incs(alerts):
 
 
 def test_grouping_loses_no_part_and_no_value(alerts, incs):
-    """The check that keeps the reduction honest -- a report that leads with
-    "260 became 108" while parts vanish has substituted a metric for the work."""
+    """A report that leads with "N became M" while parts vanish has swapped a
+    metric for the work."""
     lc = IN.load_check(alerts, incs)
     assert lc["parts_covered_after"] == lc["parts_covered_before"]
     assert lc["value_after"] == pytest.approx(lc["value_before"])
@@ -105,9 +92,6 @@ def test_one_incident_per_supplier_and_severity(incs):
 
 
 def test_severities_are_not_collapsed_onto_the_worst(incs):
-    """A supplier with a P1 and some P4s is two conversations on two clocks.
-    Collapsing them forces the whole group onto the P1 SLA -- the original
-    problem, arrived at from the other direction."""
     multi = {}
     for i in incs:
         if i.supplier_id:
@@ -128,32 +112,28 @@ def test_an_alert_without_a_supplier_stays_individual():
     assert all(i.supplier_id is None and i.n_parts == 1 for i in inc)
 
 
-def test_the_load_check_still_fails_after_grouping(alerts, incs):
-    """The finding. Grouping was the fix the README named and it is worth
-    roughly half the count -- and the queue is still four times too long."""
+def test_grouping_never_lengthens_the_worst_queue(alerts, incs):
     lc = IN.load_check(alerts, incs)
-    assert lc["passes_before"] is False
-    assert lc["passes_after"] is False
-    assert lc["reduction_pct"] > 40
+    assert lc["worst_p1_after"]["items"] <= lc["worst_p1_before"]["items"]
+    assert lc["busiest_after"]["items"] <= lc["busiest_before"]["items"]
 
 
-def test_alerts_are_not_concentrated_on_a_few_suppliers(alerts):
-    """Why grouping could not have been sufficient: the stated diagnosis
-    assumed concentration, and there is not much."""
+def test_concentration_shares_are_proper(alerts):
     c = IN.concentration(alerts)
-    assert c["n_suppliers"] > 30
-    assert c["top_share"] < 0.35
+    assert c["n_suppliers"] == 6
+    assert 0 < c["top_share"] <= 1
+    assert sum(r["alerts"] for r in c["top"]) <= len(alerts)
 
 
-def test_the_threshold_sweep_has_a_floor_and_it_is_correct(rows):
-    """Parts already at or below zero slack cannot be demoted by a slack-ratio
-    threshold, and should not be: ordering now does not recover them."""
+def test_tightening_the_p1_ratio_never_adds_p1s_and_keeps_the_floor(rows):
+    """Parts at or below zero slack cannot be demoted by a ratio threshold:
+    ordering now does not recover them."""
     cal = IN.calibrate(rows)
-    tight = cal["sweep"][-1]
+    p1 = [r["p1_alerts"] for r in cal["sweep"]]
+    assert p1 == sorted(p1, reverse=True)
     already_short = sum(1 for r in rows if r["days_of_slack"] <= 0)
     assert already_short > 0
-    assert tight["p1_alerts"] >= already_short * 0.5
-    assert cal["first_passing_p1"] is None
+    assert cal["sweep"][-1]["p1_alerts"] >= already_short
 
 
 def test_calibrate_restores_the_severity_function(rows):
@@ -167,6 +147,14 @@ def test_value_triage_reports_a_verdict_rather_than_a_number(incs):
     assert 0.0 <= vt["top_n_share_of_p1_value"] <= 1.0
     assert vt["incidents_for_80pct_of_p1_value"] >= 1
     assert "workable" in vt["verdict"]
+
+
+def test_value_triage_with_no_p1_says_so():
+    a = RT.build_alerts([{"part": "X", "supplier_id": "S", "days_of_slack": 90.0,
+                          "lead_days": 10.0, "units_at_risk": 0.0,
+                          "value_at_risk": 0.0}])
+    vt = IN.value_triage(IN.group_by_supplier(a))
+    assert vt["n_p1_incidents"] == 0 and "no P1" in vt["verdict"]
 
 
 # ---------------------------------------------------------------------------
